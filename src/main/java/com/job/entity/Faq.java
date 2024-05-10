@@ -20,7 +20,7 @@ public class Faq {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,
-    generator = "FAQL_SEQ_GENERATOR")
+    generator = "FAQ_SEQ_GENERATOR")
     @Column(name = "faq_idx", nullable = false, unique = true, updatable = false)
 	private Long faqIdx;
 	
