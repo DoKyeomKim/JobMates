@@ -162,6 +162,7 @@
 			<%@include file="/WEB-INF/views/fragment/postResult.jsp"%>
 		</div>
 	</div>
+	    <script src="/js/postingScrap.js"></script>
 	    <script src="/js/search.js"></script>
 </body>
 </html>

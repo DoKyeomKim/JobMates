@@ -4,13 +4,18 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
+import com.job.dto.PostingScrapDto;
 import com.job.dto.PostingWithFileDto;
 import com.job.dto.SkillDto;
 import com.job.service.MainService;
@@ -48,9 +53,6 @@ public class MainController {
 			mv.addObject("skills", skillList);
 			mv.addObject("posts", lists);
 		}
-		
-		
-
 		return mv;
 	}
 
@@ -84,4 +86,44 @@ public class MainController {
 		
 		return mv;
 	}
+	
+	@PostMapping("/ScrapAdd")
+	public ResponseEntity<?> addScrap(@RequestBody PostingScrapDto postingScrapDto) {
+		try {
+			mainService.insertPostingScrap(postingScrapDto);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("스크랩 추가에 실패했습니다.");
+		}
+	}
+
+	@DeleteMapping("/ScrapDelete")
+	public ResponseEntity<?> deleteScrap(@RequestBody PostingScrapDto postingScrapDto) {
+		try {
+			mainService.deletePostingScrap(postingScrapDto);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("스크랩 삭제에 실패했습니다.");
+		}
+	}
+
+	@GetMapping("/CheckScrap")
+	public ResponseEntity<?> checkScrap(@RequestParam("postingIdx") Long postingIdx, @RequestParam("personIdx") Long personIdx) {
+		Long scarapCount = mainService.countPostingScrap(personIdx, postingIdx);
+		try {
+
+			if (scarapCount != 0) {
+				boolean isScraped = true;
+				return ResponseEntity.ok(isScraped);
+			} else {
+				boolean isScraped = false;
+				return ResponseEntity.ok(isScraped);
+			}
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("스크랩 상태 확인에 실패했습니다.");
+		}
+	}
+	
+	
 }

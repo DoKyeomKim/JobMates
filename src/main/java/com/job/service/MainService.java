@@ -2,6 +2,7 @@ package com.job.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -12,16 +13,19 @@ import com.job.dto.CompanyDto;
 import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
+import com.job.dto.PostingScrapDto;
 import com.job.dto.PostingWithFileDto;
 import com.job.dto.SkillDto;
 import com.job.entity.Company;
 import com.job.entity.CompanyFile;
 import com.job.entity.Person;
 import com.job.entity.Posting;
+import com.job.entity.PostingScrap;
 import com.job.entity.Skill;
 import com.job.entity.User;
 import com.job.repository.PersonRepository;
 import com.job.repository.PostingRepository;
+import com.job.repository.PostingScrapRepository;
 import com.job.repository.SkillRepository;
 
 import jakarta.persistence.EntityManager;
@@ -32,6 +36,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -40,8 +45,13 @@ public class MainService {
 
 	@Autowired
 	private PostingRepository postingRepository;
+
+	@Autowired
+	private PostingScrapRepository postingScrapRepository;
+
 	@Autowired
 	private SkillRepository skillRepository;
+
 	@Autowired
 	private PersonRepository personRepository;
 
@@ -216,21 +226,47 @@ public class MainService {
 	}
 
 	public PersonDto findPersonByUserIdx(Long userIdx) {
-		Optional<Person> personOpt =personRepository.findByUserUserIdx(userIdx);
+		Optional<Person> personOpt = personRepository.findByUserUserIdx(userIdx);
 		if (!personOpt.isPresent()) {
 			return null; // 또는 예외 처리
 		}
 		Person person = personOpt.get();
-		PersonDto personDto = new PersonDto(
-		        person.getPersonIdx(),
-		        person.getUser().getUserIdx(), // User 객체에서 Id 값을 가져옴
-		        person.getPersonName(),
-		        person.getPersonPhone(),
-		        person.getPersonAddress(),
-		        person.getPersonBirth(),
-		        person.getPersonEducation()
-		    );
+		PersonDto personDto = new PersonDto(person.getPersonIdx(), person.getUser().getUserIdx(), // User 객체에서 Id 값을 가져옴
+				person.getPersonName(), person.getPersonPhone(), person.getPersonAddress(), person.getPersonBirth(),
+				person.getPersonEducation());
 		return personDto;
+	}
+
+	public Long countPostingScrap(Long personIdx, Long postingIdx) {
+		long postingScrapCount = postingScrapRepository.countByPersonPersonIdxAndPostingPostingIdx(personIdx,
+				postingIdx);
+		return postingScrapCount;
+	}
+
+	public void insertPostingScrap(PostingScrapDto postingScrapDto) {
+		// personIdx와 postingIdx로 Person과 Posting 인스턴스 찾기
+		Person person = personRepository.findById(postingScrapDto.getPersonIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Person을 찾을 수 없습니다."));
+		Posting posting = postingRepository.findById(postingScrapDto.getPostingIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Posting을 찾을 수 없습니다."));
+
+		// PostingScrap 인스턴스 생성 및 설정
+		PostingScrap postingScrap = PostingScrap.builder().person(person).posting(posting).build();
+
+		postingScrapRepository.save(postingScrap);
+	}
+	@Transactional
+	public void deletePostingScrap(PostingScrapDto postingScrapDto) {
+		Person person = personRepository.findById(postingScrapDto.getPersonIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Person을 찾을 수 없습니다."));
+		
+		Posting posting = postingRepository.findById(postingScrapDto.getPostingIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Posting을 찾을 수 없습니다."));
+		
+		// PostingScrap 인스턴스 생성 및 설정
+		PostingScrap postingScrap = PostingScrap.builder().person(person).posting(posting).build();
+		
+		postingScrapRepository.delete(postingScrap);
 	}
 
 }

@@ -9,11 +9,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 
 @Table(name = "POSTING_SCRAP_TB")  //  table 이름과 클래스 이름이 다를때 사용 (oracle은 user table 못만듬)
 @Getter
 @Entity
+@Builder
 @SequenceGenerator(name="PSCRAP_SEQ_GENERATOR", 
 sequenceName   = "PSCRAP_SEQ", 
 initialValue   = 1,     // 초기값
