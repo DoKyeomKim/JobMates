@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
+import com.job.dto.PostingWithFileDto;
 import com.job.dto.SkillDto;
-import com.job.entity.Skill;
 import com.job.service.MainService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,29 @@ public class MainController {
 	@GetMapping("/")
 	public ModelAndView main() {
 		ModelAndView mv = new ModelAndView("section/main");
-		List<SkillDto> skillList = mainService.findAllSkills();
-		log.info("skills = {}", skillList);
-		mv.addObject("skills", skillList);
+		Long userType= (long) 2;
+		
+		if(userType == 1) {
+			Long userIdx = (long) 1;
+			List<PostingWithFileDto> lists = mainService.findPostingByUserIdx(userIdx);
+			log.info("lists = {}", lists);
+			mv.addObject("userType", userType);
+			mv.addObject("posts", lists);
+		} else {
+			Long userIdx = (long) 3;
+			PersonDto person = mainService.findPersonByUserIdx(userIdx);
+			log.info("person = {}",person);
+			List<PostingWithFileDto> lists = mainService.findAllPosting();
+			List<SkillDto> skillList = mainService.findAllSkills();
+			log.info("lists = {}", lists);
+			mv.addObject("person", person);
+			mv.addObject("userType", userType);
+			mv.addObject("skills", skillList);
+			mv.addObject("posts", lists);
+		}
+		
+		
+
 		return mv;
 	}
 
@@ -53,7 +74,7 @@ public class MainController {
 	@GetMapping("/SearchResult")
 	public ModelAndView searchResult(@RequestParam("region") String region,@RequestParam("experience") String experience, @RequestParam("selectedSkills") List<Long> selectedSkills, @RequestParam("selectedJobs") List<String> selectedJobs) {
 		ModelAndView mv = new ModelAndView("fragment/postResult");
-		List<PostingDto> lists = mainService.findPostingBySearchResult(region, experience, selectedSkills, selectedJobs);
+		List<PostingWithFileDto> lists = mainService.findPostingBySearchResult(region, experience, selectedSkills, selectedJobs);
 		mv.addObject("posts", lists);
 		log.info("lists = {}",lists);
 		

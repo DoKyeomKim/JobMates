@@ -23,7 +23,7 @@ public class CompanyFile {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,
     generator = "COMPANY_FILE_SEQ_GENERATOR")
-    @Column(name = "resume_file_idx", nullable = false, unique = true, updatable = false)
+    @Column(name = "company_file_idx", nullable = false, unique = true, updatable = false)
 	private Long companyFileIdx;
 	
 	@ManyToOne                      // 관계 : 다대일 설정 (USER <-> Company)  
