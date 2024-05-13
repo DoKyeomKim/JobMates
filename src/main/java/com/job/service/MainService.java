@@ -9,23 +9,33 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.job.dto.ApplyDto;
 import com.job.dto.CompanyDto;
 import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingScrapDto;
+import com.job.dto.PostingSkillDto;
 import com.job.dto.PostingWithFileDto;
+import com.job.dto.ResumeDto;
 import com.job.dto.SkillDto;
+import com.job.entity.Apply;
 import com.job.entity.Company;
 import com.job.entity.CompanyFile;
 import com.job.entity.Person;
 import com.job.entity.Posting;
 import com.job.entity.PostingScrap;
+import com.job.entity.PostingSkill;
+import com.job.entity.Resume;
 import com.job.entity.Skill;
 import com.job.entity.User;
+import com.job.repository.ApplyRepository;
+import com.job.repository.CompanyRepository;
 import com.job.repository.PersonRepository;
 import com.job.repository.PostingRepository;
 import com.job.repository.PostingScrapRepository;
+import com.job.repository.PostingskillRepository;
+import com.job.repository.ResumeRepository;
 import com.job.repository.SkillRepository;
 
 import jakarta.persistence.EntityManager;
@@ -44,6 +54,12 @@ import lombok.extern.slf4j.Slf4j;
 public class MainService {
 
 	@Autowired
+	private ResumeRepository resumeRepository;
+	
+	@Autowired
+	private CompanyRepository companyRepository;
+
+	@Autowired
 	private PostingRepository postingRepository;
 
 	@Autowired
@@ -55,6 +71,12 @@ public class MainService {
 	@Autowired
 	private PersonRepository personRepository;
 
+	@Autowired
+	private PostingskillRepository postingSkillRepository;
+
+	@Autowired
+	private ApplyRepository applyRepository;
+	
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -151,7 +173,7 @@ public class MainService {
 		return postingWithFileDtos;
 	}
 
-	public List<PostingWithFileDto> findPostingByUserIdx(Long userIdx) {
+	public List<PostingWithFileDto> findPostingsByUserIdx(Long userIdx) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
 
@@ -255,18 +277,85 @@ public class MainService {
 
 		postingScrapRepository.save(postingScrap);
 	}
+
 	@Transactional
-	public void deletePostingScrap(PostingScrapDto postingScrapDto) {
+	public void deleteScrap(PostingScrapDto postingScrapDto) {
 		Person person = personRepository.findById(postingScrapDto.getPersonIdx())
 				.orElseThrow(() -> new NoSuchElementException("해당 Person을 찾을 수 없습니다."));
-		
 		Posting posting = postingRepository.findById(postingScrapDto.getPostingIdx())
 				.orElseThrow(() -> new NoSuchElementException("해당 Posting을 찾을 수 없습니다."));
-		
+
 		// PostingScrap 인스턴스 생성 및 설정
 		PostingScrap postingScrap = PostingScrap.builder().person(person).posting(posting).build();
+
+		postingScrapRepository.deleteByPostingPostingIdxAndPersonPersonIdx(postingScrap.getPosting().getPostingIdx(),
+				postingScrap.getPerson().getPersonIdx());
+	}
+
+	public PostingDto findPostingByPostingIdx(Long postingIdx) {
+		Optional<Posting> PostingOpt = postingRepository.findPostingByPostingIdx(postingIdx);
+		if (!PostingOpt.isPresent()) {
+			return null; // 또는 예외 처리
+		}
+		Posting posting = PostingOpt.get();
+		PostingDto postingDto = new PostingDto(posting.getPostingIdx(), posting.getUser().getUserIdx(), // User 객체에서 Id
+																										// 값을 가져옴
+				posting.getPostingTitle(), posting.getPostingComment(), posting.getExperience(), posting.getEmpType(),
+				posting.getSalary(), posting.getStartTime(), posting.getEndTime(), posting.getPostingDeadline(),
+				posting.getJobType(), posting.getCreatedDate(), posting.getPostingAddress());
+		return postingDto;
+	}
+
+	public CompanyDto findCompanyByUserIdx(Long userIdx) {
+		Optional<Company> CompanyOpt = companyRepository.findCompanyByUserUserIdx(userIdx);
+		if (!CompanyOpt.isPresent()) {
+			return null; // 또는 예외 처리
+		}
+		CompanyDto companyDto = CompanyDto.createCompanyDto(CompanyOpt.get());
+		return companyDto;
+	}
+
+	public List<SkillDto> findSkillListByPostingIdx(Long postingIdx) {
+		List<PostingSkill> postingSkills = postingSkillRepository.findPostinSkillByPostingPostingIdx(postingIdx);
+		List<SkillDto> skills = new ArrayList<>();
+	      for (PostingSkill postingSkill : postingSkills) {
+	            Skill skill = skillRepository.findById(postingSkill.getSkill().getSkillIdx()).orElse(null);
+	            if (skill != null) {
+	            	
+	                SkillDto skillDto = SkillDto.createSkillDto(skill);
+	                skills.add(skillDto);
+	            }
+	        }
+		return skills;
+	}
+
+	public List<ResumeDto> findResumeByUserIdx(Long userIdx) {
+		List<Resume> resumes = resumeRepository.findByUserUserIdx(userIdx);
+		return  resumes.stream().map(resume -> ResumeDto.createResumeDto(resume))
+				.collect(Collectors.toList());
+	}
+
+	public ResumeDto findResumeByResumeIdx(Long resumeIdx) {
+		Optional<Resume> ResumeOpt = resumeRepository.findResumeByResumeIdx(resumeIdx);
+		if (!ResumeOpt.isPresent()) {
+			return null; // 또는 예외 처리
+		}
+		ResumeDto resumeDto = ResumeDto.createResumeDto(ResumeOpt.get());
+		return resumeDto;
+	}
+
+	public void insertApply(ApplyDto applyDto) {
+		// personIdx와 postingIdx로 Person과 Posting 인스턴스 찾기
+		Resume resume = resumeRepository.findById(applyDto.getResumeIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Resume을 찾을 수 없습니다."));
+		Posting posting = postingRepository.findById(applyDto.getPostingIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Posting을 찾을 수 없습니다."));
+		Person person = personRepository.findById(applyDto.getPersonIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Person을 찾을 수 없습니다."));
 		
-		postingScrapRepository.delete(postingScrap);
+		Apply apply = Apply.builder().resume(resume).person(person).posting(posting).applyStatus((long) 1).build();
+
+		applyRepository.save(apply);
 	}
 
 }

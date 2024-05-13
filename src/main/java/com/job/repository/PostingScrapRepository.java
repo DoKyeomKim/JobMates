@@ -19,8 +19,6 @@ public interface PostingScrapRepository extends JpaRepository<PostingScrap, Long
 
 	Optional<PostingScrap> findByPersonAndPosting(Person person, Posting posting);
 
-	void deleteByPersonPersonIdxAndPostingPostingIdx(Long personIdx, Long postingIdx);
+	void deleteByPostingPostingIdxAndPersonPersonIdx(Long postingIdx, Long personIdx);
 
-	PostingScrap findByPersonPersonIdxAndPostingPostingIdx(Long personIdx, Long postingIdx);
-    
 }

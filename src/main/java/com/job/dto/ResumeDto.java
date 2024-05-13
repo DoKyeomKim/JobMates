@@ -1,11 +1,14 @@
 package com.job.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.job.entity.Resume;
 
-@Setter
-@Getter
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ResumeDto {   
 	private Long resumeIdx;
 	private Long userIdx;
@@ -14,4 +17,17 @@ public class ResumeDto {
 	private Long publish;
 	private String resumeComment;
 	private String createdDate;
+	
+	public static ResumeDto createResumeDto(Resume resume) {
+		return new ResumeDto(
+				resume.getResumeIdx(),
+				resume.getUser().getUserIdx(),
+				resume.getResumeTitle(),
+				resume.getPortfolio(),
+				resume.getPublish(),
+				resume.getResumeComment(),
+				resume.getCreatedDate()
+				);
+	}
+
 }

@@ -3,15 +3,41 @@ document.addEventListener("DOMContentLoaded", function() {
 	var clearIcons = document.querySelectorAll(".clear-icon"); // 수정된 부분
 	var searchInputs = document.querySelectorAll(".search-input"); // 수정된 부분
 	var timer; // 타이머 전역 변수 선언
-	
+	const personIdx = document.getElementById('personIdx').value; // 현재 사용자 ID
+
+	function updateScrapButtons() {
+		const scrapButtons = document.querySelectorAll('.scrapBtn');
+		scrapButtons.forEach(function(button) {
+			const postingIdx = button.getAttribute('data-posting-idx');
+
+			// 스크랩 상태 확인 요청
+			fetch(`/CheckScrap?postingIdx=` + postingIdx + `&personIdx=` + personIdx, {
+				method: 'GET',
+			})
+				.then(response => response.json())
+				.then(isScraped => {
+					button.setAttribute('data-scraped', isScraped);
+					if (isScraped) {
+						button.setAttribute('fill', 'yellow');
+					} else {
+						button.setAttribute('fill', 'none');
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+		});
+	}
+
+
 	document.getElementById('btn-region').textContent = '지역 전국';
-    
-    // 경력 슬라이더의 현재 값에 따라 경력 텍스트를 초기화
-    var experienceSliderValue = document.getElementById('experienceSlider').value;
-    var experienceLabel = experienceSliderValue === '-1' ? '무관' : experienceSliderValue === '0' ? '신입' : experienceSliderValue === '11' ? '10년차 이상' : experienceSliderValue + '년차';
-    document.getElementById('experienceValue').innerText = experienceLabel;
-    document.getElementById('btn_experience').innerText = '경력 ' + experienceLabel;
-	
+
+	// 경력 슬라이더의 현재 값에 따라 경력 텍스트를 초기화
+	var experienceSliderValue = document.getElementById('experienceSlider').value;
+	var experienceLabel = experienceSliderValue === '-1' ? '무관' : experienceSliderValue === '0' ? '신입' : experienceSliderValue === '11' ? '10년차 이상' : experienceSliderValue + '년차';
+	document.getElementById('experienceValue').innerText = experienceLabel;
+	document.getElementById('btn_experience').innerText = '경력 ' + experienceLabel;
+
 	// 경력 슬라이더 이벤트 리스너
 	document.getElementById('experienceSlider').addEventListener('input', function() {
 		var value = this.value;
@@ -75,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			.then(response => response.text())
 			.then(response => {
 				document.querySelector("#result").innerHTML = response;
+				updateScrapButtons();
 			})
 			.catch(error => {
 				console.error("Error: " + error);
@@ -216,10 +243,6 @@ document.addEventListener("DOMContentLoaded", function() {
 					jobTypeTxt.textContent = '직무 전체';
 				}
 			});
-
-
-
-
 
 		});
 

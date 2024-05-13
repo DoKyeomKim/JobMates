@@ -1,5 +1,8 @@
 package com.job.entity;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,13 +10,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 
 @Table(name = "APPLY_TB")  //  table 이름과 클래스 이름이 다를때 사용 (oracle은 user table 못만듬)
 @Getter
 @Entity
+@Builder
 @SequenceGenerator(name="APPLY_SEQ_GENERATOR", 
 sequenceName   = "APPLY_SEQ", 
 initialValue   = 1,     // 초기값
@@ -44,4 +50,10 @@ public class Apply {
 	
 	@Column(name = "apply_status", nullable = false)
 	private Long applyStatus;
+	
+	@PrePersist
+	public void prePersist() {
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	    this.createdDate = LocalDateTime.now().format(formatter);
+	}
 }

@@ -11,6 +11,11 @@
 	align-items: center;
 }
 
+.scrapBtn {
+	display: inline-block; /* 올바른 크기 조정을 위해 */
+	cursor: pointer; /* 마우스 커서 변경 */
+}
+
 .search-box input {
 	padding-left: 35px; /* 왼쪽에 아이콘을 위한 여백 */
 	padding-right: 35px; /* 'X' 버튼을 위한 여백 */
@@ -53,6 +58,10 @@
 	display: none;
 	cursor: pointer;
 	/* 필요한 추가 스타일 */
+}
+
+.detail-div {
+	cursor: pointer;
 }
 </style>
 </head>
@@ -162,7 +171,6 @@
 			<%@include file="/WEB-INF/views/fragment/postResult.jsp"%>
 		</div>
 	</div>
-	    <script src="/js/postingScrap.js"></script>
-	    <script src="/js/search.js"></script>
+	<script src="/js/search.js"></script>
 </body>
 </html>

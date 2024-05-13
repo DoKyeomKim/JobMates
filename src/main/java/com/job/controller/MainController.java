@@ -8,15 +8,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.job.dto.ApplyDto;
+import com.job.dto.CompanyDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingScrapDto;
 import com.job.dto.PostingWithFileDto;
+import com.job.dto.ResumeDto;
 import com.job.dto.SkillDto;
 import com.job.service.MainService;
 
@@ -33,18 +37,18 @@ public class MainController {
 	@GetMapping("/")
 	public ModelAndView main() {
 		ModelAndView mv = new ModelAndView("section/main");
-		Long userType= (long) 2;
-		
-		if(userType == 1) {
+		Long userType = (long) 2;
+
+		if (userType == 1) {
 			Long userIdx = (long) 1;
-			List<PostingWithFileDto> lists = mainService.findPostingByUserIdx(userIdx);
+			List<PostingWithFileDto> lists = mainService.findPostingsByUserIdx(userIdx);
 			log.info("lists = {}", lists);
 			mv.addObject("userType", userType);
 			mv.addObject("posts", lists);
 		} else {
 			Long userIdx = (long) 3;
 			PersonDto person = mainService.findPersonByUserIdx(userIdx);
-			log.info("person = {}",person);
+			log.info("person = {}", person);
 			List<PostingWithFileDto> lists = mainService.findAllPosting();
 			List<SkillDto> skillList = mainService.findAllSkills();
 			log.info("lists = {}", lists);
@@ -74,19 +78,22 @@ public class MainController {
 	}
 
 	@GetMapping("/SearchResult")
-	public ModelAndView searchResult(@RequestParam("region") String region,@RequestParam("experience") String experience, @RequestParam("selectedSkills") List<Long> selectedSkills, @RequestParam("selectedJobs") List<String> selectedJobs) {
+	public ModelAndView searchResult(@RequestParam("region") String region,
+			@RequestParam("experience") String experience, @RequestParam("selectedSkills") List<Long> selectedSkills,
+			@RequestParam("selectedJobs") List<String> selectedJobs) {
 		ModelAndView mv = new ModelAndView("fragment/postResult");
-		List<PostingWithFileDto> lists = mainService.findPostingBySearchResult(region, experience, selectedSkills, selectedJobs);
+		List<PostingWithFileDto> lists = mainService.findPostingBySearchResult(region, experience, selectedSkills,
+				selectedJobs);
 		mv.addObject("posts", lists);
-		log.info("lists = {}",lists);
-		
+		log.info("lists = {}", lists);
+
 		List<SkillDto> skillList = mainService.findAllSkills();
 		log.info("skills = {}", skillList);
 		mv.addObject("skills", skillList);
-		
+
 		return mv;
 	}
-	
+
 	@PostMapping("/ScrapAdd")
 	public ResponseEntity<?> addScrap(@RequestBody PostingScrapDto postingScrapDto) {
 		try {
@@ -100,15 +107,19 @@ public class MainController {
 	@DeleteMapping("/ScrapDelete")
 	public ResponseEntity<?> deleteScrap(@RequestBody PostingScrapDto postingScrapDto) {
 		try {
-			mainService.deletePostingScrap(postingScrapDto);
+			mainService.deleteScrap(postingScrapDto);
+			log.info("postingScrapDto = {}", postingScrapDto);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
+			log.info("postingScrapDto = {}", postingScrapDto);
+			log.error("스크랩 삭제 처리 중 오류 발생", e); // 로그 출력 예
 			return ResponseEntity.badRequest().body("스크랩 삭제에 실패했습니다.");
 		}
 	}
 
 	@GetMapping("/CheckScrap")
-	public ResponseEntity<?> checkScrap(@RequestParam("postingIdx") Long postingIdx, @RequestParam("personIdx") Long personIdx) {
+	public ResponseEntity<?> checkScrap(@RequestParam("postingIdx") Long postingIdx,
+			@RequestParam("personIdx") Long personIdx) {
 		Long scarapCount = mainService.countPostingScrap(personIdx, postingIdx);
 		try {
 
@@ -122,6 +133,57 @@ public class MainController {
 
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("스크랩 상태 확인에 실패했습니다.");
+		}
+	}
+
+	@GetMapping("/MainPosting/{postingIdx}")
+	public ModelAndView mainPosting(@PathVariable("postingIdx") Long postingIdx ) {
+		ModelAndView mv = new ModelAndView("section/mainPosting");
+		Long userIdx = (long) 3;
+		PersonDto person = mainService.findPersonByUserIdx(userIdx);
+		PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
+		Long postingUserIdx = posting.getUserIdx();
+		CompanyDto company = mainService.findCompanyByUserIdx(postingUserIdx);
+		List<SkillDto> skills = mainService.findSkillListByPostingIdx(postingIdx);
+		mv.addObject("company", company);
+		mv.addObject("posting", posting);
+		mv.addObject("skills", skills);
+		log.info("company = {}",company);
+		log.info("posting = {}",posting);
+		log.info("skills = {}",skills);
+		return mv;
+	}
+	@GetMapping("/applyForm/{postingIdx}")
+	public ModelAndView applyForm(@PathVariable("postingIdx") Long postingIdx ) {
+		ModelAndView mv = new ModelAndView("fragment/applyForm");
+		Long userIdx = (long) 3;
+		PersonDto person = mainService.findPersonByUserIdx(userIdx);
+		PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
+		Long postingUserIdx = posting.getUserIdx();
+		CompanyDto company = mainService.findCompanyByUserIdx(postingUserIdx);
+		List<ResumeDto> resumes = mainService.findResumeByUserIdx(userIdx);
+		mv.addObject("company", company);
+		mv.addObject("posting", posting);
+		mv.addObject("person", person);
+		mv.addObject("resumes", resumes);
+		return mv;
+	}
+	
+	@GetMapping("/ResumeSelect")
+	public ModelAndView selectResume(@RequestParam("resumeIdx") Long resumeIdx)  {
+		ModelAndView mv = new ModelAndView("fragment/selectedResume");
+		ResumeDto resume = mainService.findResumeByResumeIdx(resumeIdx);
+		mv.addObject("resume", resume);
+		return mv;
+	}
+	
+	@PostMapping("/ApplyPosting")
+	public ResponseEntity<?> postApply(@RequestBody ApplyDto applyDto) {
+		try {
+			mainService.insertApply(applyDto);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("스크랩 추가에 실패했습니다.");
 		}
 	}
 	
