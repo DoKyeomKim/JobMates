@@ -135,7 +135,7 @@ public class UserController {
 		@RequestMapping("/logout")
 		public   String   logout(  HttpSession  session    ) {
 			session.invalidate();
-			return  "/personlogin";
+			return  "redirect:/personlogin";
 		}
 		//기업로그인을 한다
 		@PostMapping("/companylogin")

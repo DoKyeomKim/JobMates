@@ -30,4 +30,19 @@
 		WHERE PERSON_IDX = #{ personIdx }
 	</update>
 
+	<select id="getPersonByUserIdx">
+		SELECT
+		PERSON_IDX,
+		PERSON_ADDRESS,
+		PERSON_BIRTH,
+		PERSON_EDUCATION,
+		PERSON_NAME,
+		PERSON_PHONE,
+		USER_EMAIL
+		FROM
+		PERSON_TB
+		WHERE
+		USER_IDX = #{ userIdx }
+	</select>
+
 </mapper>

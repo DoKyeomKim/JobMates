@@ -36,29 +36,49 @@ public class MainController {
 	@Autowired
 	private MainService mainService;
 
-	// 메인 페이지
 	@GetMapping("/")
-	public ModelAndView main(@SessionAttribute("login") UserDto user) {
+	public ModelAndView main(HttpSession session) {
 		ModelAndView mv = new ModelAndView("section/main");
-		Long userType = (long) 2;
+		UserDto user = (UserDto) session.getAttribute("login");
 
-		if (userType == 1) {
-			Long userIdx = (long) 1;
-			List<PostingWithFileDto> lists = mainService.findPostingsByUserIdx(userIdx);
-			log.info("lists = {}", lists);
-			mv.addObject("userType", userType);
-			mv.addObject("posts", lists);
+		// 여기를 수정했습니다: isLoggedIn이 null이면 false를 기본값으로 사용합니다.
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+
+		log.info("isLoggedIn = {}", isLoggedIn);
+		log.info("user = {}", user);
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userType = user.getUserType();
+				log.info("user = {}", user);
+				if (userType == 1) {
+					Long userIdx = user.getUserIdx();
+					List<PostingWithFileDto> lists = mainService.findPostingsByUserIdx(userIdx);
+					log.info("lists = {}", lists);
+					mv.addObject("userType", userType);
+					mv.addObject("posts", lists);
+					return mv;
+				} else {
+					Long userIdx = user.getUserIdx();
+					PersonDto person = mainService.findPersonByUserIdx(userIdx);
+					log.info("person = {}", person);
+					List<PostingWithFileDto> lists = mainService.findAllPosting();
+					List<SkillDto> skillList = mainService.findAllSkills();
+					log.info("lists = {}", lists);
+					mv.addObject("person", person);
+					mv.addObject("userType", userType);
+					mv.addObject("skills", skillList);
+					mv.addObject("posts", lists);
+					return mv;
+				}
+			}
 		} else {
-			Long userIdx = (long) 3;
-			PersonDto person = mainService.findPersonByUserIdx(userIdx);
-			log.info("person = {}", person);
 			List<PostingWithFileDto> lists = mainService.findAllPosting();
-			List<SkillDto> skillList = mainService.findAllSkills();
 			log.info("lists = {}", lists);
-			mv.addObject("person", person);
-			mv.addObject("userType", userType);
+			List<SkillDto> skillList = mainService.findAllSkills();
 			mv.addObject("skills", skillList);
 			mv.addObject("posts", lists);
+			return mv;
 		}
 		return mv;
 	}
@@ -140,7 +160,7 @@ public class MainController {
 	}
 
 	@GetMapping("/MainPosting/{postingIdx}")
-	public ModelAndView mainPosting(@PathVariable("postingIdx") Long postingIdx ) {
+	public ModelAndView mainPosting(@PathVariable("postingIdx") Long postingIdx) {
 		ModelAndView mv = new ModelAndView("section/mainPosting");
 		Long userIdx = (long) 3;
 		PersonDto person = mainService.findPersonByUserIdx(userIdx);
@@ -151,13 +171,14 @@ public class MainController {
 		mv.addObject("company", company);
 		mv.addObject("posting", posting);
 		mv.addObject("skills", skills);
-		log.info("company = {}",company);
-		log.info("posting = {}",posting);
-		log.info("skills = {}",skills);
+		log.info("company = {}", company);
+		log.info("posting = {}", posting);
+		log.info("skills = {}", skills);
 		return mv;
 	}
+
 	@GetMapping("/applyForm/{postingIdx}")
-	public ModelAndView applyForm(@PathVariable("postingIdx") Long postingIdx ) {
+	public ModelAndView applyForm(@PathVariable("postingIdx") Long postingIdx) {
 		ModelAndView mv = new ModelAndView("fragment/applyForm");
 		Long userIdx = (long) 3;
 		PersonDto person = mainService.findPersonByUserIdx(userIdx);
@@ -171,15 +192,15 @@ public class MainController {
 		mv.addObject("resumes", resumes);
 		return mv;
 	}
-	
+
 	@GetMapping("/ResumeSelect")
-	public ModelAndView selectResume(@RequestParam("resumeIdx") Long resumeIdx)  {
+	public ModelAndView selectResume(@RequestParam("resumeIdx") Long resumeIdx) {
 		ModelAndView mv = new ModelAndView("fragment/selectedResume");
 		ResumeDto resume = mainService.findResumeByResumeIdx(resumeIdx);
 		mv.addObject("resume", resume);
 		return mv;
 	}
-	
+
 	@PostMapping("/ApplyPosting")
 	public ResponseEntity<?> postApply(@RequestBody ApplyDto applyDto) {
 		try {
@@ -189,6 +210,5 @@ public class MainController {
 			return ResponseEntity.badRequest().body("스크랩 추가에 실패했습니다.");
 		}
 	}
-	
-	
+
 }

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,120 +22,104 @@ header {
 	background-color: #e0f7fa;
 }
 </style>
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-		document.getElementById('experienceSlider').addEventListener('input', function() {
-			var value = this.value;
-			var label = value === '0' ? '신입' : value === '11' ? '10년차 이상' : value + '년차';
-			document.getElementById('experienceValue').innerText = label;
-			document.getElementById('btn_experience').innerText = '경력 ' + label; // 버튼 텍스트를 업데이트하는 부분을 수정했습니다.
-		});
-		  var dropdownItems = document.querySelectorAll('.region-item');
-		  dropdownItems.forEach(function(item) {
-		    item.addEventListener('click', function() {
-		      var value = this.getAttribute('data-value');
-		      var dropdownButton = document.getElementById('btn-region');
-		      dropdownButton.textContent = '지역: ' + value;
-		    });
-		  });
-	       const selectedTechStacksDiv = document.getElementById('selectedTechStacks');
-	        const techStackButton = document.getElementById('techStackButton');
-	        document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(item => {
-	            item.addEventListener('change', function () {
-	                let selectedItems = document.querySelectorAll('.dropdown-menu input[type="checkbox"]:checked');
-	                let selectedNames = Array.from(selectedItems).map(item => item.value);
-	                let textToShow = selectedNames.length > 1 ? `${selectedNames[0]} 외 ${selectedNames.length - 1}` : selectedNames[0] || '기술스택';
-	                techStackButton.textContent = textToShow;
-	                selectedTechStacksDiv.textContent = (selectedNames.join(', ') || '없음');
-	            });
-	        });
-	});
-</script>
 </head>
 <body>
-<%@include file="/WEB-INF/layouts/header.jsp"%>
-<section>
+	<%@include file="/WEB-INF/layouts/header.jsp"%>
+	<section>
 
-<div class="card card-info">
-<div class="card-header">
-<h3 class="card-title">회원정보 수정</h3>
-</div>
-
-
-<form class="form-horizontal" action="/mypageUpdate" method="POST">
-<div class="card-body">
-
-<div class="form-group row">
-<label for="inputEmail3" class="col-sm-2 col-form-label">아이디</label>
-<div class="col-sm-10">
-<input type="text" class="form-control" id="id" placeholder="아이디" value="${persondto.personIdx}" name="personIdx" readonly="readonly">
-</div>
-</div>
+		<div class="card card-info">
+			<div class="card-header">
+				<h3 class="card-title">회원정보 수정</h3>
+			</div>
 
 
-<div class="form-group row">
-<label for="inputPassword3" class="col-sm-2 col-form-label">주소</label>
-<div class="col-sm-10">
-<input type="text" class="form-control" id="address" placeholder="주소" value="${persondto.personAddress}" name="personAddress">
-</div>
-</div>
+			<form class="form-horizontal" action="/mypageUpdate" method="POST">
+				<div class="card-body">
 
-<div class="form-group row">
-<label for="inputPassword3" class="col-sm-2 col-form-label">생년월일</label>
-<div class="col-sm-10">
-<input type="text" class="form-control" id="birth" placeholder="생년월일" value="${persondto.personBirth}" name="personBirth">
-</div>
-</div>
-
-<div class="form-group row">
-<label for="inputPassword3" class="col-sm-2 col-form-label">학력</label>
-<div class="col-sm-10">
-<input type="text" class="form-control" id="edu" placeholder="학력" value="${persondto.personEducation}" name="personEducation">
-</div>
-</div>
-
-<div class="form-group row">
-<label for="inputPassword3" class="col-sm-2 col-form-label">이름</label>
-<div class="col-sm-10">
-<input type="text" class="form-control" id="name" placeholder="이름" value="${persondto.personName}" name="personName">
-</div>
-</div>
-
-<div class="form-group row">
-<label for="inputPassword3" class="col-sm-2 col-form-label">전화번호</label>
-<div class="col-sm-10">
-<input type="text" class="form-control" id="phone" placeholder="전화번호" value="${persondto.personPhone}" name="personPhone">
-</div>
-</div>
-
-<div class="form-group row">
-<label for="inputPassword3" class="col-sm-2 col-form-label">이메일</label>
-<div class="col-sm-10">
-<input type="email" class="form-control" id="email" placeholder="이메일" value="${persondto.userEmail}" name="userEmail">
-</div>
-</div>
-
-</div>
+					<div class="form-group row">
+						<label for="inputEmail3" class="col-sm-2 col-form-label">아이디</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="id" placeholder="아이디"
+								value="${persondto.personIdx}" name="personIdx"
+								readonly="readonly">
+						</div>
+					</div>
 
 
-<div class="card-footer">
-<button type="submit" class="btn btn-info">저장</button>
-</div>
+					<div class="form-group row">
+						<label for="inputPassword3" class="col-sm-2 col-form-label">주소</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="address"
+								placeholder="주소" value="${persondto.personAddress}"
+								name="personAddress">
+						</div>
+					</div>
 
-</form>
-</div>
+					<div class="form-group row">
+						<label for="inputPassword3" class="col-sm-2 col-form-label">생년월일</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="birth"
+								placeholder="생년월일" value="${persondto.personBirth}"
+								name="personBirth">
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label for="inputPassword3" class="col-sm-2 col-form-label">학력</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="edu" placeholder="학력"
+								value="${persondto.personEducation}" name="personEducation">
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label for="inputPassword3" class="col-sm-2 col-form-label">이름</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="name"
+								placeholder="이름" value="${persondto.personName}"
+								name="personName">
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label for="inputPassword3" class="col-sm-2 col-form-label">전화번호</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="phone"
+								placeholder="전화번호" value="${persondto.personPhone}"
+								name="personPhone">
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label for="inputPassword3" class="col-sm-2 col-form-label">이메일</label>
+						<div class="col-sm-10">
+							<input type="email" class="form-control" id="email"
+								placeholder="이메일" value="${persondto.userEmail}"
+								name="userEmail">
+						</div>
+					</div>
+
+				</div>
 
 
-  
-  
-  
-  
-  
-  
-  
-	
+				<div class="card-footer">
+					<button type="submit" class="btn btn-info">저장</button>
+				</div>
+
+			</form>
+		</div>
+
+
+
+
+
+
+
+
+
+
 	</section>
 	<%@include file="/WEB-INF/layouts/footer.jsp"%>
-		<script src="/js/bootstrap.bundle.min.js"></script>
+	<script src="/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

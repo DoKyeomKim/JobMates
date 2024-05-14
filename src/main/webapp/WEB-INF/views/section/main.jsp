@@ -22,24 +22,32 @@ footer {
 header {
 	background-color: #e0f7fa;
 }
-
 </style>
 
 </head>
 <body>
-    <%@include file="/WEB-INF/layouts/header.jsp"%>
-    <section id="section">
-        <c:choose>
-            <c:when test="${userType == 1}">
-                <%@ include file="/WEB-INF/views/fragment/companyMain.jsp" %>
-            </c:when>
-            <c:when test="${userType == 2}">
-                <%@ include file="/WEB-INF/views/fragment/personMain.jsp" %>
-            </c:when>
-        </c:choose>
-    </section>
-    <%@include file="/WEB-INF/layouts/footer.jsp"%>
-    <script src="/js/bootstrap.bundle.min.js"></script>
+	<%@include file="/WEB-INF/layouts/header.jsp"%>
+	<section id="section">
+		<c:choose>
+			<c:when test="${sessionScope.isLoggedIn}">
+				<c:choose>
+					<c:when test="${userType == 1}">
+						<%@ include file="/WEB-INF/views/fragment/companyMain.jsp"%>
+					</c:when>
+					<c:when test="${userType == 2}">
+						<%@ include file="/WEB-INF/views/fragment/personMain.jsp"%>
+					</c:when>
+				</c:choose>
+			</c:when>
+			<c:otherwise>
+				<%@ include file="/WEB-INF/views/fragment/personMain.jsp"%>
+			</c:otherwise>
+		</c:choose>
+
+
+	</section>
+	<%@include file="/WEB-INF/layouts/footer.jsp"%>
+	<script src="/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

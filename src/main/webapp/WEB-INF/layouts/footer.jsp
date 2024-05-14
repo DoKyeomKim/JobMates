@@ -8,7 +8,6 @@
  <footer class="bg-body-tertiary">
     <div class="container">
       <a href="#" class="text-dark" style="text-decoration: none;">고객센터</a> <!-- 링크 내용을 변경할 수 있습니다. -->
-      <a href="/logout" class="text-dark" style="text-decoration: none;">로그아웃</a> <!-- 링크 내용을 변경할 수 있습니다. -->
     </div>
   </footer>
 </body>

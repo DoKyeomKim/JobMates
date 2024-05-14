@@ -12,6 +12,7 @@ import com.job.dto.UserDto;
 import com.job.mapper.MypageMapper;
 import com.job.mapper.UserMapper;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -21,15 +22,28 @@ public class MypageController {
 	private MypageMapper mypageMapper;
 	// 공고 관리 페이지
 	@RequestMapping("/mypage")
-	public ModelAndView  mypage(PersonDto personDto) {
-		Long personIdx = (long) 1;
-		personDto.setPersonIdx(personIdx);
-		
-		PersonDto persondto = mypageMapper.getPerson(personDto);
+	public ModelAndView  mypage(HttpSession session) {
+		UserDto user = (UserDto) session.getAttribute("login");
+
 		ModelAndView mv = new ModelAndView();
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userType = user.getUserType();
+				Long userIdx = user.getUserIdx();
+				PersonDto persondto = mypageMapper.getPersonByUserIdx(userIdx);
+				mv.addObject("persondto", persondto);
+				mv.addObject("userType", userType);
+				mv.setViewName("section/mypage");
+				return mv;
+			}
+		} else {
+			mv.setViewName("redirect:/personlogin");
+			return mv;
+		}
 		
-		mv.addObject("persondto", persondto);
-		mv.setViewName("section/mypage");
+		
 		return mv; 
 	}
 	

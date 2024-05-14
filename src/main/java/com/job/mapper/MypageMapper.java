@@ -11,6 +11,8 @@ public interface MypageMapper {
 	PersonDto getPerson(PersonDto personDto);
 
 	void updatePerson(PersonDto personDto);
+
+	PersonDto getPersonByUserIdx(Long userIdx);
 	
 	
 

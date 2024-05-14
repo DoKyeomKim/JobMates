@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,35 +22,6 @@ header {
 	background-color: #e0f7fa;
 }
 </style>
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-		document.getElementById('experienceSlider').addEventListener('input', function() {
-			var value = this.value;
-			var label = value === '0' ? '신입' : value === '11' ? '10년차 이상' : value + '년차';
-			document.getElementById('experienceValue').innerText = label;
-			document.getElementById('btn_experience').innerText = '경력 ' + label; // 버튼 텍스트를 업데이트하는 부분을 수정했습니다.
-		});
-		  var dropdownItems = document.querySelectorAll('.region-item');
-		  dropdownItems.forEach(function(item) {
-		    item.addEventListener('click', function() {
-		      var value = this.getAttribute('data-value');
-		      var dropdownButton = document.getElementById('btn-region');
-		      dropdownButton.textContent = '지역: ' + value;
-		    });
-		  });
-	       const selectedTechStacksDiv = document.getElementById('selectedTechStacks');
-	        const techStackButton = document.getElementById('techStackButton');
-	        document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(item => {
-	            item.addEventListener('change', function () {
-	                let selectedItems = document.querySelectorAll('.dropdown-menu input[type="checkbox"]:checked');
-	                let selectedNames = Array.from(selectedItems).map(item => item.value);
-	                let textToShow = selectedNames.length > 1 ? `${selectedNames[0]} 외 ${selectedNames.length - 1}` : selectedNames[0] || '기술스택';
-	                techStackButton.textContent = textToShow;
-	                selectedTechStacksDiv.textContent = (selectedNames.join(', ') || '없음');
-	            });
-	        });
-	});
-</script>
 </head>
 <body>
 <%@include file="/WEB-INF/layouts/header.jsp"%>
