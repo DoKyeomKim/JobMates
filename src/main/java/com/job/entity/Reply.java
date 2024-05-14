@@ -23,7 +23,7 @@ public class Reply {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,
     generator = "REPLY_SEQ_GENERATOR")
-    @Column(name = "reply_idxreply_idx", nullable = false, unique = true, updatable = false)
+    @Column(name = "reply_idx", nullable = false, unique = true, updatable = false)
 	private Long replyIdx;
 	
 	@ManyToOne                      	// 관계 : 다대일 설정 (Community <-> Reply)  

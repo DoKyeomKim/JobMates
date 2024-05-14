@@ -1,8 +1,4 @@
 package com.job.dto;
-
-
-
-
 import com.job.entity.Person;
 
 import lombok.AllArgsConstructor;
@@ -13,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PersonDto {   
+
    private Long personIdx;
    private Long userIdx;
    private String personName;
@@ -28,4 +25,5 @@ public class PersonDto {
             person.getPersonEducation(),person.getUser().getUserEmail());
    }
    
+
 }

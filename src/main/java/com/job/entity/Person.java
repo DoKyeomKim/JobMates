@@ -11,44 +11,59 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@Table(name = "PERSON_TB")  //  table 이름과 클래스 이름이 다를때 사용 (oracle은 user table 못만듬)
+@Table(name = "PERSON_TB")
 @Getter
 @Entity
-@Builder
+@ToString
+@NoArgsConstructor
 @SequenceGenerator(name="PERSON_SEQ_GENERATOR", 
 sequenceName   = "PERSON_SEQ", 
-initialValue   = 1,     // 초기값
-allocationSize = 1 )   // 증가치
+initialValue   = 1,
+allocationSize = 1 )
 public class Person {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
     generator = "PERSON_SEQ_GENERATOR")
     @Column(name = "person_idx", nullable = false, unique = true, updatable = false)
-	private Long personIdx;
+    private Long personIdx;
 
-	@ManyToOne                      // 관계 : 다대일 설정 (USER <-> Company)  
-	@JoinColumn(name="user_idx", nullable = false)  // 외래키 칼럼 (부모키 USER idx칼럼)
-	private User user;
-	
-	@Column(name = "person_name", nullable = false)
-	private String personName;
-	
-	@Column(name = "person_phone", nullable = false)
-	private String personPhone;
-	
-	@Column(name = "person_address")
-	private String personAddress;
-	
-	@Column(name = "person_birth")
-	private String personBirth;
-	
-	@Column(name = "person_education")
-	private String personEducation;
-	
+    @ManyToOne
+    @JoinColumn(name="user_idx", nullable = false)
+    private User user;
+    
+    @Column(name = "person_name", nullable = false)
+    private String personName;
+    
+    @Column(name = "person_phone", nullable = false)
+    private String personPhone;
+    
+    @Column(name = "person_address")
+    private String personAddress;
+    
+    @Column(name = "person_birth")
+    private String personBirth;
+    
+    @Column(name = "person_education")
+    private String personEducation;
 
-	}
+    @Builder
+    public Person(Long personIdx, User user, String personName, String personPhone, String personAddress, String personBirth, String personEducation) {
+        this.personIdx = personIdx;
+        this.user = user;
+        this.personName = personName;
+        this.personPhone = personPhone;
+        this.personAddress = personAddress;
+        this.personBirth = personBirth;
+        this.personEducation = personEducation;
+    }
+}
+
+
+
 	
 
 	

@@ -1,11 +1,14 @@
 package com.job.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.job.entity.CompanyFile;
 
-@Setter
-@Getter
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CompanyFileDto {   
 	private Long companyFileIdx;
 	private Long companyIdx;
@@ -13,4 +16,16 @@ public class CompanyFileDto {
 	private String filePath;
 	private Long fileSize;
 	private String uploadDate;
+	
+	public static CompanyFileDto createCompanyFileDto(CompanyFile file) {
+		// TODO Auto-generated method stub
+		return new CompanyFileDto(
+				file.getCompanyFileIdx(),
+				file.getCompany().getCompanyIdx(),
+				file.getOriginalName(),
+				file.getFilePath(),
+				file.getFileSize(),
+				file.getUploadDate()
+		    );
+	}
 }

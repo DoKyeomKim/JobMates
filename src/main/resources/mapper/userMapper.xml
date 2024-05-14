@@ -29,9 +29,9 @@
 	   FROM  
 	       USER_TB
 	   WHERE
-	       USER_ID = #{ arg0 }  
+	       USER_ID = #{ userId }  
 	    AND
-	       USER_PW = #{ arg1 }  
+	       USER_PW = #{ userPw }  
 	      
 	    
 	

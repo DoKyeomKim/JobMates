@@ -1,13 +1,24 @@
 package com.job.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.job.entity.PostingScrap;
 
-@Setter
-@Getter
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostingScrapDto {   
 	private Long pscrapIdx;
 	private Long personIdx;
 	private Long postingIdx;
+	public static PostingScrapDto 
+	       createPostingScrapDto(PostingScrap  postingScrap) {
+		return new PostingScrapDto (
+				postingScrap.getPscrapIdx(),	
+				postingScrap.getPerson().getPersonIdx(),	
+				postingScrap.getPosting().getPostingIdx()
+			);
+	}
 }
