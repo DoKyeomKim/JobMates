@@ -119,7 +119,7 @@ header {
 
 
 <div class="card-footer">
-<button type="submit" class="btn btn-info">회원정보 수정</button>
+<button type="submit" class="btn btn-info">수정하기</button>
 </div>
 
 </form>
