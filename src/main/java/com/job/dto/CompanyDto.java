@@ -1,11 +1,12 @@
 package com.job.dto;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CompanyDto {   
 	private Long companyIdx;
 	private Long userIdx;
@@ -19,4 +20,6 @@ public class CompanyDto {
 	private String companySize;
 	private String companySector;
 	private String companyYear;
+	private String userEmail;
+	private String userType;
 }

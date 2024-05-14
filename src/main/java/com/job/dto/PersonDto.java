@@ -1,11 +1,15 @@
 package com.job.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PersonDto {   
 	private Long personIdx;
 	private Long userIdx;
@@ -13,5 +17,7 @@ public class PersonDto {
 	private String personPhone;
 	private String personAddress;
 	private String personBirth;
-	private String personEducation;
+
+	private String userEmail;
+
 }
