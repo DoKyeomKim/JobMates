@@ -15,7 +15,6 @@ import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingScrapDto;
-import com.job.dto.PostingSkillDto;
 import com.job.dto.PostingWithFileDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.SkillDto;
@@ -253,9 +252,7 @@ public class MainService {
 			return null; // 또는 예외 처리
 		}
 		Person person = personOpt.get();
-		PersonDto personDto = new PersonDto(person.getPersonIdx(), person.getUser().getUserIdx(), // User 객체에서 Id 값을 가져옴
-				person.getPersonName(), person.getPersonPhone(), person.getPersonAddress(), person.getPersonBirth(),
-				person.getPersonEducation());
+		PersonDto personDto = PersonDto.createPersonDto(person);
 		return personDto;
 	}
 
@@ -298,11 +295,7 @@ public class MainService {
 			return null; // 또는 예외 처리
 		}
 		Posting posting = PostingOpt.get();
-		PostingDto postingDto = new PostingDto(posting.getPostingIdx(), posting.getUser().getUserIdx(), // User 객체에서 Id
-																										// 값을 가져옴
-				posting.getPostingTitle(), posting.getPostingComment(), posting.getExperience(), posting.getEmpType(),
-				posting.getSalary(), posting.getStartTime(), posting.getEndTime(), posting.getPostingDeadline(),
-				posting.getJobType(), posting.getCreatedDate(), posting.getPostingAddress());
+		PostingDto postingDto = PostingDto.createPostingDto(posting);
 		return postingDto;
 	}
 

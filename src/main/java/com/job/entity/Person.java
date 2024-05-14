@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -16,6 +17,7 @@ import lombok.ToString;
 @Getter
 @Entity
 @ToString
+@Builder
 @SequenceGenerator(name="PERSON_SEQ_GENERATOR", 
 sequenceName   = "PERSON_SEQ", 
 initialValue   = 1,     // 초기값
@@ -46,4 +48,10 @@ public class Person {
 	
 	@Column(name = "person_education")
 	private String personEducation;
-}
+	
+
+	}
+	
+
+	
+

@@ -2,4 +2,174 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.job.mapper.PostingMapper">
 
+<select id="getResumeListByUserIdx" resultType="com.job.dto.ResumeDto">
+SELECT user_idx, resume_idx, resume_title, publish
+FROM RESUME_TB
+WHERE user_idx = #{userIdx}
+ORDER BY resume_idx DESC
+</select>
+
+
+<insert id="rResumeWrite" parameterType="com.job.dto.ResumeDto">
+    INSERT INTO resume_tb (resume_idx, user_idx, resume_title, portfolio, publish, resume_comment,created_date)
+    VALUES (RESUME_SEQ.NEXTVAL, #{userIdx}, #{resumeTitle}, #{portfolio}, #{publish}, #{resumeComment}, SYSDATE)
+</insert>
+
+<insert id="resumeSkillWrite">
+INSERT INTO PERSON_SKILL_TB (PERSON_IDX,PERSON_SKILL_IDX,SKILL_IDX)
+VALUES (#{personIdx}, PERSONSKILL_SEQ.NEXTVAL,#{skillIdx})
+</insert>
+
+<insert id="resumeFileWrite" parameterType="com.job.dto.ResumeFileDto">
+INSERT INTO RESUME_FILE_TB (RESUME_FILE_IDX, RESUME_IDX, ORIGINAL_NAME, FILE_PATH, FILE_SIZE, UPLOAD_DATE)
+VALUES (RESUME_FILE_SEQ.NEXTVAL,RESUME_SEQ.CURRVAL,#{originalName},#{filePath},#{fileSize},SYSDATE)
+</insert>
+
+<select id="getResumeFile">
+SELECT FILE_PATH,FILE_SIZE,ORIGINAL_NAME
+FROM RESUME_FILE_TB
+WHERE RESUME_IDX = #{resumeIdx}
+</select>
+
+
+<select id = "getPersonByUserIdx">
+select *
+from person_tb
+where user_idx=#{userIdx}
+</select>
+
+<delete id="resumeDelete">
+    DELETE FROM RESUME_TB
+    WHERE resume_idx = #{resumeIdx}
+</delete>
+
+<delete id="resumeFileDelete">
+	delete from resume_File_tb
+	where resume_idx = #{resumeIdx}
+</delete>
+
+<select id="getResumeByResumeIdx">
+SELECT RESUME_IDX, USER_IDX, RESUME_TITLE, PORTFOLIO, PUBLISH, RESUME_COMMENT
+FROM RESUME_TB
+WHERE resume_idx=#{resumeIdx}
+</select>
+
+<update id="resumeUpdate">
+UPDATE RESUME_TB
+SET resume_idx=#{resumeIdx}, resume_title=#{resumeTitle}, portfolio=#{portfolio}, resume_comment=#{resumeComment}
+WHERE resume_idx=#{resumeIdx}
+</update>
+
+<update id="updateResumeFile" parameterType="com.job.dto.ResumeFileDto">
+    update resume_file_tb
+    set file_path = #{filePath}, original_name = #{originalName}, file_size = #{fileSize} 
+    where resume_idx = #{resumeIdx}
+</update>
+
+
+<select id = "getAllSkill" parameterType="com.job.dto.SkillDto">
+SELECT SKILL_IDX, SKILL_NAME
+FROM SKILL_TB
+ORDER BY SKILL_IDX ASC
+</select>
+
+
+<select id = "getSkillBySkillIdx" parameterType="com.job.dto.SkillDto">
+SELECT s.SKILL_NAME
+FROM person_skill_tb ps
+JOIN skill_tb s ON ps.SKILL_IDX = s.SKILL_IDX
+WHERE ps.PERSON_IDX = #{personIdx}
+ORDER BY s.SKILL_IDX ASC
+</select>
+
+<select id ="getUserSkill">
+SELECT p.skill_idx, s.skill_name, p.person_idx
+FROM person_skill_tb p, skill_tb s
+WHERE s.skill_idx = p.skill_idx and p.person_idx = #{personIdx}
+</select>
+
+<delete id="deletePersonSkill">
+		DELETE FROM PERSON_SKILL_TB WHERE person_idx = #{personIdx}
+</delete>
+
+
+<insert id="insertSkill">
+INSERT INTO PERSON_SKILL_TB (PERSON_IDX,PERSON_SKILL_IDX,SKILL_IDX)
+VALUES (#{personIdx}, PERSONSKILL_SEQ.NEXTVAL,#{skillIdx})
+</insert>
+
+
+
+<!-- 개인 -->
+<!-- =======================================================================  -->
+<!-- 기업 -->
+
+<select id="getPostListByUserIdx" resultType="com.job.dto.PostingDto">
+SELECT USER_IDX, POSTING_IDX, POSTING_TITLE, POSTING_DEADLINE
+FROM POSTING_TB
+WHERE user_idx = #{userIdx}
+ORDER BY posting_idx DESC
+</select>
+
+<select id="getPostingByPostingIdx" resultType="com.job.dto.PostingDto">
+SELECT POSTING_IDX,POSTING_TITLE,EXPERIENCE,POSTING_COMMENT,EMP_TYPE,START_TIME,END_TIME,POSTING_DEADLINE,JOB_TYPE,CREATED_DATE,SALARY,POSTING_ADDRESS
+FROM POSTING_TB
+WHERE posting_idx = #{postingIdx}
+</select>
+
+<select id="getCompanyByUserIdx">
+SELECT *
+FROM COMPANY_TB
+WHERE user_idx = #{userIdx}
+</select>
+
+<insert id="postingWrite" parameterType="com.job.dto.PostingDto">
+    INSERT INTO POSTING_TB (POSTING_IDX, USER_IDX, POSTING_TITLE, POSTING_COMMENT, EXPERIENCE,
+    EMP_TYPE, SALARY, START_TIME, END_TIME, POSTING_DEADLINE, JOB_TYPE, CREATED_DATE, POSTING_ADDRESS)
+    VALUES (POSTING_SEQ.NEXTVAL, #{userIdx}, #{postingTitle}, #{postingComment}, #{experience},
+    #{empType}, #{salary}, #{startTime}, #{endTime}, #{postingDeadline}, #{jobType}, SYSDATE, #{postingAddress})
+</insert>
+
+<insert id="postingSkillWrite" parameterType="com.job.dto.PostingDto">
+    INSERT INTO POSTING_SKILL_TB (POSTING_IDX,POSTING_SKILL_IDX,SKILL_IDX)
+    VALUES (POSTING_SEQ.CURRVAL, POSTINGSKILL_SEQ.NEXTVAL,#{skillIdx})
+</insert>
+
+
+
+<delete id="postingDelete">
+DELETE FROM POSTING_TB WHERE POSTING_IDX=#{postingIdx}
+</delete>
+
+<delete id="postingSkillDelete">
+DELETE FROM POSTING_SKILL_TB WHERE POSTING_IDX=#{postingIdx}
+</delete>
+
+<update id="postingUpdate">
+UPDATE POSTING_TB
+SET POSTING_TITLE=#{postingTitle}, POSTING_COMMENT=#{postingComment}, EXPERIENCE=#{experience},
+EMP_TYPE=#{empType},SALARY=#{salary},START_TIME=#{startTime},END_TIME=#{endTime},POSTING_DEADLINE=#{postingDeadline},
+JOB_TYPE=#{jobType},POSTING_ADDRESS=#{postingAddress}
+WHERE posting_idx=#{postingIdx}
+</update>
+
+<select id="getSkillByPostingIdx">
+SELECT S.SKILL_IDX, S.SKILL_NAME
+FROM POSTING_SKILL_TB PS
+JOIN SKILL_TB S ON PS.SKILL_IDX = S.SKILL_IDX
+WHERE PS.POSTING_IDX = #{postingIdx}
+ORDER BY SKILL_idx ASC
+</select>
+
+ <insert id="postingSkillUpdate">
+    INSERT INTO POSTING_SKILL_TB (POSTING_IDX,POSTING_SKILL_IDX,SKILL_IDX)
+    VALUES (#{postingIdx}, POSTINGSKILL_SEQ.NEXTVAL,#{skillIdx})
+</insert>
+ 
+ <update id="updateResumePublishStatus">
+ update resume_tb
+ set publish=#{publish}
+ where resume_idx=#{resumeIdx}
+ </update>
+ 
 </mapper>

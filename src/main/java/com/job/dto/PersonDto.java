@@ -1,16 +1,14 @@
 package com.job.dto;
-
 import com.job.entity.Person;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonDto {
+public class PersonDto {   
 	private Long personIdx;
 	private Long userIdx;
 	private String personName;
@@ -18,11 +16,12 @@ public class PersonDto {
 	private String personAddress;
 	private String personBirth;
 	private String personEducation;
-
+	private String userEmail;
+	
 	public static PersonDto createPersonDto(Person person) {
-		return new PersonDto(person.getPersonIdx(), person.getUser().getUserIdx(), // userIdx를 올바른 위치로 이동
+		return new PersonDto(person.getPersonIdx(), person.getUser().getUserIdx(), 
 				person.getPersonName(), person.getPersonPhone(), person.getPersonAddress(), person.getPersonBirth(),
-				person.getPersonEducation());
+				person.getPersonEducation(),person.getUser().getUserEmail());
 	}
-
+	
 }

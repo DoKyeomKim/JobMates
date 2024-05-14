@@ -1,40 +1,553 @@
 package com.job.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.job.dto.CompanyDto;
+import com.job.dto.PersonDto;
+import com.job.dto.PersonSkillDto;
+import com.job.dto.PostingDto;
+import com.job.dto.PostingSkillDto;
+import com.job.dto.ResumeDto;
+import com.job.dto.ResumeFileDto;
+import com.job.dto.SkillDto;
+import com.job.mapper.PostingMapper;
+import com.job.service.PostingService;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 public class PostingController {
 
+	@Autowired
+	private PostingMapper postingMapper;
+
+	@Autowired
+	private PostingService postingService;
+
+	// ------------기업---------------
 	// 공고 관리 페이지
 	@GetMapping("/postings")
-	public  String  postings() {
-		return "section/postings"; 
+	public ModelAndView postings(HttpSession session) {
+		ModelAndView mv = new ModelAndView();
+
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		if (userIdx == null) {
+			// 세션에 user_idx가 없는 경우, 예를 들어 로그인하지 않았을 경우의 처리
+			// 로그인 페이지로 리다이렉트하거나 에러 메시지 처리
+			return new ModelAndView("redirect:/login");
+		}
+
+		List<PostingDto> posting = postingMapper.getPostListByUserIdx(userIdx);
+
+		mv.addObject("posting", posting);
+		mv.setViewName("section/postings");
+
+		return mv;
 	}
+
+	// 공고 자세히보기
+	@GetMapping("/postingView")
+	public ModelAndView postingView(HttpSession session, @RequestParam("postingIdx") Long postingIdx) {
+		ModelAndView mv = new ModelAndView();
+
+		// 스킬 갖고오기
+		List<SkillDto> skill = postingMapper.getSkillByPostingIdx(postingIdx);
+
+		// company_tb 갖고오기
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
+		if (company == null) {
+
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		// posting_tb 갖고오기
+		PostingDto posting = postingMapper.getPostingByPostingIdx(postingIdx);
+		if (posting == null) {
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		mv.addObject("company", company);
+		mv.addObject("posting", posting);
+		mv.addObject("skill", skill);
+		mv.setViewName("section/postingView");
+
+		return mv;
+	}
+
+	// 공고 작성페이지로 이동
+	@GetMapping("/postingWriteForm")
+	public ModelAndView postingWriteForm(HttpSession session) {
+		ModelAndView mv = new ModelAndView();
+
+		// company_tb 갖고오기
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
+		if (company == null) {
+
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		// 스킬 들고 오기
+		List<SkillDto> skill = postingMapper.getAllSkill();
+
+		mv.addObject("skill", skill);
+		mv.addObject("company", company);
+		mv.setViewName("section/postingWrite");
+
+		return mv;
+	}
+
+	// 공고작성
+	@PostMapping("/postingWrite")
+	@Transactional
+	public ModelAndView postingWrite(HttpSession session, PostingDto postingDto, PostingSkillDto postingSkill,
+			@RequestParam("skillIdx") List<Long> skillIdxList) {
+		ModelAndView mv = new ModelAndView();
+
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		if (userIdx == null) {
+			// 세션에 사용자 정보가 없을 경우 처리
+			mv.setViewName("redirect:/login");
+			return mv;
+		}
+
+		// 세션의 useridx를 postingDto에 넣음
+		postingDto.setUserIdx(userIdx);
+		postingMapper.postingWrite(postingDto);
+
+		// 선택된 기술 스택들을 반복하여 저장
+		for (Long skillIdx : skillIdxList) {
+			postingSkill.setSkillIdx(skillIdx);
+			postingMapper.postingSkillWrite(postingSkill);
+		}
+
+		mv.setViewName("redirect:/postings");
+		return mv;
+	}
+
+	// 공고 수정폼 이동
+	@GetMapping("/postingEditForm")
+	public ModelAndView postingEditForm(HttpSession session, @RequestParam("postingIdx") Long postingIdx,
+			PostingSkillDto postingSkill) {
+		ModelAndView mv = new ModelAndView();
+
+		Long userIdx = (Long) session.getAttribute("user_idx");
+
+		// company 정보 들고 오기
+		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
+		if (company == null) {
+
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		// posting 들고오기
+		PostingDto posting = postingMapper.getPostingByPostingIdx(postingIdx);
+		if (posting == null) {
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		// postingIdx에 맞는 skill 갖고오게
+		List<SkillDto> userSkills = postingMapper.getSkillByPostingIdx(postingIdx);
+
+		// 모든 스킬 갖고오기
+		List<SkillDto> allSkills = postingMapper.getAllSkill();
+
+		mv.addObject("company", company);
+		mv.addObject("posting", posting);
+		mv.addObject("userSkills", userSkills);
+		mv.addObject("allSkills", allSkills);
+		mv.setViewName("section/postingEdit");
+		return mv;
+	}
+
+	// 공고 수정
+	@PostMapping("/postingEdit")
+	@Transactional
+	public ModelAndView postingEdit(HttpSession session, @RequestParam("postingIdx") Long postingIdx,
+			PostingDto postingDto, @RequestParam("skillIdx") List<Long> skillIdxList, PostingSkillDto postingSkill) {
+		ModelAndView mv = new ModelAndView();
+
+		postingMapper.postingUpdate(postingDto);
+
+		postingMapper.postingSkillDelete(postingIdx);
+
+		// 선택된 기술 스택들을 반복하여 저장
+		// 배열을 for문으로 구현하고, postingIdx를 입력,skillIdx는 화면에서 받아옴.
+		// 그 postingSkill(PostingSkillDto)를 토대로 매퍼를 통해 수정(새로운 스킬 입력)
+		for (Long skillIdx : skillIdxList) {
+			postingSkill.setPostingIdx(postingIdx);
+			postingSkill.setSkillIdx(skillIdx); // 추가된 라인
+			postingMapper.postingSkillUpdate(postingSkill);
+			System.out.println("=================================================================" + postingSkill);
+		}
+
+		mv.setViewName("redirect:/postingView?postingIdx=" + postingIdx);
+		return mv;
+	}
+
+	// 공고 삭제
+	@RequestMapping("/postingDelete")
+	@Transactional
+	public ModelAndView postingDelete(PostingDto postingDto) {
+		ModelAndView mv = new ModelAndView();
+
+		Long postingIdx = postingDto.getPostingIdx();
+
+		postingMapper.postingSkillDelete(postingIdx);
+		postingMapper.postingDelete(postingIdx);
+		mv.setViewName("redirect:/postings");
+		return mv;
+	}
+
+	// ------------------------------------------------------기업---------------------------------------------------------
+	// -------------------------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------개인---------------------------------------------------------
+
 	// 이력서 관리 페이지
 	@GetMapping("/resumes")
-	public  String  resumes() {
-		return "section/resumes"; 
+	public ModelAndView resumes(HttpSession session) {
+
+		// 세션에서 임시로만든 user_idx를 가져옴
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		if (userIdx == null) {
+			// 세션에 user_idx가 없는 경우, 예를 들어 로그인하지 않았을 경우의 처리
+			// 로그인 페이지로 리다이렉트하거나 에러 메시지 처리
+			return new ModelAndView("redirect:/login");
+		}
+
+		// userIdx를 사용해서 해당 사용자의 이력서 리스트를 조회
+		List<ResumeDto> resumeList = postingMapper.getResumeListByUserIdx(userIdx);
+
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("resumes", resumeList);
+		mv.setViewName("section/resumes");
+
+		return mv;
+	}
+
+	// 이력서 자세히보기
+	@GetMapping("/resumeView")
+	public ModelAndView resumeView(HttpSession session, @RequestParam("resumeIdx") Long resumeIdx) {
+
+		ModelAndView mv = new ModelAndView();
+
+		// person_tb 정보 갖고오기
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		PersonDto person = postingMapper.getPersonByUserIdx(userIdx);
+		if (person == null) {
+			// 사용자 정보가 없을 경우 처리
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		// personIdx가 같은 정보를 찾기 위해 세션에서 갖고옴
+		Long personIdx = (Long) session.getAttribute("person_idx");
+
+		// skillIdx를 토대로 skill 갖고오기
+		List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
+
+		// Resume_tb 정보 갖고 오기
+		ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
+		if (resume == null) {
+			// 사용자 정보가 없을 경우 처리
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
+		
+		
+		mv.addObject("person", person);
+		mv.addObject("resume", resume);
+		mv.addObject("skill", skill);
+		mv.addObject("resumeFile", resumeFile);
+		mv.setViewName("section/resumeView");
+		return mv;
+	}
+
+	
+	// 이력서 공개여부 변경
+	@PostMapping("/resumes/togglePublish")
+	public ResponseEntity<?> togglePublishStatus(@RequestBody ResumeDto resumeDto) {
+		Long resumeIdx = resumeDto.getResumeIdx();
+		Long currentStatus = resumeDto.getPublish();
+		log.info("resumeDto = {}", resumeDto);
+
+		// 이력서 상태 변경 로직 (예: currentStatus가 1이면 2로, 2면 1로)
+		Long publish = (long) ((currentStatus == 1L) ? 2L : 1L);
+		resumeDto.setPublish(publish);
+		
+		// 이력서 상태 업데이트를 위한 서비스 또는 매퍼 호출
+		postingMapper.updateResumePublishStatus(resumeDto);
+
+		try {
+			
+			// 새 상태와 메시지를 포함한 응답 반환
+			Map<String, Object> response = new HashMap<>();
+			response.put("newStatus", publish);
+			response.put("message", "상태가 성공적으로 변경되었습니다.");
+			
+			return ResponseEntity.ok(response);
+			
+		} catch (Exception e) {
+			// 오류 처리
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상태 변경 중 오류가 발생했습니다.");
+		}
+	}
+
+	// 이력서 작성페이지로 이동
+	// 이력서에 담길 정보들을 갖고 이동
+	@GetMapping("/resumeWriteForm")
+	public ModelAndView resumeWriteForm(HttpSession session) {
+
+		ModelAndView mv = new ModelAndView();
+
+		// 세션에서 user_idx 가져오기
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		if (userIdx == null) {
+			// 세션에 사용자 정보가 없을 경우 처리
+			mv.setViewName("section/error");
+			return mv;
+		}
+
+		// userIdx를 사용하여 해당 사용자의 정보 조회
+		PersonDto person = postingMapper.getPersonByUserIdx(userIdx);
+		if (person == null) {
+			// 사용자 정보가 없을 경우 처리
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		// 스킬 들고 오기
+		List<SkillDto> skill = postingMapper.getAllSkill();
+
+		mv.addObject("person", person);
+		mv.addObject("skill", skill);
+		mv.setViewName("section/resumeWrite");
+
+		return mv;
+	}
+
+	// 이력서 작성
+	@PostMapping("/resumeWrite")
+	@Transactional
+	public ModelAndView resumwWrite(HttpSession session, ResumeDto resumeDto, PersonSkillDto personSkill, ResumeFileDto resumeFileDto ,@RequestParam("file") MultipartFile file) {
+		ModelAndView mv = new ModelAndView();
+
+		Long userIdx = (Long) session.getAttribute("user_idx");
+		if (userIdx == null) {
+			// 세션에 사용자 정보가 없을 경우 처리
+			mv.setViewName("redirect:/login");
+			return mv;
+		}
+		
+		Long personIdx = (Long) session.getAttribute("person_idx");
+
+		// 생성 날짜를 현재 날짜로 설정
+		resumeDto.setCreatedDate(new Date());
+
+		// resumeDto에 현재 세션의 userIdx를 넣음
+		resumeDto.setUserIdx(userIdx);
+
+		// personSkillDto에 현재 세션의 personIdx를 넣음
+		personSkill.setPersonIdx(personIdx);
+
+		postingMapper.rResumeWrite(resumeDto);
+
+		postingMapper.resumeSkillWrite(personSkill);
+		
+		
+		
+		 // 파일이 업로드되지 않았을 경우 처리
+	    if (file.isEmpty()) {
+	        mv.addObject("error", "파일을 선택하세요.");
+	        mv.setViewName("section/resumeWrite");
+	        return mv;
+	    }
+	    
+	    // 이력서 파일 이름
+	    String fileName = file.getOriginalFilename();
+	    // 암호환 파일 이름 중복방지(그냥 시간 앞에 붙임)
+	    String fileNameScret = System.currentTimeMillis() + "_" + fileName;
+	    
+	    String filePath = "D:/dev/springjpa/JobMates/src/main/resources/static/images/"+fileNameScret;
+	    Long fileSize = file.getSize();
+	    //파일 해당 위치에 저장
+	    File dest = new File(filePath);
+	    
+	    try {
+	        // 파일을 지정된 경로로 저장
+	        file.transferTo(dest);
+	        
+	        // 데이터베이스에 저장할 이미지 경로 설정
+	        resumeFileDto.setFilePath("/images/" + fileNameScret);
+	        resumeFileDto.setOriginalName(fileName);
+	        resumeFileDto.setFileSize(fileSize);
+	        // 이후 데이터베이스에 저장(경로로 저장)
+	        
+	        postingMapper.resumeFileWrite(resumeFileDto);
+	        
+	    } catch (IllegalStateException | IOException e) {
+	        e.printStackTrace();
+	        mv.addObject("error", "파일 업로드 실패.");
+	        mv.setViewName("section/resumeWrite");
+	        return mv;
+	    }
+	    
+
+
+		
+		
+
+
+		mv.setViewName("redirect:/resumes");
+		return mv;
+	}
+
+	// 이력서 수정폼 이동
+	@GetMapping("/resumeEditForm")
+	public ModelAndView resumeEditForm(HttpSession session, @RequestParam("resumeIdx") Long resumeIdx,
+			PersonSkillDto personSkill) {
+		ModelAndView mv = new ModelAndView();
+
+		Long userIdx = (Long) session.getAttribute("user_idx");
+
+		// 이력서에 사용된 person_tb 갖고오기
+		PersonDto person = postingMapper.getPersonByUserIdx(userIdx);
+		if (person == null) {
+			// 사용자 정보가 없을 경우 처리
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+
+		// personIdx가 같은 정보를 찾기 위해 세션에서 갖고옴
+		Long personIdx = (Long) session.getAttribute("person_idx");
+
+		// skillIdx를 토대로 skill 갖고오기
+		List<SkillDto> userSkills = postingMapper.getUserSkill(personIdx);
+
+		// 모든 skill_tb에 있는 모든 skill
+		List<SkillDto> allSkills = postingMapper.getAllSkill();
+
+		// 이력서에 사용된 resume_tb 갖고 오기
+		ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
+		if (resume == null) {
+			// 사용자 정보가 없을 경우 처리
+			mv.setViewName("redirect:/");
+			return mv;
+		}
+		
+		ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
+		
+		mv.addObject("person", person);
+		mv.addObject("resume", resume);
+		mv.addObject("allSkills", allSkills);
+		mv.addObject("userSkills", userSkills);
+		mv.addObject("resumeIdx", resumeIdx);
+		mv.addObject("resumeFile", resumeFile);
+		mv.setViewName("section/resumeEdit");
+		return mv;
+
+	}
+
+	// 이력서 수정
+	@PostMapping("/resumeEdit")
+	@Transactional
+	public ModelAndView resumeEdit(HttpSession session, @RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto,
+			@RequestParam("skillIdx") List<Long> skillIdxList, ResumeFileDto resumeFileDto,@RequestParam("file") MultipartFile file) {
+		ModelAndView mv = new ModelAndView();
+
+		postingMapper.resumeUpdate(resumeDto);
+
+		// 세션에서 person_idx 갖고오기
+		Long personIdx = (Long) session.getAttribute("person_idx");
+
+		postingMapper.deletePersonSkill(personIdx);
+
+		for (Long skillIdx : skillIdxList) {
+			PersonSkillDto personSkillDto = new PersonSkillDto();
+			personSkillDto.setPersonIdx(personIdx); // 사용자 ID 설정
+			personSkillDto.setSkillIdx(skillIdx); // 스킬 인덱스 설정
+			postingMapper.insertSkill(personSkillDto); // 스킬 정보 삽입
+		}
+		
+		
+		// 파일 수정부분
+
+		if (!file.isEmpty()) {
+		    // 새 파일이 업로드되었을 경우
+		    String fileName = file.getOriginalFilename();
+		    String fileNameScret = System.currentTimeMillis() + "_" + fileName;
+		    String filePath = "D:/dev/springjpa/JobMates/src/main/resources/static/images/" + fileNameScret;
+		    Long fileSize = file.getSize();
+		    
+		    File dest = new File(filePath);
+
+		    try {
+		        // 파일을 지정된 경로로 저장
+		        file.transferTo(dest);
+		        resumeFileDto.setResumeIdx(resumeIdx);
+		        resumeFileDto.setOriginalName(fileName);
+		        resumeFileDto.setFileSize(fileSize);
+		        resumeFileDto.setFilePath("/images/" + fileNameScret);
+
+		        // 여기서 새 파일 정보로 업데이트
+		        postingMapper.updateResumeFile(resumeFileDto);
+
+		    } catch (IllegalStateException | IOException e) {
+		        e.printStackTrace();
+		    }
+		} else {
+		    // 새 파일이 업로드되지 않았을 경우 예전 파일 정보 유지
+		}
+
+
+		mv.setViewName("redirect:/resumeView?resumeIdx=" + resumeIdx);
+
+		return mv;
+	}
+
+	// 이력서 삭제
+	@RequestMapping("/resumeDelete")
+	@Transactional
+	public ModelAndView deleteResume(ResumeDto resumeDto) {
+
+		ModelAndView mv = new ModelAndView();
+
+		Long resumeIdx = resumeDto.getResumeIdx();
+
+		postingMapper.resumeFileDelete(resumeIdx);
+		postingMapper.resumeDelete(resumeIdx);
+
+		mv.setViewName("redirect:/resumes");
+		return mv;
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
