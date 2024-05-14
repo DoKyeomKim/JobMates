@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.ApplyDto;
@@ -22,8 +23,10 @@ import com.job.dto.PostingScrapDto;
 import com.job.dto.PostingWithFileDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.SkillDto;
+import com.job.dto.UserDto;
 import com.job.service.MainService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,7 +38,7 @@ public class MainController {
 
 	// 메인 페이지
 	@GetMapping("/")
-	public ModelAndView main() {
+	public ModelAndView main(@SessionAttribute("login") UserDto user) {
 		ModelAndView mv = new ModelAndView("section/main");
 		Long userType = (long) 2;
 
