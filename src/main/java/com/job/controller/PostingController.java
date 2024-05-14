@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +28,8 @@ import com.job.dto.PostingSkillDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
+import com.job.dto.UserDto;
+import com.job.mapper.MypageMapper;
 import com.job.mapper.PostingMapper;
 import com.job.service.PostingService;
 
@@ -45,13 +46,16 @@ public class PostingController {
 	@Autowired
 	private PostingService postingService;
 
+	@Autowired
+	private MypageMapper mypageMapper;
+	
 	// ------------기업---------------
 	// 공고 관리 페이지
 	@GetMapping("/postings")
 	public ModelAndView postings(HttpSession session) {
 		ModelAndView mv = new ModelAndView();
-
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 		if (userIdx == null) {
 			// 세션에 user_idx가 없는 경우, 예를 들어 로그인하지 않았을 경우의 처리
 			// 로그인 페이지로 리다이렉트하거나 에러 메시지 처리
@@ -59,7 +63,8 @@ public class PostingController {
 		}
 
 		List<PostingDto> posting = postingMapper.getPostListByUserIdx(userIdx);
-
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
 		mv.addObject("posting", posting);
 		mv.setViewName("section/postings");
 
@@ -70,12 +75,12 @@ public class PostingController {
 	@GetMapping("/postingView")
 	public ModelAndView postingView(HttpSession session, @RequestParam("postingIdx") Long postingIdx) {
 		ModelAndView mv = new ModelAndView();
-
+		UserDto user = (UserDto) session.getAttribute("login");
 		// 스킬 갖고오기
 		List<SkillDto> skill = postingMapper.getSkillByPostingIdx(postingIdx);
 
 		// company_tb 갖고오기
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		Long userIdx = user.getUserIdx();
 		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
 		if (company == null) {
 
@@ -89,7 +94,8 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
-
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
 		mv.addObject("company", company);
 		mv.addObject("posting", posting);
 		mv.addObject("skill", skill);
@@ -102,9 +108,9 @@ public class PostingController {
 	@GetMapping("/postingWriteForm")
 	public ModelAndView postingWriteForm(HttpSession session) {
 		ModelAndView mv = new ModelAndView();
-
+		UserDto user = (UserDto) session.getAttribute("login");
 		// company_tb 갖고오기
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		Long userIdx = user.getUserIdx();
 		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
 		if (company == null) {
 
@@ -114,7 +120,9 @@ public class PostingController {
 
 		// 스킬 들고 오기
 		List<SkillDto> skill = postingMapper.getAllSkill();
-
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
+		mv.addObject("userIdx", userIdx);
 		mv.addObject("skill", skill);
 		mv.addObject("company", company);
 		mv.setViewName("section/postingWrite");
@@ -124,27 +132,17 @@ public class PostingController {
 
 	// 공고작성
 	@PostMapping("/postingWrite")
-	@Transactional
-	public ModelAndView postingWrite(HttpSession session, PostingDto postingDto, PostingSkillDto postingSkill,
+	public ModelAndView postingWrite(HttpSession session, PostingDto postingDto,
 			@RequestParam("skillIdx") List<Long> skillIdxList) {
 		ModelAndView mv = new ModelAndView();
-
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 		if (userIdx == null) {
 			// 세션에 사용자 정보가 없을 경우 처리
 			mv.setViewName("redirect:/login");
 			return mv;
 		}
-
-		// 세션의 useridx를 postingDto에 넣음
-		postingDto.setUserIdx(userIdx);
-		postingMapper.postingWrite(postingDto);
-
-		// 선택된 기술 스택들을 반복하여 저장
-		for (Long skillIdx : skillIdxList) {
-			postingSkill.setSkillIdx(skillIdx);
-			postingMapper.postingSkillWrite(postingSkill);
-		}
+		postingService.postingWrite(postingDto, skillIdxList);
 
 		mv.setViewName("redirect:/postings");
 		return mv;
@@ -155,8 +153,8 @@ public class PostingController {
 	public ModelAndView postingEditForm(HttpSession session, @RequestParam("postingIdx") Long postingIdx,
 			PostingSkillDto postingSkill) {
 		ModelAndView mv = new ModelAndView();
-
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 
 		// company 정보 들고 오기
 		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
@@ -178,7 +176,8 @@ public class PostingController {
 
 		// 모든 스킬 갖고오기
 		List<SkillDto> allSkills = postingMapper.getAllSkill();
-
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
 		mv.addObject("company", company);
 		mv.addObject("posting", posting);
 		mv.addObject("userSkills", userSkills);
@@ -234,8 +233,8 @@ public class PostingController {
 	@GetMapping("/resumes")
 	public ModelAndView resumes(HttpSession session) {
 
-		// 세션에서 임시로만든 user_idx를 가져옴
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 		if (userIdx == null) {
 			// 세션에 user_idx가 없는 경우, 예를 들어 로그인하지 않았을 경우의 처리
 			// 로그인 페이지로 리다이렉트하거나 에러 메시지 처리
@@ -246,6 +245,8 @@ public class PostingController {
 		List<ResumeDto> resumeList = postingMapper.getResumeListByUserIdx(userIdx);
 
 		ModelAndView mv = new ModelAndView();
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
 		mv.addObject("resumes", resumeList);
 		mv.setViewName("section/resumes");
 
@@ -259,7 +260,8 @@ public class PostingController {
 		ModelAndView mv = new ModelAndView();
 
 		// person_tb 정보 갖고오기
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 		PersonDto person = postingMapper.getPersonByUserIdx(userIdx);
 		if (person == null) {
 			// 사용자 정보가 없을 경우 처리
@@ -268,7 +270,7 @@ public class PostingController {
 		}
 
 		// personIdx가 같은 정보를 찾기 위해 세션에서 갖고옴
-		Long personIdx = (Long) session.getAttribute("person_idx");
+		Long personIdx = person.getPersonIdx();
 
 		// skillIdx를 토대로 skill 갖고오기
 		List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
@@ -282,8 +284,8 @@ public class PostingController {
 		}
 
 		ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
-		
-		
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("resume", resume);
 		mv.addObject("skill", skill);
@@ -292,7 +294,6 @@ public class PostingController {
 		return mv;
 	}
 
-	
 	// 이력서 공개여부 변경
 	@PostMapping("/resumes/togglePublish")
 	public ResponseEntity<?> togglePublishStatus(@RequestBody ResumeDto resumeDto) {
@@ -303,19 +304,19 @@ public class PostingController {
 		// 이력서 상태 변경 로직 (예: currentStatus가 1이면 2로, 2면 1로)
 		Long publish = (long) ((currentStatus == 1L) ? 2L : 1L);
 		resumeDto.setPublish(publish);
-		
+
 		// 이력서 상태 업데이트를 위한 서비스 또는 매퍼 호출
 		postingMapper.updateResumePublishStatus(resumeDto);
 
 		try {
-			
+
 			// 새 상태와 메시지를 포함한 응답 반환
 			Map<String, Object> response = new HashMap<>();
 			response.put("newStatus", publish);
 			response.put("message", "상태가 성공적으로 변경되었습니다.");
-			
+
 			return ResponseEntity.ok(response);
-			
+
 		} catch (Exception e) {
 			// 오류 처리
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상태 변경 중 오류가 발생했습니다.");
@@ -330,7 +331,8 @@ public class PostingController {
 		ModelAndView mv = new ModelAndView();
 
 		// 세션에서 user_idx 가져오기
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 		if (userIdx == null) {
 			// 세션에 사용자 정보가 없을 경우 처리
 			mv.setViewName("section/error");
@@ -347,7 +349,8 @@ public class PostingController {
 
 		// 스킬 들고 오기
 		List<SkillDto> skill = postingMapper.getAllSkill();
-
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("skill", skill);
 		mv.setViewName("section/resumeWrite");
@@ -358,18 +361,20 @@ public class PostingController {
 	// 이력서 작성
 	@PostMapping("/resumeWrite")
 	@Transactional
-	public ModelAndView resumwWrite(HttpSession session, ResumeDto resumeDto, PersonSkillDto personSkill, ResumeFileDto resumeFileDto ,@RequestParam("file") MultipartFile file) {
+	public ModelAndView resumwWrite(HttpSession session, ResumeDto resumeDto, PersonSkillDto personSkill,
+			ResumeFileDto resumeFileDto, @RequestParam("file") MultipartFile file) {
 		ModelAndView mv = new ModelAndView();
 
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 		if (userIdx == null) {
 			// 세션에 사용자 정보가 없을 경우 처리
 			mv.setViewName("redirect:/login");
 			return mv;
 		}
+		PersonDto persondto = mypageMapper.getPersonByUserIdx(userIdx);
 		
-		Long personIdx = (Long) session.getAttribute("person_idx");
-
+		Long personIdx = persondto.getPersonIdx();
 		// 생성 날짜를 현재 날짜로 설정
 		resumeDto.setCreatedDate(new Date());
 
@@ -382,50 +387,44 @@ public class PostingController {
 		postingMapper.rResumeWrite(resumeDto);
 
 		postingMapper.resumeSkillWrite(personSkill);
-		
-		
-		
-		 // 파일이 업로드되지 않았을 경우 처리
-	    if (file.isEmpty()) {
-	        mv.addObject("error", "파일을 선택하세요.");
-	        mv.setViewName("section/resumeWrite");
-	        return mv;
-	    }
-	    
-	    // 이력서 파일 이름
-	    String fileName = file.getOriginalFilename();
-	    // 암호환 파일 이름 중복방지(그냥 시간 앞에 붙임)
-	    String fileNameScret = System.currentTimeMillis() + "_" + fileName;
-	    
-	    String filePath = "D:/dev/springjpa/JobMates/src/main/resources/static/images/"+fileNameScret;
-	    Long fileSize = file.getSize();
-	    //파일 해당 위치에 저장
-	    File dest = new File(filePath);
-	    
-	    try {
-	        // 파일을 지정된 경로로 저장
-	        file.transferTo(dest);
-	        
-	        // 데이터베이스에 저장할 이미지 경로 설정
-	        resumeFileDto.setFilePath("/images/" + fileNameScret);
-	        resumeFileDto.setOriginalName(fileName);
-	        resumeFileDto.setFileSize(fileSize);
-	        // 이후 데이터베이스에 저장(경로로 저장)
-	        
-	        postingMapper.resumeFileWrite(resumeFileDto);
-	        
-	    } catch (IllegalStateException | IOException e) {
-	        e.printStackTrace();
-	        mv.addObject("error", "파일 업로드 실패.");
-	        mv.setViewName("section/resumeWrite");
-	        return mv;
-	    }
-	    
 
+		// 파일이 업로드되지 않았을 경우 처리
+		if (file.isEmpty()) {
+			mv.addObject("error", "파일을 선택하세요.");
+			mv.setViewName("section/resumeWrite");
+			return mv;
+		}
 
-		
-		
+		// 이력서 파일 이름
+		String fileName = file.getOriginalFilename();
+		// 암호환 파일 이름 중복방지(그냥 시간 앞에 붙임)
+		String fileNameScret = System.currentTimeMillis() + "_" + fileName;
 
+		String filePath = "C:/images/images" + fileNameScret;
+		Long fileSize = file.getSize();
+		// 파일 해당 위치에 저장
+		File dest = new File(filePath);
+		if (!dest.exists()) {
+			dest.mkdirs();
+        }
+		try {
+			// 파일을 지정된 경로로 저장
+			file.transferTo(dest);
+
+			// 데이터베이스에 저장할 이미지 경로 설정
+			resumeFileDto.setFilePath("/images/" + fileNameScret);
+			resumeFileDto.setOriginalName(fileName);
+			resumeFileDto.setFileSize(fileSize);
+			// 이후 데이터베이스에 저장(경로로 저장)
+
+			postingMapper.resumeFileWrite(resumeFileDto);
+
+		} catch (IllegalStateException | IOException e) {
+			e.printStackTrace();
+			mv.addObject("error", "파일 업로드 실패.");
+			mv.setViewName("section/resumeWrite");
+			return mv;
+		}
 
 		mv.setViewName("redirect:/resumes");
 		return mv;
@@ -436,8 +435,8 @@ public class PostingController {
 	public ModelAndView resumeEditForm(HttpSession session, @RequestParam("resumeIdx") Long resumeIdx,
 			PersonSkillDto personSkill) {
 		ModelAndView mv = new ModelAndView();
-
-		Long userIdx = (Long) session.getAttribute("user_idx");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
 
 		// 이력서에 사용된 person_tb 갖고오기
 		PersonDto person = postingMapper.getPersonByUserIdx(userIdx);
@@ -448,8 +447,7 @@ public class PostingController {
 		}
 
 		// personIdx가 같은 정보를 찾기 위해 세션에서 갖고옴
-		Long personIdx = (Long) session.getAttribute("person_idx");
-
+		Long personIdx = person.getPersonIdx();
 		// skillIdx를 토대로 skill 갖고오기
 		List<SkillDto> userSkills = postingMapper.getUserSkill(personIdx);
 
@@ -463,9 +461,10 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
-		
+
 		ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
-		
+		Long userType = user.getUserType();
+		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("resume", resume);
 		mv.addObject("allSkills", allSkills);
@@ -481,7 +480,8 @@ public class PostingController {
 	@PostMapping("/resumeEdit")
 	@Transactional
 	public ModelAndView resumeEdit(HttpSession session, @RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto,
-			@RequestParam("skillIdx") List<Long> skillIdxList, ResumeFileDto resumeFileDto,@RequestParam("file") MultipartFile file) {
+			@RequestParam("skillIdx") List<Long> skillIdxList, ResumeFileDto resumeFileDto,
+			@RequestParam("file") MultipartFile file) {
 		ModelAndView mv = new ModelAndView();
 
 		postingMapper.resumeUpdate(resumeDto);
@@ -497,37 +497,35 @@ public class PostingController {
 			personSkillDto.setSkillIdx(skillIdx); // 스킬 인덱스 설정
 			postingMapper.insertSkill(personSkillDto); // 스킬 정보 삽입
 		}
-		
-		
+
 		// 파일 수정부분
 
 		if (!file.isEmpty()) {
-		    // 새 파일이 업로드되었을 경우
-		    String fileName = file.getOriginalFilename();
-		    String fileNameScret = System.currentTimeMillis() + "_" + fileName;
-		    String filePath = "D:/dev/springjpa/JobMates/src/main/resources/static/images/" + fileNameScret;
-		    Long fileSize = file.getSize();
-		    
-		    File dest = new File(filePath);
+			// 새 파일이 업로드되었을 경우
+			String fileName = file.getOriginalFilename();
+			String fileNameScret = System.currentTimeMillis() + "_" + fileName;
+			String filePath = "D:/dev/springjpa/JobMates/src/main/resources/static/images/" + fileNameScret;
+			Long fileSize = file.getSize();
 
-		    try {
-		        // 파일을 지정된 경로로 저장
-		        file.transferTo(dest);
-		        resumeFileDto.setResumeIdx(resumeIdx);
-		        resumeFileDto.setOriginalName(fileName);
-		        resumeFileDto.setFileSize(fileSize);
-		        resumeFileDto.setFilePath("/images/" + fileNameScret);
+			File dest = new File(filePath);
 
-		        // 여기서 새 파일 정보로 업데이트
-		        postingMapper.updateResumeFile(resumeFileDto);
+			try {
+				// 파일을 지정된 경로로 저장
+				file.transferTo(dest);
+				resumeFileDto.setResumeIdx(resumeIdx);
+				resumeFileDto.setOriginalName(fileName);
+				resumeFileDto.setFileSize(fileSize);
+				resumeFileDto.setFilePath("/images/" + fileNameScret);
 
-		    } catch (IllegalStateException | IOException e) {
-		        e.printStackTrace();
-		    }
+				// 여기서 새 파일 정보로 업데이트
+				postingMapper.updateResumeFile(resumeFileDto);
+
+			} catch (IllegalStateException | IOException e) {
+				e.printStackTrace();
+			}
 		} else {
-		    // 새 파일이 업로드되지 않았을 경우 예전 파일 정보 유지
+			// 새 파일이 업로드되지 않았을 경우 예전 파일 정보 유지
 		}
-
 
 		mv.setViewName("redirect:/resumeView?resumeIdx=" + resumeIdx);
 

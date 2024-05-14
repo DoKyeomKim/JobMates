@@ -112,6 +112,8 @@ public interface PostingMapper {
 	// 이력서 사진 수정
 	void updateResumeFile(ResumeFileDto resumeFileDto);
 
+	Long selectNextPostingSeq();
+
 
 
 	

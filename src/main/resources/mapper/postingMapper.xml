@@ -123,6 +123,10 @@ FROM COMPANY_TB
 WHERE user_idx = #{userIdx}
 </select>
 
+<select id="selectNextPostingSeq" resultType="long">
+   select POSTING_SEQ.CURRVAL FROM DUAL
+</select>
+
 <insert id="postingWrite" parameterType="com.job.dto.PostingDto">
     INSERT INTO POSTING_TB (POSTING_IDX, USER_IDX, POSTING_TITLE, POSTING_COMMENT, EXPERIENCE,
     EMP_TYPE, SALARY, START_TIME, END_TIME, POSTING_DEADLINE, JOB_TYPE, CREATED_DATE, POSTING_ADDRESS)
@@ -130,9 +134,9 @@ WHERE user_idx = #{userIdx}
     #{empType}, #{salary}, #{startTime}, #{endTime}, #{postingDeadline}, #{jobType}, SYSDATE, #{postingAddress})
 </insert>
 
-<insert id="postingSkillWrite" parameterType="com.job.dto.PostingDto">
+<insert id="postingSkillWrite" parameterType="com.job.dto.PostingSkillDto">
     INSERT INTO POSTING_SKILL_TB (POSTING_IDX,POSTING_SKILL_IDX,SKILL_IDX)
-    VALUES (POSTING_SEQ.CURRVAL, POSTINGSKILL_SEQ.NEXTVAL,#{skillIdx})
+    VALUES (#{postingIdx}, POSTINGSKILL_SEQ.NEXTVAL, #{skillIdx})
 </insert>
 
 
@@ -163,7 +167,7 @@ ORDER BY SKILL_idx ASC
 
  <insert id="postingSkillUpdate">
     INSERT INTO POSTING_SKILL_TB (POSTING_IDX,POSTING_SKILL_IDX,SKILL_IDX)
-    VALUES (#{postingIdx}, POSTINGSKILL_SEQ.NEXTVAL,#{skillIdx})
+    VALUES (#{postingIdx}, POSTINGSKILL_SEQ.NEXTVAL, #{skillIdx})
 </insert>
  
  <update id="updateResumePublishStatus">
