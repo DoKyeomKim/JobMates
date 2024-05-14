@@ -1,5 +1,7 @@
 package com.job.dto;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,4 +16,8 @@ public class ResumeDto {
 	private Long publish;
 	private String resumeComment;
 	private String createdDate;
+	public void setCreatedDate(Date date) {
+		// TODO Auto-generated method stub
+		
+	}
 }
