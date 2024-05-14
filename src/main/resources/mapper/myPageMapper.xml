@@ -2,4 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.job.mapper.MypageMapper">
 
+	<select id="getPerson">
+		SELECT
+		PERSON_IDX,
+		PERSON_ADDRESS,
+		PERSON_BIRTH,
+		PERSON_EDUCATION,
+		PERSON_NAME,
+		PERSON_PHONE,
+		USER_EMAIL
+		FROM
+		PERSON_TB
+		WHERE
+		PERSON_IDX = #{ personIdx }
+	</select>
+
+	<update id="updatePerson">
+		UPDATE PERSON_TB
+		SET PERSON_IDX = #{ personIdx },
+		PERSON_ADDRESS = #{ personAddress },
+		PERSON_BIRTH = #{ personBirth },
+		PERSON_EDUCATION = #{ personEducation
+		},
+		PERSON_NAME = #{ personName },
+		PERSON_PHONE = #{ personPhone },
+		USER_EMAIL = #{ userEmail }
+		WHERE PERSON_IDX = #{ personIdx }
+	</update>
+
 </mapper>
