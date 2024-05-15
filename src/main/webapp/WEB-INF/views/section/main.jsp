@@ -6,7 +6,6 @@
 <head>
 <meta charset="UTF-8">
 <title>메인 페이지</title>
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <style>
