@@ -582,4 +582,32 @@ public class PostingController {
 		return mv;
 	}
 
+
+
+	// ==================================================================
+	// == 개인유저가 보는 추천 공고(스킬 기반)
+	
+		//추천 공고 페이지 이동
+		@GetMapping("/postingRecommend")
+		public ModelAndView postingRecommend(HttpSession session) {
+			ModelAndView mv = new ModelAndView();
+			
+			mv.setViewName("section/postingRecommend");
+			return mv;
+		} 
+
+	// ==================================================================
+	// == 기업 유저가 보는 추천 이력서(스킬 기반)
+		
+		//추천 이력서 페이지 이동
+		@GetMapping("/resumeRecommend")
+		public ModelAndView resumeRecommend(HttpSession session) {
+			ModelAndView mv = new ModelAndView();
+			
+			mv.setViewName("section/resumeRecommend");
+			return mv;
+		}
+	
+		
+		
 }
