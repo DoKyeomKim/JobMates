@@ -177,6 +177,7 @@ width : 150px;}
         <div style="display: flex;">
             <input type="checkbox" name="userType" value="2" style="margin-right: 5px; width: 20px; height: 20px;" disabled><label style="margin-right: 10px;">개인</label>
             <input type="checkbox" name="userType" value="1" style="margin-left: 20px; margin-right: 5px; width: 20px; height: 20px;" checked><label style="margin-right: 10px;">기업</label>
+
         </div>
     </td>
 </tr>

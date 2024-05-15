@@ -135,6 +135,7 @@ public class PostingController {
 	public ModelAndView postingWrite(HttpSession session, PostingDto postingDto,
 			@RequestParam("skillIdx") List<Long> skillIdxList) {
 		ModelAndView mv = new ModelAndView();
+
 		
 		UserDto user = (UserDto) session.getAttribute("login");
 		
@@ -548,6 +549,7 @@ public class PostingController {
 				resumeFileDto.setOriginalName(fileName);
 				resumeFileDto.setFileSize(fileSize);
 				resumeFileDto.setFilePath("/images/"+fileNameScret);
+
 
 				// 여기서 새 파일 정보로 업데이트
 				postingMapper.updateResumeFile(resumeFileDto);

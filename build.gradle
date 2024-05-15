@@ -50,6 +50,7 @@ dependencies {
     // 시큐리티 관련 설정 현재 주석처리. 로그인 구현되면 풀 것
 	// implementation 'org.springframework.boot:spring-boot-starter-security'
 	// implementation 'org.springframework.security:spring-security-test'
+<<<<<<< HEAD
 	
 	
 	// 이미지 파일 관련
@@ -61,3 +62,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+=======
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+>>>>>>> branch 'posting' of https://github.com/DoKyeomKim/JobMates.git

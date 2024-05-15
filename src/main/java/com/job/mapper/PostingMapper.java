@@ -95,6 +95,7 @@ public interface PostingMapper {
 	
 	// 스킬 수정용 입력 
 
+
 	
 	
 	// 공개여부 상태변경
@@ -118,6 +119,9 @@ public interface PostingMapper {
 	List<Long> getPeronIdxByUserIdx(Long userIdx);
 
 	void insertSkill(PersonSkillDto personSkillDto);
+
+
+	
 
 
 
