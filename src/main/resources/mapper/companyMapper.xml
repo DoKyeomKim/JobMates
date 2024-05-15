@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.job.mapper.CompanyMapper">
+
+
+
+<insert id="insertCompany" parameterType="com.job.dto.CompanyDto">
+		
+INSERT  INTO   COMPANY_TB (
+  	USER_IDX,
+    COMPANY_IDX,
+	COMPANY_NAME,
+	COMPANY_REP_NAME,
+	COMPANY_PHONE,
+	COMPANY_ADDRESS,
+	USER_EMAIL
+		)
+VALUES (
+    USER_SEQ.CURRVAL,
+    COMPANY_SEQ.NEXTVAL,
+    #{ companyName},
+    #{ companyRepName},
+    #{ companyPhone  },
+  	#{ companyAddress     },
+    #{ userEmail}
+)
+	
+	</insert>
+</mapper>
