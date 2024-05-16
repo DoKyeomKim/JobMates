@@ -50,6 +50,11 @@ dependencies {
     // 시큐리티 관련 설정 현재 주석처리. 로그인 구현되면 풀 것
 	// implementation 'org.springframework.boot:spring-boot-starter-security'
 	// implementation 'org.springframework.security:spring-security-test'
+	
+	
+	// 이미지 파일 관련
+	implementation 'commons-fileupload:commons-fileupload:1.4'
+	implementation 'commons-io:commons-io:2.11.0'
 }
 
 tasks.named('test') {

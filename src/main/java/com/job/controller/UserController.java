@@ -186,19 +186,3 @@ public class UserController {
 				
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
