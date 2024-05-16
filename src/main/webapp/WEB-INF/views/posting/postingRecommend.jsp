@@ -68,7 +68,7 @@ header {
 		<script src="/js/postingRecommendScrap.js"></script>
 	</c:if>
 	<c:if test="${empty posting}">
-		<p>검색 결과가 없습니다.</p>
+		<p>추천 공고가 없습니다.</p>
 	</c:if>
 	
 <%@include file="/WEB-INF/layouts/footer.jsp"%>
