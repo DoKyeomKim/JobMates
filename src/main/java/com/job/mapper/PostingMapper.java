@@ -94,7 +94,7 @@ public interface PostingMapper {
 	void deletePersonSkill(Long personIdx);
 	
 	// 스킬 수정용 입력 
-	void insertSkill(PersonSkillDto personSkillDto);
+
 
 	
 	
@@ -113,6 +113,15 @@ public interface PostingMapper {
 	void updateResumeFile(ResumeFileDto resumeFileDto);
 
 	Long selectNextPostingSeq();
+
+	// 이력서 작성에서 user_idx로 person_idx찾으려고 만든거
+	//나중에 삭제해야함
+	List<Long> getPeronIdxByUserIdx(Long userIdx);
+
+	void insertSkill(PersonSkillDto personSkillDto);
+
+
+	
 
 
 
