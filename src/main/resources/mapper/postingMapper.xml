@@ -184,4 +184,35 @@ ORDER BY SKILL_idx ASC
  where resume_idx=#{resumeIdx}
  </update>
  
+ <!-- ===================== 추천공고 ===============-->
+ 
+<select id="getPostingIdxByPersonUserIdx">
+SELECT pt.POSTING_IDX,co.USER_IDX,co.COMPANY_IDX, pt.POSTING_TITLE, co.COMPANY_NAME, cf.FILE_PATH
+FROM posting_tb pt 
+JOIN company_tb co ON pt.USER_IDX = co.USER_IDX
+LEFT JOIN company_file_tb cf ON co.COMPANY_IDX = cf.COMPANY_IDX
+WHERE pt.POSTING_IDX IN (
+    SELECT pst.POSTING_IDX
+    FROM posting_skill_tb pst
+    JOIN (
+        SELECT ps.SKILL_IDX
+        FROM person_tb p
+        JOIN person_skill_tb ps ON p.PERSON_IDX = ps.PERSON_IDX
+        WHERE p.USER_IDX = #{userIdx}
+    ) ps_matched ON pst.SKILL_IDX = ps_matched.SKILL_IDX
+    GROUP BY pst.POSTING_IDX
+    HAVING COUNT(pst.SKILL_IDX) >= 1
+)
+ </select>
+ 
+ <select id="getPersonIdxByUserIdx">
+select pt.person_idx
+from person_tb pt
+join user_tb ut on pt.user_idx = ut.user_idx
+where ut.user_idx = #{userIdx}
+ </select>
+ 
+
+
+ 
 </mapper>

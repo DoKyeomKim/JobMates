@@ -3,12 +3,13 @@ package com.job.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import com.job.dto.CompanyDto;
+import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
+import com.job.dto.PostingRecommendDto;
 import com.job.dto.PostingSkillDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
@@ -119,6 +120,18 @@ public interface PostingMapper {
 	List<Long> getPeronIdxByUserIdx(Long userIdx);
 
 	void insertSkill(PersonSkillDto personSkillDto);
+
+	//==================추천공고=================================
+	
+	// userIdx로 personIdx갖고오기
+	Long getPersonIdxByUserIdx(Long userIdx);
+	// person의 user_idx로 posting_idx를 갖고오기.
+	List<PostingRecommendDto> getPostingIdxByPersonUserIdx(Long userIdx);
+
+
+	
+
+
 
 
 	
