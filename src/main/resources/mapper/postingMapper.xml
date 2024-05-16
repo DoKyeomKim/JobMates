@@ -203,6 +203,7 @@ WHERE pt.POSTING_IDX IN (
     GROUP BY pst.POSTING_IDX
     HAVING COUNT(pst.SKILL_IDX) >= 1
 )
+order by pt.posting_idx ASC
  </select>
  
  <select id="getPersonIdxByUserIdx">
