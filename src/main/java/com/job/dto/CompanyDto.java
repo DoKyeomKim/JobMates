@@ -33,4 +33,5 @@ public class CompanyDto {
 				com.getCompanySector(), com.getCompanyYear(),com.getUser().getUserEmail());
 	}
 
+
 }

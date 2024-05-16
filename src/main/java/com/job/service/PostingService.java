@@ -6,8 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.job.dto.PersonDto;
+import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingSkillDto;
+import com.job.dto.SkillDto;
 import com.job.mapper.PostingMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,5 +35,7 @@ public class PostingService {
             postingMapper.postingSkillWrite(postingSkillDto); // 기술 스택을 POSTING_SKILL_TB에 저장
         }
     }
+
+
 
 }

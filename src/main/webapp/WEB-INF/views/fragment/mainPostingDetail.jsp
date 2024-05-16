@@ -168,7 +168,7 @@
 							<c:when test="${sessionScope.isLoggedIn}">
 								<button id="applyButton" class="btn btn-success"
 									data-posting-idx="${posting.postingIdx}">지원하기</button>
-								<a class="btn btn-info ms-3" href="/">목록으로</a>
+								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
 								<button
 									class="btn btn-outline-secondary  d-flex align-items-center ms-3">
 									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapBtn me-2"
@@ -180,7 +180,7 @@
 								</button>
 							</c:when>
 							<c:otherwise>
-								<a class="btn btn-info ms-3" href="/">목록으로</a>
+								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
 							</c:otherwise>
 						</c:choose>
 					</div>

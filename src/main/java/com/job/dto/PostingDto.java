@@ -24,6 +24,7 @@ public class PostingDto {
 	private String createdDate;
 	private String postingAddress;
 	
+	
 	public static PostingDto createPostingDto(Posting posting) {
 	    return new PostingDto(
 	        posting.getPostingIdx(),

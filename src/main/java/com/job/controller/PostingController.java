@@ -21,9 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.CompanyDto;
+import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
+import com.job.dto.PostingRecommendDto;
 import com.job.dto.PostingSkillDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
@@ -66,7 +68,7 @@ public class PostingController {
 		Long userType = user.getUserType();
 		mv.addObject("userType", userType);
 		mv.addObject("posting", posting);
-		mv.setViewName("section/postings");
+		mv.setViewName("posting/postings");
 
 		return mv;
 	}
@@ -99,7 +101,7 @@ public class PostingController {
 		mv.addObject("company", company);
 		mv.addObject("posting", posting);
 		mv.addObject("skill", skill);
-		mv.setViewName("section/postingView");
+		mv.setViewName("posting/postingView");
 
 		return mv;
 	}
@@ -125,7 +127,7 @@ public class PostingController {
 		mv.addObject("userIdx", userIdx);
 		mv.addObject("skill", skill);
 		mv.addObject("company", company);
-		mv.setViewName("section/postingWrite");
+		mv.setViewName("posting/postingWrite");
 
 		return mv;
 	}
@@ -186,7 +188,7 @@ public class PostingController {
 		mv.addObject("posting", posting);
 		mv.addObject("userSkills", userSkills);
 		mv.addObject("allSkills", allSkills);
-		mv.setViewName("section/postingEdit");
+		mv.setViewName("posting/postingEdit");
 		return mv;
 	}
 
@@ -251,7 +253,7 @@ public class PostingController {
 		Long userType = user.getUserType();
 		mv.addObject("userType", userType);
 		mv.addObject("resumes", resumeList);
-		mv.setViewName("section/resumes");
+		mv.setViewName("posting/resumes");
 
 		return mv;
 	}
@@ -293,7 +295,7 @@ public class PostingController {
 		mv.addObject("resume", resume);
 		mv.addObject("skill", skill);
 		mv.addObject("resumeFile", resumeFile);
-		mv.setViewName("section/resumeView");
+		mv.setViewName("posting/resumeView");
 		return mv;
 	}
 
@@ -338,7 +340,7 @@ public class PostingController {
 		Long userIdx = user.getUserIdx();
 		if (userIdx == null) {
 			// 세션에 사용자 정보가 없을 경우 처리
-			mv.setViewName("section/error");
+			mv.setViewName("posting/error");
 			return mv;
 		}
 
@@ -356,7 +358,7 @@ public class PostingController {
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("skill", skill);
-		mv.setViewName("section/resumeWrite");
+		mv.setViewName("posting/resumeWrite");
 
 		return mv;
 	}
@@ -394,7 +396,7 @@ public class PostingController {
 		// 파일이 업로드되지 않았을 경우 처리
 		if (file.isEmpty()) {
 			mv.addObject("error", "파일을 선택하세요.");
-			mv.setViewName("section/resumeWrite");
+			mv.setViewName("posting/resumeWrite");
 			return mv;
 		}
 
@@ -426,7 +428,7 @@ public class PostingController {
 		} catch (IllegalStateException | IOException e) {
 			e.printStackTrace();
 			mv.addObject("error", "파일 업로드 실패.");
-			mv.setViewName("section/resumeWrite");
+			mv.setViewName("posting/resumeWrite");
 			return mv;
 		}
 
@@ -481,7 +483,7 @@ public class PostingController {
 		mv.addObject("userSkills", userSkills);
 		mv.addObject("resumeIdx", resumeIdx);
 		mv.addObject("resumeFile", resumeFile);
-		mv.setViewName("section/resumeEdit");
+		mv.setViewName("posting/resumeEdit");
 		return mv;
 
 	}
@@ -513,17 +515,17 @@ public class PostingController {
 		// 이걸 한개만 찾아오니 다 못집어넣어서 생기는 문제다. 라고 생각하면 될거 같음.
 
 	    List<Long> personIdxList = postingMapper.getPeronIdxByUserIdx(userIdx);
-	    System.out.println("userIdx========================="+personIdxList);
+	    System.out.println("personIdxList========================="+personIdxList);
 		
 	    for (Long personIdx : personIdxList) {
 	        postingMapper.deletePersonSkill(personIdx);
 		
-		for (Long skillIdx : skillIdxList) {
-			PersonSkillDto personSkillDto = new PersonSkillDto();
-			personSkillDto.setPersonIdx(personIdx); // 사용자 ID 설정
-			personSkillDto.setSkillIdx(skillIdx); // 스킬 인덱스 설정
-			postingMapper.insertSkill(personSkillDto); // 스킬 정보 삽입
-		}
+			for (Long skillIdx : skillIdxList) {
+				PersonSkillDto personSkillDto = new PersonSkillDto();
+				personSkillDto.setPersonIdx(personIdx); // 사용자 ID 설정
+				personSkillDto.setSkillIdx(skillIdx); // 스킬 인덱스 설정
+				postingMapper.insertSkill(personSkillDto); // 스킬 정보 삽입
+			}
 	    }
 		
 		
@@ -589,10 +591,36 @@ public class PostingController {
 	
 		//추천 공고 페이지 이동
 		@GetMapping("/postingRecommend")
-		public ModelAndView postingRecommend(HttpSession session) {
+		public ModelAndView postingRecommend(HttpSession session,PersonDto personDto,PersonSkillDto personSkill) {
 			ModelAndView mv = new ModelAndView();
+
+			// 세션에서 로그인 정보 불러오기.
+			UserDto user = (UserDto) session.getAttribute("login");
+			Long userIdx = user.getUserIdx();
+			if (userIdx == null) {
+				// 세션에 사용자 정보가 없을 경우 처리
+				mv.setViewName("posting/error");
+				return mv;
+			}
+			Long userType = user.getUserType();
+
+			// userIdx로 로그인한 사람 personIdx 갖고 오기
+			Long personIdx = postingMapper.getPersonIdxByUserIdx(userIdx);
+			personDto.setPersonIdx(personIdx);
 			
-			mv.setViewName("section/postingRecommend");
+			// 불러온 userIdx로 person의 skill을 갖고오고
+			// person의 skill과 posting의 skill이 1개 이상 일치하는 공고 posting_idx를 갖고 오고
+			// 해당 postingIdx로 company_name 들고오기
+			List<PostingRecommendDto> postingList = postingMapper.getPostingIdxByPersonUserIdx(userIdx);
+			
+			// 위에서 찾은 회사 user_idx(세션에 있는 user_idx가 아님)로 file_path 찾아오기
+
+			System.out.println("============================================="+personIdx);
+			
+			mv.addObject("person", personDto);
+			mv.addObject("userType", userType);
+			mv.addObject("posting",postingList);
+			mv.setViewName("posting/postingRecommend");
 			return mv;
 		} 
 
@@ -604,7 +632,9 @@ public class PostingController {
 		public ModelAndView resumeRecommend(HttpSession session) {
 			ModelAndView mv = new ModelAndView();
 			
-			mv.setViewName("section/resumeRecommend");
+			
+			
+			mv.setViewName("posting/resumeRecommend");
 			return mv;
 		}
 	
