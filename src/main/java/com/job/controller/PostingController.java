@@ -135,13 +135,17 @@ public class PostingController {
 	public ModelAndView postingWrite(HttpSession session, PostingDto postingDto,
 			@RequestParam("skillIdx") List<Long> skillIdxList) {
 		ModelAndView mv = new ModelAndView();
+
+		
 		UserDto user = (UserDto) session.getAttribute("login");
+		
 		Long userIdx = user.getUserIdx();
 		if (userIdx == null) {
 			// 세션에 사용자 정보가 없을 경우 처리
 			mv.setViewName("redirect:/login");
 			return mv;
 		}
+		
 		postingService.postingWrite(postingDto, skillIdxList);
 
 		mv.setViewName("redirect:/postings");
@@ -195,7 +199,7 @@ public class PostingController {
 
 		postingMapper.postingUpdate(postingDto);
 
-		postingMapper.postingSkillDelete(postingIdx);
+		postingMapper.postingSkillDelete(postingIdx);	
 
 		// 선택된 기술 스택들을 반복하여 저장
 		// 배열을 for문으로 구현하고, postingIdx를 입력,skillIdx는 화면에서 받아옴.
@@ -204,7 +208,6 @@ public class PostingController {
 			postingSkill.setPostingIdx(postingIdx);
 			postingSkill.setSkillIdx(skillIdx); // 추가된 라인
 			postingMapper.postingSkillUpdate(postingSkill);
-			System.out.println("=================================================================" + postingSkill);
 		}
 
 		mv.setViewName("redirect:/postingView?postingIdx=" + postingIdx);
@@ -400,10 +403,11 @@ public class PostingController {
 		// 암호환 파일 이름 중복방지(그냥 시간 앞에 붙임)
 		String fileNameScret = System.currentTimeMillis() + "_" + fileName;
 
-		String filePath = "C:/images/images" + fileNameScret;
+		String filePath = "C:/dev/" + fileNameScret;
 		Long fileSize = file.getSize();
 		// 파일 해당 위치에 저장
-		File dest = new File(filePath);
+		File dest = new File("C:/dev/images/"+fileNameScret);
+		// 만약 해당 위치에 폴더가 없으면 생성
 		if (!dest.exists()) {
 			dest.mkdirs();
         }
@@ -429,6 +433,8 @@ public class PostingController {
 		mv.setViewName("redirect:/resumes");
 		return mv;
 	}
+	
+	
 
 	// 이력서 수정폼 이동
 	@GetMapping("/resumeEditForm")
@@ -448,9 +454,11 @@ public class PostingController {
 
 		// personIdx가 같은 정보를 찾기 위해 세션에서 갖고옴
 		Long personIdx = person.getPersonIdx();
+		
 		// skillIdx를 토대로 skill 갖고오기
 		List<SkillDto> userSkills = postingMapper.getUserSkill(personIdx);
-
+		
+		
 		// 모든 skill_tb에 있는 모든 skill
 		List<SkillDto> allSkills = postingMapper.getAllSkill();
 
@@ -461,9 +469,11 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
-
 		ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
+		
 		Long userType = user.getUserType();
+		
+		
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("resume", resume);
@@ -479,35 +489,58 @@ public class PostingController {
 	// 이력서 수정
 	@PostMapping("/resumeEdit")
 	@Transactional
-	public ModelAndView resumeEdit(HttpSession session, @RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto,
-			@RequestParam("skillIdx") List<Long> skillIdxList, ResumeFileDto resumeFileDto,
+	public ModelAndView resumeEdit(HttpSession session, 
+			@RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto,
+			@RequestParam("skillIdx") List<Long> skillIdxList, PersonDto person,
+			ResumeFileDto resumeFileDto, 
 			@RequestParam("file") MultipartFile file) {
+		
 		ModelAndView mv = new ModelAndView();
 
+		UserDto user = (UserDto) session.getAttribute("login");
 		postingMapper.resumeUpdate(resumeDto);
+		
 
-		// 세션에서 person_idx 갖고오기
-		Long personIdx = (Long) session.getAttribute("person_idx");
+		// 세션에서 user_idx 갖고오기
+		Long userIdx = user.getUserIdx();
+		//System.out.println("userIdx========================="+userIdx);
+		
+		
+		// 세션에서 user_idx로 person_idx 갖고오기 스킬용으로(나중에 삭제)
+				
+		//Long personIdx = postingMapper.getPeronIdxByUserIdx(userIdx); 이게 문제인데 왜 이게 문제인지 모르겠음.
+		// 찾아서 해결해본 결과로는 이제 내가 매퍼에 userIdx로 personIdx를 갖고오는게 1개뿐인데 
+		// 이걸 한개만 찾아오니 다 못집어넣어서 생기는 문제다. 라고 생각하면 될거 같음.
 
-		postingMapper.deletePersonSkill(personIdx);
-
+	    List<Long> personIdxList = postingMapper.getPeronIdxByUserIdx(userIdx);
+	    System.out.println("userIdx========================="+personIdxList);
+		
+	    for (Long personIdx : personIdxList) {
+	        postingMapper.deletePersonSkill(personIdx);
+		
 		for (Long skillIdx : skillIdxList) {
 			PersonSkillDto personSkillDto = new PersonSkillDto();
 			personSkillDto.setPersonIdx(personIdx); // 사용자 ID 설정
 			personSkillDto.setSkillIdx(skillIdx); // 스킬 인덱스 설정
 			postingMapper.insertSkill(personSkillDto); // 스킬 정보 삽입
 		}
-
+	    }
+		
+		
+		
 		// 파일 수정부분
 
 		if (!file.isEmpty()) {
 			// 새 파일이 업로드되었을 경우
 			String fileName = file.getOriginalFilename();
 			String fileNameScret = System.currentTimeMillis() + "_" + fileName;
-			String filePath = "D:/dev/springjpa/JobMates/src/main/resources/static/images/" + fileNameScret;
+			String filePath = "C:/dev/" + fileNameScret;
 			Long fileSize = file.getSize();
 
-			File dest = new File(filePath);
+			File dest = new File("C:/dev/images/"+fileNameScret);
+			if (!dest.exists()) {
+				dest.mkdirs();
+	        }
 
 			try {
 				// 파일을 지정된 경로로 저장
@@ -515,7 +548,8 @@ public class PostingController {
 				resumeFileDto.setResumeIdx(resumeIdx);
 				resumeFileDto.setOriginalName(fileName);
 				resumeFileDto.setFileSize(fileSize);
-				resumeFileDto.setFilePath("/images/" + fileNameScret);
+				resumeFileDto.setFilePath("/images/"+fileNameScret);
+
 
 				// 여기서 새 파일 정보로 업데이트
 				postingMapper.updateResumeFile(resumeFileDto);
@@ -548,4 +582,32 @@ public class PostingController {
 		return mv;
 	}
 
+
+
+	// ==================================================================
+	// == 개인유저가 보는 추천 공고(스킬 기반)
+	
+		//추천 공고 페이지 이동
+		@GetMapping("/postingRecommend")
+		public ModelAndView postingRecommend(HttpSession session) {
+			ModelAndView mv = new ModelAndView();
+			
+			mv.setViewName("section/postingRecommend");
+			return mv;
+		} 
+
+	// ==================================================================
+	// == 기업 유저가 보는 추천 이력서(스킬 기반)
+		
+		//추천 이력서 페이지 이동
+		@GetMapping("/resumeRecommend")
+		public ModelAndView resumeRecommend(HttpSession session) {
+			ModelAndView mv = new ModelAndView();
+			
+			mv.setViewName("section/resumeRecommend");
+			return mv;
+		}
+	
+		
+		
 }
