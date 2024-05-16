@@ -41,7 +41,6 @@ public class MainController {
 		ModelAndView mv = new ModelAndView("section/main");
 		UserDto user = (UserDto) session.getAttribute("login");
 
-		// 여기를 수정했습니다: isLoggedIn이 null이면 false를 기본값으로 사용합니다.
 		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
 		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
 
@@ -160,20 +159,31 @@ public class MainController {
 	}
 
 	@GetMapping("/MainPosting/{postingIdx}")
-	public ModelAndView mainPosting(@PathVariable("postingIdx") Long postingIdx) {
+	public ModelAndView mainPosting(@PathVariable("postingIdx") Long postingIdx, HttpSession session) {
 		ModelAndView mv = new ModelAndView("section/mainPosting");
-		Long userIdx = (long) 3;
-		PersonDto person = mainService.findPersonByUserIdx(userIdx);
-		PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
-		Long postingUserIdx = posting.getUserIdx();
-		CompanyDto company = mainService.findCompanyByUserIdx(postingUserIdx);
-		List<SkillDto> skills = mainService.findSkillListByPostingIdx(postingIdx);
-		mv.addObject("company", company);
-		mv.addObject("posting", posting);
-		mv.addObject("skills", skills);
-		log.info("company = {}", company);
-		log.info("posting = {}", posting);
-		log.info("skills = {}", skills);
+		UserDto user = (UserDto) session.getAttribute("login");
+
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+		
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userIdx = user.getUserIdx();
+				PersonDto person = mainService.findPersonByUserIdx(userIdx);
+				PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
+				Long postingUserIdx = posting.getUserIdx();
+				CompanyDto company = mainService.findCompanyByUserIdx(postingUserIdx);
+				List<SkillDto> skills = mainService.findSkillListByPostingIdx(postingIdx);
+				mv.addObject("company", company);
+				mv.addObject("posting", posting);
+				mv.addObject("skills", skills);
+				log.info("company = {}", company);
+				log.info("posting = {}", posting);
+				log.info("skills = {}", skills);
+			}
+		} else {
+			mv.setViewName("redirect:/personlogin");
+		}
 		return mv;
 	}
 

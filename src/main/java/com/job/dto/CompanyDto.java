@@ -23,14 +23,13 @@ public class CompanyDto {
 	private String companySize;
 	private String companySector;
 	private String companyYear;
-	private String userEmail;
 
 	public static CompanyDto createCompanyDto(Company com) {
 		// TODO Auto-generated method stub
 		return new CompanyDto(com.getCompanyIdx(), com.getUser().getUserIdx(), // userIdx를 올바른 위치로 이동
 				com.getCompanyName(), com.getCompanyRepName(), com.getCompanyPhone(), com.getCompanyAddress(),
 				com.getCompanyMgrName(), com.getCompanyMgrPhone(), com.getCompanyEmp(), com.getCompanySize(),
-				com.getCompanySector(), com.getCompanyYear(),com.getUser().getUserEmail());
+				com.getCompanySector(), com.getCompanyYear());
 	}
 
 }
