@@ -24,7 +24,7 @@
 										<li><a href="#" class="nav-link px-2 text-dark">추천 인재</a></li>
 										<li><a href="/postings" class="nav-link px-2 text-dark">공고
 												관리</a></li>
-										<li><a href="#" class="nav-link px-2 text-dark">채용 관리</a></li>
+										<li><a href="/ApplyPage" class="nav-link px-2 text-dark">채용 관리</a></li>
 										<li><a href="#" class="nav-link px-2 text-dark">관심 인재</a></li>
 										<li><a href="#" class="nav-link px-2 text-dark">자유
 												게시판</a></li>
@@ -36,14 +36,13 @@
 										<li><a href="#" class="nav-link px-2 text-dark">추천 공고</a></li>
 										<li><a href="/resumes" class="nav-link px-2 text-dark">이력서
 												관리</a></li>
-										<li><a href="#" class="nav-link px-2 text-dark">지원 현황</a></li>
+										<li><a href="/ApplyPage" class="nav-link px-2 text-dark">지원 현황</a></li>
 										<li><a href="#" class="nav-link px-2 text-dark">관심 기업</a></li>
 										<li><a href="#" class="nav-link px-2 text-dark">자유
 												게시판</a></li>
 									</ul>
 								</c:when>
 							</c:choose>
-
 						</c:when>
 						<c:otherwise>
 							<ul

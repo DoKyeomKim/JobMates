@@ -88,13 +88,12 @@
 		<div>
 			<div class="container" style="width: 85%;">
 
-
 				<div class="mt-5">
 					<label class="form-control w-100" style="text-align: center;">${posting.postingTitle}</label>
 					<input type="hidden" name="postingDeadline"
 						value="${posting.postingDeadline}">
 				</div>
-
+				<input type="hidden" value="${person.personIdx}" id="personIdx">
 				<div class="row">
 					<!-- 왼쪽 필드 -->
 					<div class="col-md-6 mt-5">
@@ -139,10 +138,6 @@
 				</div>
 			</div>
 
-
-
-
-
 			<div class="container mt-3" style="width: 85%;">
 				<div class="row justify-content-center ">
 
@@ -166,24 +161,33 @@
 					<div class="d-flex justify-content-center">
 						<c:choose>
 							<c:when test="${sessionScope.isLoggedIn}">
-								<button id="applyButton" class="btn btn-success"
-									data-posting-idx="${posting.postingIdx}">지원하기</button>
-								<a class="btn btn-info ms-3" href="/">목록으로</a>
-								<button
-									class="btn btn-outline-secondary  d-flex align-items-center ms-3">
-									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapBtn me-2"
-										aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-										width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            		<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-											d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" /></svg>
-									<span>스크랩</span>
-								</button>
+								<c:if test="${sessionScope.userType == 2}">
+									<button id="applyButton" class="btn btn-success"
+										data-posting-idx="${posting.postingIdx}">지원하기</button>
+									<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
+									<button
+										class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
+										<svg
+											class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
+											data-posting-idx="${posting.postingIdx}" aria-hidden="true"
+											xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+											fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor"
+												stroke-linecap="round" stroke-linejoin="round"
+												stroke-width="2"
+												d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" />
+                    </svg>
+										<span>스크랩</span>
+									</button>
+								</c:if>
+								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
 							</c:when>
 							<c:otherwise>
-								<a class="btn btn-info ms-3" href="/">목록으로</a>
+								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
 							</c:otherwise>
 						</c:choose>
 					</div>
+
 
 					<div style="margin-top: 15px;">
 						<h4>기업소개</h4>
@@ -220,5 +224,6 @@
 			</div>
 		</div>
 	</main>
+	<script src="/js/postingScrap.js"></script>
 </body>
 </html>

@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.ApplyDto;
+import com.job.dto.ApplyStatusDto;
 import com.job.dto.CompanyDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
@@ -165,16 +165,19 @@ public class MainController {
 
 		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
 		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
-		
+
 		if (isLoggedIn) {
 			if (user != null) {
+				Long userType = user.getUserType();
 				Long userIdx = user.getUserIdx();
 				PersonDto person = mainService.findPersonByUserIdx(userIdx);
 				PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
 				Long postingUserIdx = posting.getUserIdx();
 				CompanyDto company = mainService.findCompanyByUserIdx(postingUserIdx);
 				List<SkillDto> skills = mainService.findSkillListByPostingIdx(postingIdx);
+				mv.addObject("userType", userType);
 				mv.addObject("company", company);
+				mv.addObject("person", person);
 				mv.addObject("posting", posting);
 				mv.addObject("skills", skills);
 				log.info("company = {}", company);
@@ -219,6 +222,42 @@ public class MainController {
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("스크랩 추가에 실패했습니다.");
 		}
+	}
+
+	@GetMapping("/ApplyPage")
+	public ModelAndView applyPage(HttpSession session) {
+		ModelAndView mv = new ModelAndView("section/apply");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
+		Long userType = user.getUserType();
+
+		if (userType == 2) {
+			PersonDto person = mainService.findPersonByUserIdx(userIdx);
+			Long personIdx = person.getPersonIdx();
+			List<ApplyStatusDto> applyList = mainService.findApplyList(personIdx);
+			mv.addObject("apply", applyList);
+		} else {
+			if (userType == 1) {
+				CompanyDto companyDto = mainService.findCompanyByUserIdx(userIdx);
+				Long companyIdx = companyDto.getCompanyIdx();
+				List<ApplyStatusDto> applyList = mainService.findApplyListByCompanyIdx(companyIdx);
+				mv.addObject("apply", applyList);
+			}
+		}
+
+		mv.addObject("userType", userType);
+		return mv;
+	}
+
+	@DeleteMapping("/Applycancel/{applyIdx}")
+	public ResponseEntity<?> cancelApply(@PathVariable("applyIdx") Long applyIdx) {
+	    try {
+	        log.info("applyIdxs = {}", applyIdx);
+	        mainService.deleteAllByApplyIdxs(applyIdx);
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest().body("지원 취소에 실패했습니다.");
+	    }
 	}
 
 }

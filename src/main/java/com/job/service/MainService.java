@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.job.dto.ApplyDto;
+import com.job.dto.ApplyStatusDto;
 import com.job.dto.CompanyDto;
 import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
@@ -54,7 +55,7 @@ public class MainService {
 
 	@Autowired
 	private ResumeRepository resumeRepository;
-	
+
 	@Autowired
 	private CompanyRepository companyRepository;
 
@@ -75,7 +76,7 @@ public class MainService {
 
 	@Autowired
 	private ApplyRepository applyRepository;
-	
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -156,7 +157,7 @@ public class MainService {
 
 		// CompanyFile의 처리를 위한 Root 추가 (가정에 기반한 예시)
 		Root<CompanyFile> fileRoot = cq.from(CompanyFile.class);
-		Join<CompanyFile, Company> fileCompanyJoin = fileRoot.join("company", JoinType.INNER);
+		Join<CompanyFile, Company> fileCompanyJoin = fileRoot.join("company", JoinType.RIGHT);
 
 		cq.multiselect(postingRoot, fileRoot, companyRoot).where(
 				cb.equal(companyUserJoin.get("userIdx"), postingUserJoin.get("userIdx")),
@@ -176,19 +177,20 @@ public class MainService {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
 
+		Root<Posting> postingRoot = cq.from(Posting.class);
+		Join<Posting, User> postingUserJoin = postingRoot.join("user", JoinType.INNER);
+		Join<Posting, Company> postingCompanyJoin = postingRoot.join("user", JoinType.INNER);
+		
 		Root<Company> companyRoot = cq.from(Company.class);
 		Join<Company, User> companyUserJoin = companyRoot.join("user", JoinType.INNER);
 
-		Root<Posting> postingRoot = cq.from(Posting.class);
-		Join<Posting, User> postingUserJoin = postingRoot.join("user", JoinType.INNER);
-
 		// CompanyFile의 처리를 위한 Root 추가 (가정에 기반한 예시)
 		Root<CompanyFile> fileRoot = cq.from(CompanyFile.class);
-		Join<CompanyFile, Company> fileCompanyJoin = fileRoot.join("company", JoinType.INNER);
+		Join<CompanyFile, Company> fileCompanyJoin = fileRoot.join("company", JoinType.RIGHT);
 
 		cq.multiselect(postingRoot, fileRoot, companyRoot).where(
-				cb.equal(companyUserJoin.get("userIdx"), postingUserJoin.get("userIdx")),
 				cb.equal(companyRoot.get("companyIdx"), fileCompanyJoin.get("companyIdx")),
+				cb.equal(companyUserJoin.get("userIdx"), userIdx),
 				cb.equal(postingUserJoin.get("userIdx"), userIdx)); // Company와 CompanyFile을 연결
 
 		List<Object[]> results = entityManager.createQuery(cq).getResultList();
@@ -202,21 +204,28 @@ public class MainService {
 	}
 
 	private PostingWithFileDto buildPostingWithFileDto(Object[] result) {
-		Posting posting = (Posting) result[0];
-		CompanyFile file = (CompanyFile) result[1];
-		Company com = (Company) result[2];
+	    Posting posting = (Posting) result[0];
+	    CompanyFile file = null;
+	    if(result[1] != null) {
+	        file = (CompanyFile) result[1]; // result[1]이 null이 아닐 때만 캐스팅
+	    }
+	    Company com = (Company) result[2];
 
-		PostingDto postingDto = convertToPostingDto(posting);
-		CompanyFileDto companyFileDto = convertToCompanyFileDto(file);
-		CompanyDto companyDto = convertToCompanyDto(com);
+	    PostingDto postingDto = convertToPostingDto(posting);
+	    CompanyFileDto companyFileDto = null;
+	    if(file != null) {
+	        companyFileDto = convertToCompanyFileDto(file); // file이 null이 아닐 때만 DTO 변환
+	    }
+	    CompanyDto companyDto = convertToCompanyDto(com);
 
-		PostingWithFileDto postingWithFileDto = new PostingWithFileDto();
-		postingWithFileDto.setPostingDto(postingDto);
-		postingWithFileDto.setCompanyFileDto(companyFileDto);
-		postingWithFileDto.setCompanyDto(companyDto);
+	    PostingWithFileDto postingWithFileDto = new PostingWithFileDto();
+	    postingWithFileDto.setPostingDto(postingDto);
+	    postingWithFileDto.setCompanyFileDto(companyFileDto); // file이 null일 경우 companyFileDto도 null
+	    postingWithFileDto.setCompanyDto(companyDto);
 
-		return postingWithFileDto;
+	    return postingWithFileDto;
 	}
+
 
 	private PostingDto convertToPostingDto(Posting posting) {
 		PostingDto postingDto = new PostingDto();
@@ -311,21 +320,20 @@ public class MainService {
 	public List<SkillDto> findSkillListByPostingIdx(Long postingIdx) {
 		List<PostingSkill> postingSkills = postingSkillRepository.findPostinSkillByPostingPostingIdx(postingIdx);
 		List<SkillDto> skills = new ArrayList<>();
-	      for (PostingSkill postingSkill : postingSkills) {
-	            Skill skill = skillRepository.findById(postingSkill.getSkill().getSkillIdx()).orElse(null);
-	            if (skill != null) {
-	            	
-	                SkillDto skillDto = SkillDto.createSkillDto(skill);
-	                skills.add(skillDto);
-	            }
-	        }
+		for (PostingSkill postingSkill : postingSkills) {
+			Skill skill = skillRepository.findById(postingSkill.getSkill().getSkillIdx()).orElse(null);
+			if (skill != null) {
+
+				SkillDto skillDto = SkillDto.createSkillDto(skill);
+				skills.add(skillDto);
+			}
+		}
 		return skills;
 	}
 
 	public List<ResumeDto> findResumeByUserIdx(Long userIdx) {
 		List<Resume> resumes = resumeRepository.findByUserUserIdx(userIdx);
-		return  resumes.stream().map(resume -> ResumeDto.createResumeDto(resume))
-				.collect(Collectors.toList());
+		return resumes.stream().map(resume -> ResumeDto.createResumeDto(resume)).collect(Collectors.toList());
 	}
 
 	public ResumeDto findResumeByResumeIdx(Long resumeIdx) {
@@ -345,10 +353,102 @@ public class MainService {
 				.orElseThrow(() -> new NoSuchElementException("해당 Posting을 찾을 수 없습니다."));
 		Person person = personRepository.findById(applyDto.getPersonIdx())
 				.orElseThrow(() -> new NoSuchElementException("해당 Person을 찾을 수 없습니다."));
-		
-		Apply apply = Apply.builder().resume(resume).person(person).posting(posting).applyStatus((long) 1).build();
+		Company company = companyRepository.findById(applyDto.getCompanyIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Company를 찾을 수 없습니다."));
+
+		Apply apply = Apply.builder().resume(resume).person(person).posting(posting).company(company)
+				.applyStatus((long) 1).build();
 
 		applyRepository.save(apply);
+	}
+
+	public List<ApplyStatusDto> findApplyList(Long personIdx) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+
+		Root<Apply> applyRoot = cq.from(Apply.class);
+		Join<Apply, Posting> postingJoin = applyRoot.join("posting", JoinType.INNER);
+		Join<Apply, Resume> resumeJoin = applyRoot.join("resume", JoinType.INNER);
+		Join<Apply, Person> personJoin = applyRoot.join("person", JoinType.INNER);
+		Join<Apply, Company> companyJoin = applyRoot.join("company", JoinType.INNER);
+
+		cq.multiselect(postingJoin.get("postingIdx"), postingJoin.get("postingTitle"), resumeJoin.get("resumeIdx"),
+				resumeJoin.get("resumeTitle"), applyRoot.get("applyIdx"), applyRoot.get("applyStatus"),
+				applyRoot.get("createdDate"), personJoin, companyJoin.get("companyName"))
+				.where(cb.equal(personJoin.get("personIdx"), personIdx));
+
+		List<Object[]> results = entityManager.createQuery(cq).getResultList();
+
+		List<ApplyStatusDto> applyStatusDtos = results.stream().map(result -> {
+			ApplyStatusDto applyStatusDto = new ApplyStatusDto();
+
+			// 각 DTO 인스턴스 생성
+			PostingDto postingDto = PostingDto.builder().postingIdx((Long) result[0]).postingTitle((String) result[1])
+					.build();
+			ResumeDto resumeDto = ResumeDto.builder().resumeIdx((Long) result[2]).resumeTitle((String) result[3])
+					.build();
+			ApplyDto applyDto = ApplyDto.builder().applyIdx((Long) result[4]).applyStatus((Long) result[5]).createdDate((String) result[6]).build();
+			PersonDto personDto = PersonDto.createPersonDto((Person) result[7]);
+			CompanyDto companyDto = CompanyDto.builder().companyName((String) result[8]).build();
+
+			// ApplyStatusDto에 DTO 인스턴스 설정
+			applyStatusDto.setApplyDto(applyDto);
+			applyStatusDto.setPostingDto(postingDto);
+			applyStatusDto.setResumeDto(resumeDto);
+			applyStatusDto.setPersonDto(personDto);
+			applyStatusDto.setCompanyDto(companyDto);
+
+			return applyStatusDto;
+		}).collect(Collectors.toList());
+
+		return applyStatusDtos;
+	}
+
+	public void deleteAllByApplyIdxs(Long applyIdx) {
+		
+		 applyRepository.deleteById(applyIdx);
+	}
+
+	public List<ApplyStatusDto> findApplyListByCompanyIdx(Long companyIdx) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+
+		Root<Apply> applyRoot = cq.from(Apply.class);
+		Join<Apply, Posting> postingJoin = applyRoot.join("posting", JoinType.INNER);
+		Join<Apply, Resume> resumeJoin = applyRoot.join("resume", JoinType.INNER);
+		Join<Apply, Person> personJoin = applyRoot.join("person", JoinType.INNER);
+		Join<Apply, Company> companyJoin = applyRoot.join("company", JoinType.INNER);
+
+		cq.multiselect(postingJoin.get("postingIdx"), postingJoin.get("postingTitle"), resumeJoin.get("resumeIdx"),
+				resumeJoin.get("resumeTitle"), applyRoot.get("applyIdx"), applyRoot.get("applyStatus"),
+				applyRoot.get("createdDate"), personJoin, companyJoin.get("companyName"))
+				.where(cb.equal(companyJoin.get("companyIdx"), companyIdx));
+
+		List<Object[]> results = entityManager.createQuery(cq).getResultList();
+
+		List<ApplyStatusDto> applyStatusDtos = results.stream().map(result -> {
+			ApplyStatusDto applyStatusDto = new ApplyStatusDto();
+
+			// 각 DTO 인스턴스 생성
+			PostingDto postingDto = PostingDto.builder().postingIdx((Long) result[0]).postingTitle((String) result[1])
+					.build();
+			ResumeDto resumeDto = ResumeDto.builder().resumeIdx((Long) result[2]).resumeTitle((String) result[3])
+					.build();
+			ApplyDto applyDto = ApplyDto.builder().applyIdx((Long) result[4]).applyStatus((Long) result[5]).createdDate((String) result[6]).build();
+			PersonDto personDto = PersonDto.createPersonDto((Person) result[7]);
+			CompanyDto companyDto = CompanyDto.builder().companyName((String) result[8]).build();
+
+			// ApplyStatusDto에 DTO 인스턴스 설정
+			applyStatusDto.setApplyDto(applyDto);
+			applyStatusDto.setPostingDto(postingDto);
+			applyStatusDto.setResumeDto(resumeDto);
+			applyStatusDto.setPersonDto(personDto);
+			applyStatusDto.setCompanyDto(companyDto);
+
+			return applyStatusDto;
+		}).collect(Collectors.toList());
+
+		return applyStatusDtos;
 	}
 
 }

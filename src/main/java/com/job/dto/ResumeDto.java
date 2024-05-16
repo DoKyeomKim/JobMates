@@ -3,12 +3,14 @@ package com.job.dto;
 import java.util.Date;
 import com.job.entity.Resume;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ResumeDto {
 	private Long resumeIdx;
 	private Long userIdx;

@@ -38,7 +38,7 @@ header {
 
 					<div class="mt-5">
 						<input type="text" class="form-control w-100" name="postingTitle"
-							style="text-align: center;" placeholder="공고 제목을 입력해주세요" required>
+							style="text-align: center;" placeholder="공고 제목을 입력해주세요" required="required">
 					</div>
 
 					<div class="row">
