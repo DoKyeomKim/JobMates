@@ -2,12 +2,14 @@ package com.job.dto;
 import com.job.entity.Person;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PersonDto {   
 
    private Long personIdx;

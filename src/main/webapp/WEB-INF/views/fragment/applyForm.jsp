@@ -39,6 +39,7 @@
 		</div>
 		<form>
 		<input type="hidden" value="${person.personIdx }" name="personIdx" id="personIdx">
+		<input type="hidden" value="${company.companyIdx }" name="companyIdx" id="companyIdx">
 		<div class="border container mt-3" id="selected-resume">
 		</div>
 		<div class="d-flex justify-content-center mt-3">
@@ -75,14 +76,14 @@
 		    const postingIdx = this.getAttribute('data-posting-idx');
 		    const resumeIdx = document.querySelector('#resumeIdx').value;
 		    const personIdx = document.querySelector('#personIdx').value;
-		    
+		    const companyIdx = document.querySelector('#companyIdx').value;
 		    const formData = new FormData(); // 필요한 데이터 추가
 		    fetch('/ApplyPosting', { // 실제 요청 URL로 변경해야 합니다.
 		        method: 'POST',
 		        headers: {
 		            'Content-Type': 'application/json'
 		          },
-		          body: JSON.stringify({ postingIdx, resumeIdx, personIdx }),
+		          body: JSON.stringify({ postingIdx, resumeIdx, personIdx, companyIdx }),
 		    })
 		    .then(response => {
 		        if (response.ok) {

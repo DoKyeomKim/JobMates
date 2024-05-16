@@ -88,13 +88,12 @@
 		<div>
 			<div class="container" style="width: 85%;">
 
-
 				<div class="mt-5">
 					<label class="form-control w-100" style="text-align: center;">${posting.postingTitle}</label>
 					<input type="hidden" name="postingDeadline"
 						value="${posting.postingDeadline}">
 				</div>
-
+					<input type="hidden" value="${person.personIdx}" id="personIdx">
 				<div class="row">
 					<!-- 왼쪽 필드 -->
 					<div class="col-md-6 mt-5">
@@ -139,10 +138,6 @@
 				</div>
 			</div>
 
-
-
-
-
 			<div class="container mt-3" style="width: 85%;">
 				<div class="row justify-content-center ">
 
@@ -170,8 +165,9 @@
 									data-posting-idx="${posting.postingIdx}">지원하기</button>
 								<a class="btn btn-info ms-3" href="/">목록으로</a>
 								<button
-									class="btn btn-outline-secondary  d-flex align-items-center ms-3">
-									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapBtn me-2"
+									class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
+									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
+										data-posting-idx="${posting.postingIdx}"
 										aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
 										width="24" height="24" fill="none" viewBox="0 0 24 24">
                             		<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -220,5 +216,6 @@
 			</div>
 		</div>
 	</main>
+	<script src="/js/postingScrap.js"></script>
 </body>
 </html>
