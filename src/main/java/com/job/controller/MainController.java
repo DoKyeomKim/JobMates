@@ -1,13 +1,17 @@
 package com.job.controller;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,12 +22,15 @@ import com.job.dto.ApplyDto;
 import com.job.dto.ApplyStatusDto;
 import com.job.dto.CompanyDto;
 import com.job.dto.PersonDto;
+import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingScrapDto;
 import com.job.dto.PostingWithFileDto;
 import com.job.dto.ResumeDto;
+import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
+import com.job.entity.Resume;
 import com.job.service.MainService;
 
 import jakarta.servlet.http.HttpSession;
@@ -191,14 +198,26 @@ public class MainController {
 	}
 
 	@GetMapping("/applyForm/{postingIdx}")
-	public ModelAndView applyForm(@PathVariable("postingIdx") Long postingIdx) {
+	public ModelAndView applyForm(@PathVariable("postingIdx") Long postingIdx, HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/applyForm");
-		Long userIdx = (long) 3;
+
+		// 세션에서 유저 정보 불러옴
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
+
+		// 가져온 유저 정보로 PERSON 지정
 		PersonDto person = mainService.findPersonByUserIdx(userIdx);
+
+		// 지정한 PERSON으로 이력서 리스트 가져옴
+		List<ResumeDto> resumes = mainService.findResumeByUserIdx(userIdx);
+
+		// 지정한 VIEW에서 넘겨받은 postingIdx로 POSTING 정보 가져옴
 		PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
 		Long postingUserIdx = posting.getUserIdx();
+
+		// POSTING에서 가져온 userIdx로 COMPANY 지정
 		CompanyDto company = mainService.findCompanyByUserIdx(postingUserIdx);
-		List<ResumeDto> resumes = mainService.findResumeByUserIdx(userIdx);
+
 		mv.addObject("company", company);
 		mv.addObject("posting", posting);
 		mv.addObject("person", person);
@@ -248,16 +267,106 @@ public class MainController {
 		mv.addObject("userType", userType);
 		return mv;
 	}
+	@GetMapping("/CompanyApply")
+	public ModelAndView companyApply(HttpSession session) {
+		ModelAndView mv = new ModelAndView("fragment/companyApply");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
+		Long userType = user.getUserType();
+		CompanyDto companyDto = mainService.findCompanyByUserIdx(userIdx);
+		Long companyIdx = companyDto.getCompanyIdx();
+		List<ApplyStatusDto> applyList = mainService.findApplyListByCompanyIdx(companyIdx);
+		mv.addObject("apply", applyList);
+		mv.addObject("userType", userType);
+		return mv;
+	}
+	@GetMapping("/PersonApply")
+	public ModelAndView personApply(HttpSession session) {
+		ModelAndView mv = new ModelAndView("fragment/personApply");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userIdx = user.getUserIdx();
+		Long userType = user.getUserType();
+		PersonDto person = mainService.findPersonByUserIdx(userIdx);
+		Long personIdx = person.getPersonIdx();
+		List<ApplyStatusDto> applyList = mainService.findApplyList(personIdx);
+		mv.addObject("apply", applyList);
+		mv.addObject("userType", userType);
+		return mv;
+	}
 
 	@DeleteMapping("/Applycancel/{applyIdx}")
 	public ResponseEntity<?> cancelApply(@PathVariable("applyIdx") Long applyIdx) {
-	    try {
-	        log.info("applyIdxs = {}", applyIdx);
-	        mainService.deleteAllByApplyIdxs(applyIdx);
-	        return ResponseEntity.ok().build();
-	    } catch (Exception e) {
-	        return ResponseEntity.badRequest().body("지원 취소에 실패했습니다.");
-	    }
+		try {
+			log.info("applyIdxs = {}", applyIdx);
+			mainService.deleteAllByApplyIdxs(applyIdx);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("지원 취소에 실패했습니다.");
+		}
+	}
+
+	@GetMapping("/ApplyCheck/{personIdx}/{postingIdx}")
+	public ResponseEntity<Map<String, String>> checkApply(@PathVariable("personIdx") Long personIdx,
+			@PathVariable("postingIdx") Long postingIdx) {
+		try {
+			log.info("Checking application for personIdx = {} and postingIdx = {}", personIdx, postingIdx);
+
+			boolean exists = mainService.existsByPersonIdxAndPostingIdx(personIdx, postingIdx);
+			Map<String, String> response = new HashMap<>();
+
+			if (exists) {
+				response.put("message", "이미 해당 공고에 지원하셨습니다.");
+				return ResponseEntity.ok().body(response);
+			} else {
+				response.put("message", "지원 가능합니다.");
+				return ResponseEntity.ok().body(response);
+			}
+		} catch (Exception e) {
+			log.error("Error checking application status", e);
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "지원 상태를 확인할 수 없습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+
+	@PatchMapping("/ApplyProcess/{applyIdx}/{applyStatus}")
+	public ResponseEntity<?> ProcessApply(@PathVariable("applyIdx") Long applyIdx,
+			@PathVariable("applyStatus") Long applyStatus) {
+		try {
+			log.info("applyIdxs = {}", applyIdx);
+			mainService.processApply(applyIdx, applyStatus);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("지원 처리에 실패했습니다.");
+		}
+	}
+
+	@GetMapping("/ApplyResumeView/{resumeIdx}/{personIdx}/{postingIdx}")
+	public ModelAndView resumeView(HttpSession session, @PathVariable("resumeIdx") Long resumeIdx,
+			@PathVariable("personIdx") Long personIdx, @PathVariable("postingIdx") Long postingIdx) {
+
+		ModelAndView mv = new ModelAndView();
+
+		// person_tb 정보 갖고오기
+		UserDto user = (UserDto) session.getAttribute("login");
+		PersonDto person = mainService.findPersonByPersonIdx(personIdx);
+		ResumeDto resume = mainService.findResumeByResumeIdx(resumeIdx);
+		ResumeFileDto resumeFile = mainService.findResumeFileByResumeIdx(resumeIdx);
+		PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
+		
+		ApplyDto apply = mainService.findApplyByResumeIdxAndPostingIdx(resume.getResumeIdx(), posting.getPostingIdx());
+		// skillIdx를 토대로 skill 갖고오기
+		List<SkillDto> skill = mainService.findSkillListByPersonIdx(personIdx);
+
+		Long userType = user.getUserType();
+		mv.addObject("apply", apply);
+		mv.addObject("userType", userType);
+		mv.addObject("person", person);
+		mv.addObject("resume", resume);
+		mv.addObject("skill", skill);
+		mv.addObject("resumeFile", resumeFile);
+		mv.setViewName("fragment/applyResumeView");
+		return mv;
 	}
 
 }

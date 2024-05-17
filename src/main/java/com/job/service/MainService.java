@@ -18,23 +18,28 @@ import com.job.dto.PostingDto;
 import com.job.dto.PostingScrapDto;
 import com.job.dto.PostingWithFileDto;
 import com.job.dto.ResumeDto;
+import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
 import com.job.entity.Apply;
 import com.job.entity.Company;
 import com.job.entity.CompanyFile;
 import com.job.entity.Person;
+import com.job.entity.PersonSkill;
 import com.job.entity.Posting;
 import com.job.entity.PostingScrap;
 import com.job.entity.PostingSkill;
 import com.job.entity.Resume;
+import com.job.entity.ResumeFile;
 import com.job.entity.Skill;
 import com.job.entity.User;
 import com.job.repository.ApplyRepository;
 import com.job.repository.CompanyRepository;
 import com.job.repository.PersonRepository;
+import com.job.repository.PersonSkillRepository;
 import com.job.repository.PostingRepository;
 import com.job.repository.PostingScrapRepository;
 import com.job.repository.PostingskillRepository;
+import com.job.repository.ResumeFileRepository;
 import com.job.repository.ResumeRepository;
 import com.job.repository.SkillRepository;
 
@@ -53,6 +58,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class MainService {
 
+	@Autowired
+	private ResumeFileRepository resumeFileRepository;
+	
+	@Autowired
+	private PersonSkillRepository personSkillRepository;
+	
 	@Autowired
 	private ResumeRepository resumeRepository;
 
@@ -449,6 +460,60 @@ public class MainService {
 		}).collect(Collectors.toList());
 
 		return applyStatusDtos;
+	}
+
+	public boolean existsByPersonIdxAndPostingIdx(Long personIdx, Long postingIdx) {
+		
+		return applyRepository.existsByPersonPersonIdxAndPostingPostingIdx(personIdx, postingIdx);
+	}
+
+	public void processApply(Long applyIdx, Long applyStatus) {
+		Apply apply = applyRepository.findById(applyIdx).orElseThrow(() -> new IllegalArgumentException("해당 지원 정보가 존재하지 않습니다. id=" + applyIdx));
+		apply.changeApplyStatus(applyStatus);
+		applyRepository.save(apply);
+	}
+
+	public PersonDto findPersonByPersonIdx(Long personIdx) {
+		Optional<Person> personOpt = personRepository.findByPersonIdx(personIdx);
+		if (!personOpt.isPresent()) {
+			return null; // 또는 예외 처리
+		}
+		Person person = personOpt.get();
+		PersonDto personDto = PersonDto.createPersonDto(person);
+		return personDto;
+	}
+
+	public List<SkillDto> findSkillListByPersonIdx(Long personIdx) {
+	    List<PersonSkill> personSkills = personSkillRepository.findSkillIdxByPersonPersonIdx(personIdx);
+	    List<SkillDto> skillDtos = new ArrayList<>(); // SkillDto 리스트를 생성합니다.
+
+	    for (PersonSkill personSkill : personSkills) {
+	        Long skillIdx = personSkill.getSkill().getSkillIdx();
+	        List<Skill> skills = skillRepository.findSkillNameBySkillIdx(skillIdx);
+
+	        // 스트림을 사용하여 SkillDto 리스트에 추가
+	        skillDtos.addAll(skills.stream().map(SkillDto::createSkillDto).collect(Collectors.toList()));
+	    }
+	    return skillDtos; // 모든 PersonSkill에 대해 처리된 SkillDto 리스트를 반환합니다.
+	}
+
+
+	public ResumeFileDto findResumeFileByResumeIdx(Long resumeIdx) {
+		Optional<ResumeFile> resumeFileOpt  = resumeFileRepository.findByResumeResumeIdx(resumeIdx);
+		if (!resumeFileOpt.isPresent()) {
+			return null; // 또는 예외 처리
+		}
+		ResumeFileDto resumeFileDto = ResumeFileDto.createResumeFileDto(resumeFileOpt.get());
+		return resumeFileDto;
+	}
+
+	public ApplyDto findApplyByResumeIdxAndPostingIdx(Long resumeIdx, Long postingIdx) {
+		Optional<Apply> applyOpt  = applyRepository.findApplyByResumeResumeIdxAndPostingPostingIdx(resumeIdx, postingIdx);
+		if (!applyOpt.isPresent()) {
+			return null; // 또는 예외 처리
+		}
+		ApplyDto applyDto = ApplyDto.createResumeFileDto(applyOpt.get());
+		return applyDto;
 	}
 
 }

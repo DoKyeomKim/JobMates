@@ -78,7 +78,7 @@
 		    const personIdx = document.querySelector('#personIdx').value;
 		    const companyIdx = document.querySelector('#companyIdx').value;
 		    const formData = new FormData(); // 필요한 데이터 추가
-		    fetch('/ApplyPosting', { // 실제 요청 URL로 변경해야 합니다.
+		    fetch('/ApplyPosting', { 
 		        method: 'POST',
 		        headers: {
 		            'Content-Type': 'application/json'

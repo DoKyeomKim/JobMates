@@ -56,31 +56,57 @@
 }
 </style>
 <script type="text/javascript">
-	document.addEventListener("DOMContentLoaded", function() {
-		document.getElementById('applyButton').addEventListener(
-				'click',
-				function() {
-					const postingIdx = this.getAttribute('data-posting-idx');
-					// 화면의 너비와 높이를 얻습니다.
-					var screenWidth = window.screen.width;
-					var screenHeight = window.screen.height;
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('applyButton').addEventListener('click', async function() {
+        const personIdx = this.getAttribute('data-person-idx');
+        const postingIdx = this.getAttribute('data-posting-idx');
 
-					// 창의 너비와 높이를 계산합니다 (예: 화면의 30% 너비와 90% 높이).
-					var windowWidth = screenWidth * 0.4;
-					var windowHeight = screenHeight * 0.7;
+        try {
+            const data = await checkApplyStatus(personIdx, postingIdx);
+            handleApplyStatus(data, postingIdx);
+        } catch (error) {
+            alert('지원 상태를 확인할 수 없습니다. 잠시 후 다시 시도해주세요.');
+            console.error('An error occurred:', error);
+        }
+    });
+});
 
-					// 새 창을 화면의 중앙에 위치시키기 위한 left와 top 값을 계산합니다.
-					var left = (screenWidth - windowWidth) / 2;
-					var top = (screenHeight - windowHeight) / 2;
+async function checkApplyStatus(personIdx, postingIdx) {
+    const response = await fetch(`/ApplyCheck/` + personIdx + `/` + postingIdx, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
 
-					// 계산된 위치와 크기로 새 창을 엽니다.
-					var myWindow = window.open('/applyForm/' + postingIdx,
-							'applyForm', 'width=' + windowWidth + ',height='
-									+ windowHeight + ',left=' + left + ',top='
-									+ top);
-				});
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
 
-	});
+    return response.json();
+}
+
+function handleApplyStatus(data, postingIdx) {
+    if (data.message === "지원 가능합니다.") {
+        openApplyWindow(postingIdx);
+    } else if (data.message === "이미 해당 공고에 지원하셨습니다.") {
+        if (confirm('이미 지원한 공고 입니다. 지원 현황을 확인 하겠습니까?')) {
+            window.location.href = '/ApplyPage';
+        }
+    }
+}
+
+function openApplyWindow(postingIdx) {
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const windowWidth = screenWidth * 0.4;
+    const windowHeight = screenHeight * 0.7;
+    const left = (screenWidth - windowWidth) / 2;
+    const top = (screenHeight - windowHeight) / 2;
+    const options = 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top;
+    window.open(`/applyForm/` + postingIdx, options);
+}
+
 </script>
 </head>
 <body>
@@ -161,10 +187,9 @@
 					<div class="d-flex justify-content-center">
 						<c:choose>
 							<c:when test="${sessionScope.isLoggedIn}">
-								<c:if test="${sessionScope.userType == 2}">
+								<c:if test="${userType == 2}">
 									<button id="applyButton" class="btn btn-success"
-										data-posting-idx="${posting.postingIdx}">지원하기</button>
-									<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
+										data-posting-idx="${posting.postingIdx}" data-person-idx="${person.personIdx}">지원하기</button>
 									<button
 										class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
 										<svg
@@ -172,20 +197,22 @@
 											data-posting-idx="${posting.postingIdx}" aria-hidden="true"
 											xmlns="http://www.w3.org/2000/svg" width="24" height="24"
 											fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor"
-												stroke-linecap="round" stroke-linejoin="round"
-												stroke-width="2"
+                    <path stroke="currentColor" stroke-linecap="round"
+												stroke-linejoin="round" stroke-width="2"
 												d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" />
-                    </svg>
+                </svg>
 										<span>스크랩</span>
 									</button>
 								</c:if>
+								<!-- 이 경우에만 목록으로 버튼을 표시합니다. -->
 								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
 							</c:when>
 							<c:otherwise>
+								<!-- 로그인하지 않은 경우에도 목록으로 버튼을 표시합니다. -->
 								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
 							</c:otherwise>
 						</c:choose>
+
 					</div>
 
 

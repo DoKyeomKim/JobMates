@@ -65,4 +65,9 @@ public class Apply {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		this.createdDate = LocalDateTime.now().format(formatter);
 	}
+
+	public void changeApplyStatus(Long applyStatus) {
+		 this.applyStatus = applyStatus;
+		
+	}
 }

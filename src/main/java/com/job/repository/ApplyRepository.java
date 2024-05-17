@@ -9,6 +9,10 @@ import com.job.entity.Apply;
 
 public interface ApplyRepository extends JpaRepository<Apply, Long> {
 	
-    Optional<Apply> findByApplyIdx(Long apply_idx); 
+    Optional<Apply> findByApplyIdx(Long apply_idx);
+
+	boolean existsByPersonPersonIdxAndPostingPostingIdx(Long personIdx, Long postingIdx);
+
+	Optional<Apply> findApplyByResumeResumeIdxAndPostingPostingIdx(Long resumeIdx, Long postingIdx); 
     
 }
