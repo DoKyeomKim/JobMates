@@ -2,6 +2,7 @@ package com.job.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.CompanyDto;
-import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
@@ -29,6 +29,7 @@ import com.job.dto.PostingRecommendDto;
 import com.job.dto.PostingSkillDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
+import com.job.dto.ResumeRecommendDto;
 import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
 import com.job.mapper.MypageMapper;
@@ -515,7 +516,7 @@ public class PostingController {
 		// 이걸 한개만 찾아오니 다 못집어넣어서 생기는 문제다. 라고 생각하면 될거 같음.
 
 	    List<Long> personIdxList = postingMapper.getPeronIdxByUserIdx(userIdx);
-	    System.out.println("personIdxList========================="+personIdxList);
+	    //System.out.println("personIdxList========================="+personIdxList);
 		
 	    for (Long personIdx : personIdxList) {
 	        postingMapper.deletePersonSkill(personIdx);
@@ -615,7 +616,6 @@ public class PostingController {
 			
 			// 위에서 찾은 회사 user_idx(세션에 있는 user_idx가 아님)로 file_path 찾아오기
 
-			System.out.println("============================================="+personIdx);
 			
 			mv.addObject("person", personDto);
 			mv.addObject("userType", userType);
@@ -627,16 +627,31 @@ public class PostingController {
 	// ==================================================================
 	// == 기업 유저가 보는 추천 이력서(스킬 기반)
 		
-		//추천 이력서 페이지 이동
 		@GetMapping("/resumeRecommend")
-		public ModelAndView resumeRecommend(HttpSession session) {
-			ModelAndView mv = new ModelAndView();
-			
-			
-			
-			mv.setViewName("posting/resumeRecommend");
-			return mv;
+		public ModelAndView resumeRecommend(HttpSession session, ResumeDto resumeDto, UserDto userDto) {
+		    ModelAndView mv = new ModelAndView();
+		    
+		    UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    
+		    List<Long> postingIdxList = postingMapper.getPostingIdxByUserIdx(userIdx);
+		    Map<Long, List<ResumeRecommendDto>> resumeRecMap = new HashMap<>();
+		    
+		    for (Long postingIdx : postingIdxList) {
+		        Map<String, Object> params = new HashMap<>();
+		        params.put("postingIdx", postingIdx);
+		        params.put("userIdx", userIdx);
+		        List<ResumeRecommendDto> resumeRecs = postingMapper.resumeRecommend(params);
+		        resumeRecMap.put(postingIdx, resumeRecs);
+		    }
+		    
+		    mv.addObject("resumeRecMap", resumeRecMap);
+		    mv.addObject("userType", userType);
+		    mv.setViewName("posting/resumeRecommend");
+		    return mv;
 		}
+
 	
 		
 		

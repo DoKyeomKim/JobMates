@@ -40,8 +40,10 @@ header {
 </head>
 <body>
 <%@include file="/WEB-INF/layouts/header.jsp"%>
+<h3 class="my-4"> 추천 공고 </h3>
+<hr>
 <section id="section">
-	<div id="result" class="mt-3 ms-5">
+	<div id="result" class="mt-5 ms-5">
 		<c:if test="${not empty posting}">
 			<div class="d-flex flex-wrap">
 				<input type="hidden" value="${person.personIdx}" id="personIdx">

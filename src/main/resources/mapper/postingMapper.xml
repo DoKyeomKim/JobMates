@@ -213,7 +213,33 @@ join user_tb ut on pt.user_idx = ut.user_idx
 where ut.user_idx = #{userIdx}
  </select>
  
-
-
+ <select id="getPostingIdxByUserIdx">
+ select posting_idx
+ from posting_tb
+ where user_idx=#{userIdx}
+ </select>
  
+ <select id="resumeRecommend" parameterType="com.job.dto.ResumeRecommendDto">
+ SELECT 
+    distinct pt.posting_idx,
+    pt.posting_title,
+    pt.posting_deadline,
+    p.person_idx,
+    p.person_name,
+    r.resume_idx,
+    r.resume_title
+FROM 
+    posting_tb pt
+JOIN 
+    posting_skill_tb ps ON pt.posting_idx = ps.posting_idx
+JOIN 
+    person_skill_tb pk ON ps.skill_idx = pk.skill_idx
+JOIN 
+    person_tb p ON pk.person_idx = p.person_idx
+LEFT JOIN 
+    resume_tb r ON p.user_idx = r.user_idx AND r.publish = 1
+WHERE 
+    pt.user_idx = #{userIdx} AND pt.posting_idx = #{postingIdx}
+order by posting_idx asc
+ </select>
 </mapper>

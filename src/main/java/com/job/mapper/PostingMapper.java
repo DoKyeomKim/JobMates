@@ -1,6 +1,7 @@
 package com.job.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,6 +15,8 @@ import com.job.dto.PostingSkillDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
+import com.job.dto.UserDto;
+import com.job.dto.ResumeRecommendDto;
 
 @Mapper
 public interface PostingMapper {
@@ -128,6 +131,13 @@ public interface PostingMapper {
 	// person의 user_idx로 posting_idx를 갖고오기.
 	List<PostingRecommendDto> getPostingIdxByPersonUserIdx(Long userIdx);
 
+	
+	//==================추천인재=================================
+	// userIdx로 내 posting갖고 오기.
+	List<Long> getPostingIdxByUserIdx(Long userIdx);
+
+
+    List<ResumeRecommendDto> resumeRecommend(Map<String, Object> params);
 
 	
 
