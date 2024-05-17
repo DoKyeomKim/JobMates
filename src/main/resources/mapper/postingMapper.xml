@@ -237,9 +237,9 @@ JOIN
 JOIN 
     person_tb p ON pk.person_idx = p.person_idx
 LEFT JOIN 
-    resume_tb r ON p.user_idx = r.user_idx AND r.publish = 1
+    resume_tb r ON p.user_idx = r.user_idx
 WHERE 
-    pt.user_idx = #{userIdx} AND pt.posting_idx = #{postingIdx}
+    pt.user_idx = #{userIdx} AND pt.posting_idx = #{postingIdx} and r.publish =1
 order by posting_idx asc
  </select>
 </mapper>

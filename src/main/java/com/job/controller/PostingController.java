@@ -635,9 +635,12 @@ public class PostingController {
 		    Long userType = user.getUserType();
 		    Long userIdx = user.getUserIdx();
 		    
+		    // user_idx로 posting_idx 갖고 옴
 		    List<Long> postingIdxList = postingMapper.getPostingIdxByUserIdx(userIdx);
+		    // posting_idx에 값을 설정하기 위해서 hashmap 씀 
 		    Map<Long, List<ResumeRecommendDto>> resumeRecMap = new HashMap<>();
 		    
+		    // 배열에 postingIdx 넣기
 		    for (Long postingIdx : postingIdxList) {
 		        Map<String, Object> params = new HashMap<>();
 		        params.put("postingIdx", postingIdx);
