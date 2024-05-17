@@ -143,8 +143,8 @@
 								<div class="resume-box mb-3" data-resume-idx="${resumeItem.resumeIdx}" data-person-idx="${resumeItem.personIdx}">
 									<input type="hidden" name="personIdx" value="${resumeItem.personIdx}">
 									<input type="hidden" name="resumeIdx" value="${resumeItem.resumeIdx}">
-									<p class="m-4">${resumeItem.resumeTitle}</p>
 									<p class="m-4">${resumeItem.personName}</p>
+									<p class="m-4">${resumeItem.resumeTitle}</p>
 																
 									<button id="btn-scrap" class="btn btn-outline-primary mx-1">
 										스크랩버튼
