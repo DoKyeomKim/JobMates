@@ -242,4 +242,11 @@ WHERE
     pt.user_idx = #{userIdx} AND pt.posting_idx = #{postingIdx} and r.publish =1
 order by posting_idx asc
  </select>
+ 
+ <select id="getPersonByPersonIdx">
+ select person_idx,person_name,person_birth,person_phone,person_address,person_education,user_email
+ from person_tb
+ where person_idx = #{personIdx}
+ </select>
+ 
 </mapper>

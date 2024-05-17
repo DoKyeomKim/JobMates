@@ -136,8 +136,11 @@ public interface PostingMapper {
 	// userIdx로 내 posting갖고 오기.
 	List<Long> getPostingIdxByUserIdx(Long userIdx);
 
-
+	// posting_skill에 맞는 이력서 및 유저 정보 갖고오기
     List<ResumeRecommendDto> resumeRecommend(Map<String, Object> params);
+
+    // 추천 인재 자세히보기 페이지용 유저 정보 호출
+	PersonDto getPersonByPersonIdx(Long personIdx);
 
 	
 

@@ -655,6 +655,38 @@ public class PostingController {
 		    return mv;
 		}
 
+		
+		// 추천 이력서 보기(기업이 보는 이력서)
+		@GetMapping("/resumeRecommendView")
+		public ModelAndView resumeRecommendView(HttpSession session,PersonDto person,@RequestParam("personIdx") Long personIdx,@RequestParam("resumeIdx") Long resumeIdx) {
+			ModelAndView mv = new ModelAndView();
+			UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    
+		    person = postingMapper.getPersonByPersonIdx(personIdx);
+		    
+		    // 개인유저 스킬 갖고오기 
+		    List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
+
+			// Resume_tb 정보 갖고 오기
+			ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
+			if (resume == null) {
+				// 사용자 정보가 없을 경우 처리
+				mv.setViewName("redirect:/");
+				return mv;
+			}
+
+			ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
+			
+		    mv.addObject("userType", userType);
+		    mv.addObject("person", person);
+		    mv.addObject("skill", skill);
+		    mv.addObject("resume", resume);
+		    mv.addObject("resumeFile", resumeFile);
+			mv.setViewName("posting/resumeRecommendView");
+
+			return mv;
+		}
 	
 		
 		

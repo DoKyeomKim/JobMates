@@ -140,7 +140,7 @@
                         <!-- 현재 공고에 해당하는 이력서 목록 표시 -->
                         <div class="resume-container" style="display: none; ">
                             <c:forEach var="resumeItem" items="${resumeRecList}">
-								<div class="resume-box mb-3" data-resume-idx="${resumeItem.personIdx}">
+								<div class="resume-box mb-3" data-resume-idx="${resumeItem.resumeIdx}" data-person-idx="${resumeItem.personIdx}">
 									<input type="hidden" name="personIdx" value="${resumeItem.personIdx}">
 									<input type="hidden" name="resumeIdx" value="${resumeItem.resumeIdx}">
 									<p class="m-4">${resumeItem.resumeTitle}</p>
@@ -174,6 +174,28 @@
             });
         });
     });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // document 전체에 클릭 이벤트 리스너를 추가합니다.
+        document.addEventListener('click', function(event) {
+            // 스크랩 버튼 클릭 시 함수 종료
+            if (event.target.id === 'btn-scrap') {
+                return;
+            }
+
+            // 클릭된 요소가 resume-box 내부의 요소인지 확인합니다.
+            var clickedElement = event.target.closest('.resume-box');
+            if (!clickedElement) return; // 클릭된 요소가 resume-box 내부의 요소가 아니면 함수 종료
+
+            // 클릭된 resume-box 요소에서 data-resume-idx와 data-person-idx 값을 읽어옵니다.
+            var resumeIdx = clickedElement.getAttribute('data-resume-idx');
+            var personIdx = clickedElement.getAttribute('data-person-idx');
+
+            // resumeIdx와 personIdx를 URL 파라미터로 포함하여 페이지 이동합니다.
+            window.location.href = '/resumeRecommendView?resumeIdx=' + resumeIdx + '&personIdx=' + personIdx;
+        });
+    });
+
 </script>
 </body>
 </html>
