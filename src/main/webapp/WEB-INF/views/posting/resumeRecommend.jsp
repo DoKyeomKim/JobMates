@@ -146,7 +146,7 @@
 									<p class="m-4">${resumeItem.resumeTitle}</p>
 									<p class="m-4">${resumeItem.personName}</p>
 																
-									<button id="btn-scrap" class="btn btn-primary} mx-1">
+									<button id="btn-scrap" class="btn btn-outline-primary mx-1">
 										스크랩버튼
 									</button>
 								</div>
