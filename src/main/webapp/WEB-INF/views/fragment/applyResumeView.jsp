@@ -130,6 +130,68 @@ header {
 			</div>
 		</div>
 	</main>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnPass = document.getElementById('btnPass');
+    const btnFail = document.getElementById('btnFail');
+
+    btnPass.addEventListener('click', () => handleButtonClick(btnPass));
+    btnFail.addEventListener('click', () => handleButtonClick(btnFail));
+
+    function handleButtonClick(button) {
+        const applyStatus = button.getAttribute('data-apply-status');
+        const applyIdx = button.getAttribute('data-apply-idx');
+
+        fetch('/ApplyProcess/' + applyIdx + '/' + applyStatus, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                applyIdx: applyIdx,
+                applyStatus: applyStatus
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                // 성공적으로 처리되지 않았을 경우, 오류 메시지를 추출하여 예외를 발생시킴
+                return response.text().then(text => { throw new Error(text) });
+            }
+            return response.text(); // 성공 시, 별도의 데이터가 없으므로 이 부분은 그냥 통과됨
+        })
+        .then(data => {
+            // 성공적으로 처리되었을 때의 로직
+            alert('처리가 완료되었습니다.');
+
+            // 부모 창이 접근 가능한지 확인
+            if (window.opener && !window.opener.closed) {
+                // 업데이트된 ApplyPage 콘텐츠를 가져옴
+                fetch('/CompanyApply', {
+                    method: 'GET',
+                })
+                .then(response => response.text())
+                .then(responseText => {
+                    // 부모 창의 section 내용을 업데이트
+                    window.opener.document.querySelector("#section").innerHTML = responseText;
+                    // 팝업 창을 닫음
+                    window.close();
+                })
+                .catch(error => {
+                    console.error("부모 창 업데이트 오류: " + error);
+                });
+            } else {
+                console.error("부모 창에 접근할 수 없습니다.");
+            }
+        })
+        .catch((error) => {
+            // fetch 또는 응답 처리 중 오류 처리 로직
+            console.error('오류:', error);
+            alert('처리 중 오류가 발생했습니다: ' + error.message);
+        });
+    }
+});
+
+</script>
 
 
 	<script src="/js/bootstrap.bundle.min.js"></script>

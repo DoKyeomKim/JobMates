@@ -104,7 +104,7 @@ function openApplyWindow(postingIdx) {
     const left = (screenWidth - windowWidth) / 2;
     const top = (screenHeight - windowHeight) / 2;
     const options = 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top;
-    window.open(`/applyForm/` + postingIdx, options);
+    window.open(`/applyForm/` + postingIdx, 'ApplyWindow', options);
 }
 
 </script>

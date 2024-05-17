@@ -94,7 +94,7 @@
 		    .then(response => {
 		        alert('지원이 완료되었습니다!'); // 성공 메시지 출력
 		        window.close(); // 현재 팝업 창 닫기
-		       // window.opener.location.href = '/ApplyPerson'; // 부모 창을 '/ApplyPerson' 페이지로 이동
+		       window.opener.location.href = '/ApplyPage'; // 부모 창을 '/ApplyPerson' 페이지로 이동
 		    })
 		    .catch(error => {
 		        console.error('There has been a problem with your fetch operation:', error);

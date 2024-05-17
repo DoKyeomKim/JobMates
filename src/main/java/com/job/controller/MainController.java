@@ -368,5 +368,39 @@ public class MainController {
 		mv.setViewName("fragment/applyResumeView");
 		return mv;
 	}
+	
+	@GetMapping("/Community")
+	public ModelAndView community(HttpSession session) {
+		ModelAndView mv = new ModelAndView("section/community");
+		UserDto user = (UserDto) session.getAttribute("login");
 
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+
+		log.info("isLoggedIn = {}", isLoggedIn);
+		log.info("user = {}", user);
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userType = user.getUserType();
+				log.info("user = {}", user);
+				if (userType == 1) {
+					Long userIdx = user.getUserIdx();
+					
+					mv.addObject("userType", userType);
+				} else {
+					Long userIdx = user.getUserIdx();
+					PersonDto person = mainService.findPersonByUserIdx(userIdx);
+				
+					mv.addObject("person", person);
+					mv.addObject("userType", userType);
+					return mv;
+				}
+			}
+		} else {
+			
+			return mv;
+		}
+		return mv;
+	
+	}
 }

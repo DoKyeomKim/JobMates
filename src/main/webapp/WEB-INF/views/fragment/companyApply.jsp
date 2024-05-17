@@ -22,12 +22,16 @@
 						<td><input type="checkbox" class="processCheckbox" /></td>
 						<td>${ apply.personDto.personName }</td>
 						<td><a
-							href="/ApplyResumeView/${ apply.resumeDto.resumeIdx }/${ apply.personDto.personIdx }"
+							href="/ApplyResumeView/${ apply.resumeDto.resumeIdx }/${ apply.personDto.personIdx }/${apply.postingDto.postingIdx}"
 							class="text-dark text-decoration-none">${ apply.resumeDto.resumeTitle }</a></td>
 						<td>${ apply.applyDto.createdDate }</td>
 						<td><a href="/MainPosting/${ apply.postingDto.postingIdx }"
 							class="text-dark text-decoration-none">${ apply.postingDto.postingTitle }</a></td>
-						<td class="processTd" data-resume-idx="${ apply.resumeDto.resumeIdx }" data-person-idx="${ apply.personDto.personIdx }" data-posting-idx="${apply.postingDto.postingIdx}"  style="cursor: pointer;"><c:choose>
+						<td class="processTd"
+							data-resume-idx="${ apply.resumeDto.resumeIdx }"
+							data-person-idx="${ apply.personDto.personIdx }"
+							data-posting-idx="${apply.postingDto.postingIdx}"
+							style="cursor: pointer;"><c:choose>
 								<c:when test="${apply.applyDto.applyStatus == 1}">
                                     미처리
                                 </c:when>
@@ -46,131 +50,105 @@
 			</tbody>
 		</table>
 		<div class="d-flex flex-row-reverse">
-			<button id="processApply" class="btn btn-outline-danger">지원
-				취소</button>
+			<button id="processApplyFail" class="btn btn-danger">일괄 불합격</button>
+			<button id="processApplyPass" class="btn btn-success me-3">일괄
+				합격</button>
 		</div>
 	</div>
 
 	<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var processAll = document.getElementById('processAll');
-    var processCheckboxes = document.querySelectorAll('.processCheckbox');
-    var processApply = document.getElementById('processApply');
-    const btnPass = document.getElementById('btnPass');
-    const btnFail = document.getElementById('btnFail');
+	document.addEventListener('DOMContentLoaded', function() {
+	    var processAll = document.getElementById('processAll');
+	    var processApplyFail = document.getElementById('processApplyFail');
+	    var processApplyPass = document.getElementById('processApplyPass');
 
-    // '모두 선택' 체크박스 클릭 이벤트
-    processAll.addEventListener('click', function() {
-        var isChecked = this.checked;
-        processCheckboxes.forEach(function(checkbox) {
-            checkbox.checked = isChecked;
-        });
-    });
+	    // '모두 선택' 체크박스 클릭 이벤트
+	    document.addEventListener('click', function() {
+	        if (event.target.matches('#processAll')) {
+		        var isChecked = processAll.checked;
+		        var processCheckboxes = document.querySelectorAll('.processCheckbox');
+		        processCheckboxes.forEach(function(checkbox) {
+		            checkbox.checked = isChecked;
+		        });
+	        }
+	    });
 
-    // '일괄 처리' 버튼 클릭 이벤트
-    processApply.addEventListener('click', function() {
-        processCheckboxes.forEach(function(checkbox) {
-            if (checkbox.checked) {
-                var tr = checkbox.closest('tr');
-                var applyIdx = tr.getAttribute('data-apply-idx');
-                var applyStatus = tr.getAttribute('data-apply-status');
-                
-                // 서버로 지원 상태 처리 요청을 보냄
-                fetch('/ApplyProcess/' + applyIdx + '/' + applyStatus, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(data => {
-                    const url = '/ApplyPage';
+	    // 일괄 처리 요청 함수
+	    function processApplications(applyStatus, confirmMessage) {
+	        if (!confirm(confirmMessage)) return;
 
-                    fetch(url, {
-                        method: 'GET',
-                    })
-                    .then(response => response.text())
-                    .then(response => {
-                        document.querySelector("#section").innerHTML = response;
-                    })
-                    .catch(error => {
-                        console.error("Error: " + error);
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
+	        var processCheckboxes = document.querySelectorAll('.processCheckbox:checked');
+	        processCheckboxes.forEach(function(checkbox) {
+	            var tr = checkbox.closest('tr');
+	            var applyIdx = tr.getAttribute('data-apply-idx');
+
+	            fetch('/ApplyProcess/' + applyIdx + '/' + applyStatus, {
+	                method: 'PATCH',
+	                headers: {
+	                    'Content-Type': 'application/json'
+	                },
+	                body: JSON.stringify({
+	                    applyIdx: applyIdx,
+	                    applyStatus: applyStatus
+	                })
+	            })
+	            .then(response => {
+	                if (!response.ok) {
+	                    return response.text().then(text => { throw new Error(text) });
+	                }
+	                return response.text();
+	            })
+	            .then(data => {
+	                fetch('/CompanyApply', { method: 'GET' })
+	                .then(response => response.text())
+	                .then(responseText => {
+	                    document.querySelector("#section").innerHTML = responseText;
+	                    initializeEventListeners(); // 업데이트 후 이벤트 리스너 다시 설정
+	                })
+	                .catch(error => {
+	                    console.error("업데이트 오류: " + error);
+	                });
+	            })
+	            .catch((error) => {
+	                console.error('Error:', error);
+	            });
+	        });
+	    }
+
+	    document.addEventListener('click', function() {
+	        if (event.target.matches('#processApplyFail')) {
+	        	processApplications(3, '전부 불합격 처리 하시겠습니까?');
+	        }
+	    });
+	    
+	    document.addEventListener('click', function() {
+	        if (event.target.matches('#processApplyPass')) {
+	        	processApplications(2, '전부 합격 처리 하시겠습니까?');
+	        }
+	    });
+
+        document.addEventListener('click', function(event) {
+            if (event.target.matches('.processTd')) {
+                var resumeIdx = event.target.getAttribute('data-resume-idx');
+                var personIdx = event.target.getAttribute('data-person-idx');
+                var postingIdx = event.target.getAttribute('data-posting-idx');
+                openPopup('/ApplyResumeView/' + resumeIdx + '/' + personIdx + '/' + postingIdx);
             }
         });
-    });
+        
+	    // 팝업 열기 함수
+	    function openPopup(url) {
+	        var screenWidth = window.screen.width;
+	        var screenHeight = window.screen.height;
+	        var windowWidth = screenWidth * 0.7;
+	        var windowHeight = screenHeight * 0.7;
+	        var left = (screenWidth - windowWidth) / 2;
+	        var top = (screenHeight - windowHeight) / 2;
+	        var options = 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top;
+	        window.open(url, 'ResumeView', options);
+	    }
+        
+	});
 
-    // 'processTd' 클래스를 가진 모든 요소에 대해 이벤트 리스너를 추가
-    document.querySelectorAll('.processTd').forEach(function(td) {
-        td.addEventListener('click', function() {
-            var resumeIdx = this.getAttribute('data-resume-idx');
-            var personIdx = this.getAttribute('data-person-idx');
-            var postingIdx = this.getAttribute('data-posting-idx');
-
-            // 팝업창(또는 모달)을 만들어서 표시하는 함수를 호출
-            openPopup(`/ApplyResumeView/`+resumeIdx+`/`+personIdx+`/`+postingIdx);
-        });
-    });
-
-    btnPass.addEventListener('click', () => handleButtonClick(btnPass));
-    btnFail.addEventListener('click', () => handleButtonClick(btnFail));
-
-    function handleButtonClick(button) {
-        const applyStatus = button.getAttribute('data-apply-status');
-        const applyIdx = button.getAttribute('data-apply-idx');
-
-        fetch('/ApplyProcess/'+applyIdx+'/'+applyStatus, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                applyIdx: applyIdx,
-                applyStatus: applyStatus
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => { throw new Error(text) });
-            }
-            return response.text();
-        })
-        .then(data => {
-            alert('처리가 완료되었습니다.');
-            const url = '/ApplyPage';
-            window.close();
-            fetch(url, {
-                method: 'GET',
-            })
-            .then(response => response.text())
-            .then(response => {
-                window.opener.document.querySelector("#section").innerHTML = response;
-            })
-            .catch(error => {
-                console.error("Error: " + error);
-            });
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('처리 중 오류가 발생했습니다: ' + error.message);
-        });
-    }
-
-    function openPopup(url) {
-        const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        const windowWidth = screenWidth * 0.7;
-        const windowHeight = screenHeight * 0.7;
-        const left = (screenWidth - windowWidth) / 2;
-        const top = (screenHeight - windowHeight) / 2;
-
-        const options = 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top;
-
-        window.open(url, 'ResumeView', options);
-    }
-});
-</script>
+    </script>
 </body>

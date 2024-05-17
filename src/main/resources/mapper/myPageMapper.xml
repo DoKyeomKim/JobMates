@@ -9,8 +9,7 @@
 		PERSON_BIRTH,
 		PERSON_EDUCATION,
 		PERSON_NAME,
-		PERSON_PHONE,
-		USER_EMAIL
+		PERSON_PHONE
 		FROM
 		PERSON_TB
 		WHERE
@@ -25,8 +24,7 @@
 		PERSON_EDUCATION = #{ personEducation
 		},
 		PERSON_NAME = #{ personName },
-		PERSON_PHONE = #{ personPhone },
-		USER_EMAIL = #{ userEmail }
+		PERSON_PHONE = #{ personPhone }
 		WHERE PERSON_IDX = #{ personIdx }
 	</update>
 
@@ -37,8 +35,7 @@
 		PERSON_BIRTH,
 		PERSON_EDUCATION,
 		PERSON_NAME,
-		PERSON_PHONE,
-		USER_EMAIL
+		PERSON_PHONE
 		FROM
 		PERSON_TB
 		WHERE
