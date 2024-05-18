@@ -293,6 +293,7 @@ public class PostingController {
 
 		ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
 		Long userType = user.getUserType();
+		
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("resume", resume);
@@ -354,9 +355,13 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
+		
+		Long personIdx = person.getPersonIdx();
 
-		// 스킬 들고 오기
-		List<SkillDto> skill = postingMapper.getAllSkill();
+		
+		// skillIdx를 토대로 skill 갖고오기
+		List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
+
 		Long userType = user.getUserType();
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
@@ -369,7 +374,7 @@ public class PostingController {
 	// 이력서 작성
 	@PostMapping("/resumeWrite")
 	@Transactional
-	public ModelAndView resumwWrite(HttpSession session, ResumeDto resumeDto, PersonSkillDto personSkill,
+	public ModelAndView resumwWrite(HttpSession session, ResumeDto resumeDto,
 			ResumeFileDto resumeFileDto, @RequestParam("file") MultipartFile file) {
 		ModelAndView mv = new ModelAndView();
 
@@ -390,11 +395,9 @@ public class PostingController {
 		resumeDto.setUserIdx(userIdx);
 
 		// personSkillDto에 현재 세션의 personIdx를 넣음
-		personSkill.setPersonIdx(personIdx);
 
 		postingMapper.rResumeWrite(resumeDto);
 
-		postingMapper.resumeSkillWrite(personSkill);
 
 		// 파일이 업로드되지 않았을 경우 처리
 		if (file.isEmpty()) {
@@ -461,12 +464,9 @@ public class PostingController {
 		Long personIdx = person.getPersonIdx();
 		
 		// skillIdx를 토대로 skill 갖고오기
-		List<SkillDto> userSkills = postingMapper.getUserSkill(personIdx);
+		List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
 		
 		
-		// 모든 skill_tb에 있는 모든 skill
-		List<SkillDto> allSkills = postingMapper.getAllSkill();
-
 		// 이력서에 사용된 resume_tb 갖고 오기
 		ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
 		if (resume == null) {
@@ -482,8 +482,7 @@ public class PostingController {
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("resume", resume);
-		mv.addObject("allSkills", allSkills);
-		mv.addObject("userSkills", userSkills);
+		mv.addObject("skill", skill);
 		mv.addObject("resumeIdx", resumeIdx);
 		mv.addObject("resumeFile", resumeFile);
 		mv.setViewName("posting/resumeEdit");
@@ -495,8 +494,7 @@ public class PostingController {
 	@PostMapping("/resumeEdit")
 	@Transactional
 	public ModelAndView resumeEdit(HttpSession session, 
-			@RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto,
-			@RequestParam("skillIdx") List<Long> skillIdxList, PersonDto person,
+			@RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto, PersonDto person,
 			ResumeFileDto resumeFileDto, 
 			@RequestParam("file") MultipartFile file) {
 		
@@ -508,29 +506,6 @@ public class PostingController {
 
 		// 세션에서 user_idx 갖고오기
 		Long userIdx = user.getUserIdx();
-		//System.out.println("userIdx========================="+userIdx);
-		
-		
-		// 세션에서 user_idx로 person_idx 갖고오기 스킬용으로(나중에 삭제)
-				
-		//Long personIdx = postingMapper.getPeronIdxByUserIdx(userIdx); 이게 문제인데 왜 이게 문제인지 모르겠음.
-		// 찾아서 해결해본 결과로는 이제 내가 매퍼에 userIdx로 personIdx를 갖고오는게 1개뿐인데 
-		// 이걸 한개만 찾아오니 다 못집어넣어서 생기는 문제다. 라고 생각하면 될거 같음.
-
-	    List<Long> personIdxList = postingMapper.getPeronIdxByUserIdx(userIdx);
-	    //System.out.println("personIdxList========================="+personIdxList);
-		
-	    for (Long personIdx : personIdxList) {
-	        postingMapper.deletePersonSkill(personIdx);
-		
-			for (Long skillIdx : skillIdxList) {
-				PersonSkillDto personSkillDto = new PersonSkillDto();
-				personSkillDto.setPersonIdx(personIdx); // 사용자 ID 설정
-				personSkillDto.setSkillIdx(skillIdx); // 스킬 인덱스 설정
-				postingMapper.insertSkill(personSkillDto); // 스킬 정보 삽입
-			}
-	    }
-		
 		
 		
 		// 파일 수정부분
@@ -665,6 +640,7 @@ public class PostingController {
 		@GetMapping("/resumeRecommendView")
 		public ModelAndView resumeRecommendView(HttpSession session,PersonDto person,@RequestParam("personIdx") Long personIdx,@RequestParam("resumeIdx") Long resumeIdx) {
 			ModelAndView mv = new ModelAndView();
+			
 			UserDto user = (UserDto) session.getAttribute("login");
 		    Long userType = user.getUserType();
 		    Long userIdx = user.getUserIdx();

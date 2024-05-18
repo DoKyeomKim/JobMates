@@ -35,12 +35,14 @@ header {
 
 			<form class="form-horizontal" action="/mypageUpdate" method="POST">
 				<div class="card-body">
+				<input type="hidden" name="userIdx" value="${userIdx}">
+				<input type="hidden" name="personIdx" value="${person.personIdx }">
 
 					<div class="form-group row">
 						<label for="inputEmail3" class="col-sm-2 col-form-label">아이디</label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" id="id" placeholder="아이디"
-								value="${persondto.personIdx}" name="personIdx"
+								value="${userId}" name="userId"
 								readonly="readonly">
 						</div>
 					</div>
@@ -50,7 +52,7 @@ header {
 						<label for="inputPassword3" class="col-sm-2 col-form-label">주소</label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" id="address"
-								placeholder="주소" value="${persondto.personAddress}"
+								placeholder="주소" value="${person.personAddress}"
 								name="personAddress">
 						</div>
 					</div>
@@ -59,7 +61,7 @@ header {
 						<label for="inputPassword3" class="col-sm-2 col-form-label">생년월일</label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" id="birth"
-								placeholder="생년월일" value="${persondto.personBirth}"
+								placeholder="생년월일" value="${person.personBirth}"
 								name="personBirth">
 						</div>
 					</div>
@@ -68,7 +70,7 @@ header {
 						<label for="inputPassword3" class="col-sm-2 col-form-label">학력</label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" id="edu" placeholder="학력"
-								value="${persondto.personEducation}" name="personEducation">
+								value="${person.personEducation}" name="personEducation">
 						</div>
 					</div>
 
@@ -76,7 +78,7 @@ header {
 						<label for="inputPassword3" class="col-sm-2 col-form-label">이름</label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" id="name"
-								placeholder="이름" value="${persondto.personName}"
+								placeholder="이름" value="${person.personName}"
 								name="personName">
 						</div>
 					</div>
@@ -85,7 +87,7 @@ header {
 						<label for="inputPassword3" class="col-sm-2 col-form-label">전화번호</label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" id="phone"
-								placeholder="전화번호" value="${persondto.personPhone}"
+								placeholder="전화번호" value="${person.personPhone}"
 								name="personPhone">
 						</div>
 					</div>
@@ -94,10 +96,29 @@ header {
 						<label for="inputPassword3" class="col-sm-2 col-form-label">이메일</label>
 						<div class="col-sm-10">
 							<input type="email" class="form-control" id="email"
-								placeholder="이메일" value="${persondto.userEmail}"
+								placeholder="이메일" value="${userEmail}"
 								name="userEmail">
 						</div>
 					</div>
+					
+					<br>
+					<br>
+					<br>
+					
+					<div class="form-group row">
+					<c:forEach var="skill" items="${allSkills}">
+						<div class="col-auto">
+							<input type="checkbox" class="btn-check" name="skillIdx"
+								id="skill_${skill.skillIdx }" value="${skill.skillIdx}"  
+								<c:forEach var="userSkill" items="${userSkills}">
+					             <c:if test="${skill.skillIdx == userSkill.skillIdx}">
+					                   checked="checked"
+					             </c:if>
+					            </c:forEach>>
+					    	<label class="btn btn-outline-primary" for="skill_${skill.skillIdx }">${skill.skillName}</label>
+						</div>
+					</c:forEach>
+				 	</div>
 
 				</div>
 

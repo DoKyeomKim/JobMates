@@ -244,9 +244,10 @@ order by posting_idx asc
  </select>
  
  <select id="getPersonByPersonIdx">
- select person_idx,person_name,person_birth,person_phone,person_address,person_education,user_email
- from person_tb
- where person_idx = #{personIdx}
+select p.PERSON_IDX, p.USER_IDX, p.PERSON_ADDRESS, p.PERSON_BIRTH, p.PERSON_EDUCATION, p.PERSON_NAME, p.PERSON_PHONE, u.USER_EMAIL
+from person_tb p
+join USER_TB U ON U.USER_IDX = p.USER_IDX
+where p.person_idx=#{personIdx}
  </select>
  
  <select id="getCompanyIdxByUserIdx">
