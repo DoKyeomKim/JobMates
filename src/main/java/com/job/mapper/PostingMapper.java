@@ -17,6 +17,7 @@ import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
 import com.job.dto.ResumeRecommendDto;
+import com.job.dto.ResumeScrapDto;
 
 @Mapper
 public interface PostingMapper {
@@ -141,6 +142,16 @@ public interface PostingMapper {
 
     // 추천 인재 자세히보기 페이지용 유저 정보 호출
 	PersonDto getPersonByPersonIdx(Long personIdx);
+
+	// 유저 아이디로 companyIdx 갖고오기
+	Long getCompanyIdxByUserIdx(Long userIdx);
+
+	// 스크랩 체크
+	int checkScrap(Long resumeIdx, Long companyIdx);
+	// 스크랩 하기
+	void insertScrap(ResumeScrapDto resumeScrapDto);
+	// 스크랩 삭제
+	void deleteScrap(ResumeScrapDto resumeScrapDto);
 
 	
 

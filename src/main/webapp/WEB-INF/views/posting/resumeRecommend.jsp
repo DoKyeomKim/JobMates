@@ -123,79 +123,144 @@
 	<h3 class="mb-3 mt-3" style="text-align:center;"> 공고별 추천 인재 </h3>
 	<hr>
 
-    <article>
-        <div class="mt-5">
-            <div id="postings-container">
-                <c:forEach var="entry" items="${resumeRecMap}">
-                    <c:set var="postingIdx" value="${entry.key}"/>
-                    <c:set var="resumeRecList" value="${entry.value}"/>
-                    <c:if test="${not empty resumeRecList}">
-                        <div class="posting-box mt-4" data-postings-idx="${postingIdx}" style="cursor: pointer;">
-                            <input type="hidden" name="postingIdx" value="${postingIdx}">
-                            <div class="m-4">${resumeRecList[0].postingTitle}</div>
-                            <div class="m-4">마감일: ${resumeRecList[0].postingDeadline}</div>
-                            <a class="btn btn-primary posting-view" href="/postingView?postingIdx=${postingIdx}">공고 확인</a>
-                        </div>
-                        
-                        <!-- 현재 공고에 해당하는 이력서 목록 표시 -->
-                        <div class="resume-container" style="display: none; ">
-                            <c:forEach var="resumeItem" items="${resumeRecList}">
-								<div class="resume-box mb-3" data-resume-idx="${resumeItem.resumeIdx}" data-person-idx="${resumeItem.personIdx}">
-									<input type="hidden" name="personIdx" value="${resumeItem.personIdx}">
-									<input type="hidden" name="resumeIdx" value="${resumeItem.resumeIdx}">
-									<p class="m-4">${resumeItem.personName}</p>
-									<p class="m-4">${resumeItem.resumeTitle}</p>
-																
-									<button id="btn-scrap" class="btn btn-outline-primary mx-1">
-										스크랩버튼
-									</button>
-								</div>
-                            </c:forEach>
-                        </div>
-                    </c:if>
-                </c:forEach>
-            </div>
-            <br>
+<article>
+    <input type="hidden" name="companyIdx" id="companyIdx" value="${companyIdx}">
+    <div class="mt-5">
+        <div id="postings-container">
+            <c:forEach var="entry" items="${resumeRecMap}">
+                <c:set var="postingIdx" value="${entry.key}"/>
+                <c:set var="resumeRecList" value="${entry.value}"/>
+                <c:if test="${not empty resumeRecList}">
+                    <div class="posting-box mt-4" data-postings-idx="${postingIdx}" style="cursor: pointer;">
+                        <input type="hidden" name="postingIdx" value="${postingIdx}">
+                        <div class="m-4">${resumeRecList[0].postingTitle}</div>
+                        <div class="m-4">마감일: ${resumeRecList[0].postingDeadline}</div>
+                        <a class="btn btn-primary posting-view" href="/postingView?postingIdx=${postingIdx}">공고 확인</a>
+                    </div>
+                    <!-- 현재 공고에 해당하는 이력서 목록 표시 -->
+                    <div class="resume-container" style="display: none;">
+                        <c:forEach var="resumeItem" items="${resumeRecList}">
+                            <div class="resume-box mb-3" data-resume-idx="${resumeItem.resumeIdx}" data-person-idx="${resumeItem.personIdx}">
+                                <input type="hidden" name="personIdx" value="${resumeItem.personIdx}">
+                                <input type="hidden" name="resumeIdx" value="${resumeItem.resumeIdx}">
+                                <p class="m-4">${resumeItem.personName}</p>
+                                <p class="m-4">${resumeItem.resumeTitle}</p>
+                                <button class="btn btn-outline-secondary d-flex align-items-center ms-3 scrapBtn">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
+                                        data-resume-idx="${resumeItem.resumeIdx}"
+                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                        width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" />
+                                    </svg>
+                                    <span>스크랩</span>
+                                </button>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </c:if>
+            </c:forEach>
         </div>
-    </article>
+        <br>
+    </div>
+</article>
 </section>
-<%@include file="/WEB-INF/layouts/footer.jsp"%>
+<%@ include file="/WEB-INF/layouts/footer.jsp" %>
 <script src="/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var postingBoxes = document.querySelectorAll('.posting-box');
 
-        postingBoxes.forEach(function(box) {
-            box.addEventListener('click', function() {
+        postingBoxes.forEach(function (box) {
+            box.addEventListener('click', function () {
                 var resumeContainer = this.nextElementSibling;
                 var displayStatus = resumeContainer.style.display;
-
                 resumeContainer.style.display = displayStatus === 'block' ? 'none' : 'block';
             });
         });
-    });
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // document 전체에 클릭 이벤트 리스너를 추가합니다.
-        document.addEventListener('click', function(event) {
-            // 스크랩 버튼 클릭 시 함수 종료
-            if (event.target.id === 'btn-scrap') {
+
+        const companyIdx = document.getElementById('companyIdx').value;
+
+        function updatescrapSvgs() {
+            const scrapSvgs = document.querySelectorAll('.scrapSvg');
+            scrapSvgs.forEach(function (button) {
+                const resumeIdx = button.getAttribute('data-resume-idx');
+                // 스크랩 상태 확인 요청
+                fetch(`/CheckResumeScrap?resumeIdx=` + resumeIdx + `&companyIdx=` + companyIdx, {
+                    method: 'GET',
+                })
+                    .then(response => response.json())
+                    .then(isScraped => {
+                        button.setAttribute('data-scraped', isScraped);
+                        if (isScraped) {
+                            button.setAttribute('fill', 'yellow');
+                        } else {
+                            button.setAttribute('fill', 'none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+        }
+
+        updatescrapSvgs(); // 페이지 로드 시 스크랩 버튼 상태 갱신
+
+        document.addEventListener('click', async function (e) {
+            const button = e.target.closest('.scrapBtn');
+            if (button) {
+                e.preventDefault();
+                e.stopPropagation();
+                const scrapSvg = button.querySelector('.scrapSvg');
+                const resumeIdx = scrapSvg.getAttribute('data-resume-idx');
+                const isScraped = scrapSvg.getAttribute('data-scraped') === 'true';
+
+                try {
+                    let response;
+                    if (isScraped) {
+                        // 스크랩 삭제 요청
+                        response = await fetch(`/ResumeScrapDelete`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ resumeIdx, companyIdx }),
+                        });
+                    } else {
+                        // 스크랩 추가 요청
+                        response = await fetch('/ResumeScrapAdd', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ resumeIdx, companyIdx }),
+                        });
+                    }
+
+                    if (response.ok) {
+                        const message = isScraped ? '스크랩이 해제되었습니다.' : '스크랩되었습니다.';
+                        alert(message);
+                        updatescrapSvgs(); // 모든 스크랩 버튼 상태 갱신
+                    } else {
+                        throw new Error('error.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다. 다시 시도해주세요.');
+                }
                 return;
             }
 
-            // 클릭된 요소가 resume-box 내부의 요소인지 확인합니다.
-            var clickedElement = event.target.closest('.resume-box');
-            if (!clickedElement) return; // 클릭된 요소가 resume-box 내부의 요소가 아니면 함수 종료
-
-            // 클릭된 resume-box 요소에서 data-resume-idx와 data-person-idx 값을 읽어옵니다.
-            var resumeIdx = clickedElement.getAttribute('data-resume-idx');
-            var personIdx = clickedElement.getAttribute('data-person-idx');
-
-            // resumeIdx와 personIdx를 URL 파라미터로 포함하여 페이지 이동합니다.
-            window.location.href = '/resumeRecommendView?resumeIdx=' + resumeIdx + '&personIdx=' + personIdx;
+            // 이력서 항목 클릭 이벤트 처리
+            const clickedElement = e.target.closest('.resume-box');
+            if (clickedElement) {
+                const resumeIdx = clickedElement.getAttribute('data-resume-idx');
+                const personIdx = clickedElement.getAttribute('data-person-idx');
+                window.location.href = '/resumeRecommendView?resumeIdx=' + resumeIdx + '&personIdx=' + personIdx;
+            }
         });
     });
-
 </script>
+
 </body>
 </html>

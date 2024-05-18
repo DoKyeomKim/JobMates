@@ -2,7 +2,6 @@ package com.job.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -30,6 +31,7 @@ import com.job.dto.PostingSkillDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.ResumeRecommendDto;
+import com.job.dto.ResumeScrapDto;
 import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
 import com.job.mapper.MypageMapper;
@@ -634,6 +636,8 @@ public class PostingController {
 		    UserDto user = (UserDto) session.getAttribute("login");
 		    Long userType = user.getUserType();
 		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
+
 		    
 		    // user_idx로 posting_idx 갖고 옴
 		    List<Long> postingIdxList = postingMapper.getPostingIdxByUserIdx(userIdx);
@@ -649,6 +653,7 @@ public class PostingController {
 		        resumeRecMap.put(postingIdx, resumeRecs);
 		    }
 		    
+			mv.addObject("companyIdx", companyIdx);
 		    mv.addObject("resumeRecMap", resumeRecMap);
 		    mv.addObject("userType", userType);
 		    mv.setViewName("posting/resumeRecommend");
@@ -662,6 +667,8 @@ public class PostingController {
 			ModelAndView mv = new ModelAndView();
 			UserDto user = (UserDto) session.getAttribute("login");
 		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
 		    
 		    person = postingMapper.getPersonByPersonIdx(personIdx);
 		    
@@ -678,6 +685,7 @@ public class PostingController {
 
 			ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
 			
+			mv.addObject("companyIdx", companyIdx);
 		    mv.addObject("userType", userType);
 		    mv.addObject("person", person);
 		    mv.addObject("skill", skill);
@@ -688,6 +696,42 @@ public class PostingController {
 			return mv;
 		}
 	
+		// ================ 이력서 스크랩 =====================
 		
+		// 스크랩 상태 확인
+		@GetMapping("/CheckResumeScrap")
+		public ResponseEntity<Boolean> checkScrap(@RequestParam("resumeIdx") Long resumeIdx, @RequestParam("companyIdx") Long companyIdx) {
+		    boolean isScraped = postingService.checkResumeScrap(resumeIdx, companyIdx);
+		    return ResponseEntity.ok(isScraped);
+		}
 		
+	    // 스크랩 추가
+	    @PostMapping("/ResumeScrapAdd")
+	    @ResponseBody
+	    public Map<String, Object> addScrap(@RequestBody ResumeScrapDto resumeScrapDto) {
+	        Map<String, Object> response = new HashMap<>();
+	        try {
+	            postingService.addScrap(resumeScrapDto);
+	            response.put("success", true);
+	        } catch (Exception e) {
+	            response.put("success", false);
+	            response.put("message", e.getMessage());
+	        }
+	        return response;
+	    }
+
+	    // 스크랩 삭제
+	    @DeleteMapping("/ResumeScrapDelete")
+	    @ResponseBody
+	    public Map<String, Object> deleteScrap(@RequestBody ResumeScrapDto resumeScrapDto) {
+	        Map<String, Object> response = new HashMap<>();
+	        try {
+	            postingService.deleteScrap(resumeScrapDto);
+	            response.put("success", true);
+	        } catch (Exception e) {
+	            response.put("success", false);
+	            response.put("message", e.getMessage());
+	        }
+	        return response;
+	    }
 }

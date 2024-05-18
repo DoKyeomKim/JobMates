@@ -10,6 +10,7 @@ import com.job.dto.PersonDto;
 import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingSkillDto;
+import com.job.dto.ResumeScrapDto;
 import com.job.dto.SkillDto;
 import com.job.mapper.PostingMapper;
 
@@ -35,6 +36,22 @@ public class PostingService {
             postingMapper.postingSkillWrite(postingSkillDto); // 기술 스택을 POSTING_SKILL_TB에 저장
         }
     }
+
+	// 이력서 체크
+	public boolean checkResumeScrap(Long resumeIdx, Long companyIdx) {
+	    return postingMapper.checkScrap(resumeIdx, companyIdx) > 0;
+	}
+
+	public void addScrap(ResumeScrapDto resumeScrapDto) {
+		postingMapper.insertScrap(resumeScrapDto);
+		
+	}
+
+	public void deleteScrap(ResumeScrapDto resumeScrapDto) {
+		postingMapper.deleteScrap(resumeScrapDto);
+		
+	}
+
 
 
 

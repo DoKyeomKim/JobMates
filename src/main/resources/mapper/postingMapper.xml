@@ -249,4 +249,26 @@ order by posting_idx asc
  where person_idx = #{personIdx}
  </select>
  
+ <select id="getCompanyIdxByUserIdx">
+ select company_idx
+ from company_tb
+ where user_idx=#{userIdx}
+ </select>
+ 
+<select id="checkScrap">
+	SELECT COUNT(*)
+    FROM resume_scrap_tb
+	WHERE resume_idx = #{param1} AND company_idx = #{param2}
+</select>
+ 
+<insert id="insertScrap">
+    INSERT INTO resume_scrap_tb (RSCRAP_IDX,RESUME_IDX, COMPANY_IDX)
+    VALUES (RSCRAP_SEQ.NEXTVAL,#{resumeIdx}, #{companyIdx})
+</insert> 
+ 
+<delete id="deleteScrap">
+	DELETE FROM resume_scrap_tb
+	WHERE resume_idx = #{resumeIdx} AND company_idx = #{companyIdx}
+</delete>
+ 
 </mapper>

@@ -9,7 +9,7 @@
 <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <style>
-/* 추가적인 CSS 스타일링 */
+/* 추가적인 	SS 스타일링 */
 footer {
 	position: fixed;
 	bottom: 0;
