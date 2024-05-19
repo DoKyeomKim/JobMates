@@ -1,38 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>메인 페이지</title>
-<link rel="icon" type="image/x-icon" href="/images/favicon.png">
-<link href="/css/bootstrap.min.css" rel="stylesheet" />
-<style>
-main {
-	margin-bottom: 100px;
-}
 
-/* 추가적인 CSS 스타일링 */
-footer {
-	position: fixed;
-	bottom: 0;
-	width: 100%;
-	padding: 20px 0;
-	text-align: center;
-}
-
-header {
-	background-color: #e0f7fa;
-}
-</style>
-</head>
-<body>
-<%@include file="/WEB-INF/layouts/header.jsp"%>
-
-	<main>
-		<div>
-			<div class="container" style="width: 85%;">
+			<div class="container" style="width: 100%;">
 		
 				<input type="hidden" name=companyIdx id=companyIdx value=${companyIdx }>
 
@@ -45,7 +15,7 @@ header {
 					<!-- 왼쪽에 이미지 -->
 					<div class="col-md-4 mt-5">
 						<img src="${resumeFile.filePath}" id="imagePreview"
-							style="width: 250px; height: 310px;"
+							style="width: 240px; height: 305px;"
 							class="mb-2 border border-tertiary">
 					</div>
 
@@ -89,7 +59,7 @@ header {
 
 
 
-			<div class="container" style="width: 85%;">
+			<div class="container" style="width: 100%;">
 				<div class="row justify-content-center ">
 
 					<div class="input-group mb-3">
@@ -122,7 +92,6 @@ header {
 					</div>
 					<div class="d-flex mt-4 justify-content-center">
 
-							<a id="btn-go-list" href="/RScrapList" class="btn btn-primary">목록으로</a>
 
 							<button class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
 									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
@@ -221,4 +190,3 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 	<script src="/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>

@@ -135,7 +135,7 @@
                         <input type="hidden" name="postingIdx" value="${postingIdx}">
                         <div class="m-4">${resumeRecList[0].postingTitle}</div>
                         <div class="m-4">마감일: ${resumeRecList[0].postingDeadline}</div>
-                        <a class="btn btn-primary posting-view" href="/postingView?postingIdx=${postingIdx}">공고 확인</a>
+<a class="btn btn-primary posting-view" href="javascript:void(0);" data-posting-idx="${postingIdx}">공고 확인</a>
                     </div>
                     <!-- 현재 공고에 해당하는 이력서 목록 표시 -->
                     <div class="resume-container" style="display: none;">
@@ -165,6 +165,27 @@
     </div>
 </article>
 </section>
+
+<!-- 모달 -->
+<div class="modal fade" id="postingModal" tabindex="-1" aria-labelledby="postingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="postingModalLabel">공고 상세</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="postingModalBody">
+        <!-- 내용이 AJAX로 여기에 로드됩니다 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <%@ include file="/WEB-INF/layouts/footer.jsp" %>
 <script src="/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -185,7 +206,6 @@
             const scrapSvgs = document.querySelectorAll('.scrapSvg');
             scrapSvgs.forEach(function (button) {
                 const resumeIdx = button.getAttribute('data-resume-idx');
-                // 스크랩 상태 확인 요청
                 fetch(`/CheckResumeScrap?resumeIdx=` + resumeIdx + `&companyIdx=` + companyIdx, {
                     method: 'GET',
                 })
@@ -218,7 +238,6 @@
                 try {
                     let response;
                     if (isScraped) {
-                        // 스크랩 삭제 요청
                         response = await fetch(`/ResumeScrapDelete`, {
                             method: 'DELETE',
                             headers: {
@@ -227,7 +246,6 @@
                             body: JSON.stringify({ resumeIdx, companyIdx }),
                         });
                     } else {
-                        // 스크랩 추가 요청
                         response = await fetch('/ResumeScrapAdd', {
                             method: 'POST',
                             headers: {
@@ -240,7 +258,7 @@
                     if (response.ok) {
                         const message = isScraped ? '스크랩이 해제되었습니다.' : '스크랩되었습니다.';
                         alert(message);
-                        updatescrapSvgs(); // 모든 스크랩 버튼 상태 갱신
+                        updatescrapSvgs();
                     } else {
                         throw new Error('error.');
                     }
@@ -251,7 +269,24 @@
                 return;
             }
 
-            // 이력서 항목 클릭 이벤트 처리
+            const postingViewBtn = e.target.closest('.posting-view');
+            if (postingViewBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const postingIdx = postingViewBtn.getAttribute('data-posting-idx');
+                fetch(`/postingView?postingIdx=` + postingIdx)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('postingModalBody').innerHTML = html;
+                        var postingModal = new bootstrap.Modal(document.getElementById('postingModal'));
+                        postingModal.show();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('오류가 발생했습니다. 다시 시도해주세요.');
+                    });
+            }
+
             const clickedElement = e.target.closest('.resume-box');
             if (clickedElement) {
                 const resumeIdx = clickedElement.getAttribute('data-resume-idx');
@@ -261,6 +296,7 @@
         });
     });
 </script>
+
 
 </body>
 </html>

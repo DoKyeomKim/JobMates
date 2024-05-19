@@ -157,6 +157,10 @@ DELETE FROM POSTING_TB WHERE POSTING_IDX=#{postingIdx}
 DELETE FROM POSTING_SKILL_TB WHERE POSTING_IDX=#{postingIdx}
 </delete>
 
+<delete id="postingScrapDelete">
+DELETE FROM POSTING_SCRAP_TB WHERE POSTING_IDX=#{postingIdx}
+</delete>
+
 <update id="postingUpdate">
 UPDATE POSTING_TB
 SET POSTING_TITLE=#{postingTitle}, POSTING_COMMENT=#{postingComment}, EXPERIENCE=#{experience},

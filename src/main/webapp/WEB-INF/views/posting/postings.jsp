@@ -98,11 +98,30 @@
 
     </article>
 </section>
+
+<!-- Modal Structure -->
+<div class="modal fade" id="postingModal" tabindex="-1" aria-labelledby="postingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="postingModalLabel">공고 보기</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="postingModalBody">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <%@include file="/WEB-INF/layouts/footer.jsp"%>
 <script src="/js/bootstrap.bundle.min.js"></script>
 
 <!-- div 클릭시 이동  -->
-<script>
+<!-- <script>
 $(document).ready(function() {
     // 게시물 박스 클릭 이벤트
     $('#postings-container').on('click', '.posting-box', function(e) {
@@ -114,7 +133,38 @@ $(document).ready(function() {
     });
 
 });
+</script> -->
+
+<script>
+$(document).ready(function() {
+    // 게시물 박스 클릭 이벤트
+    $('#postings-container').on('click', '.posting-box', function(e) {
+        // 삭제 버튼 클릭 이벤트가 버블링되는 것을 방지
+        if (!$(e.target).closest('.posting-delete').length) {
+            var postingIdx = $(this).data('postings-idx'); // 게시물 인덱스 가져오기
+
+            // AJAX 요청으로 postingView.jsp 내용을 가져옴
+            $.ajax({
+                url: '/postingView',
+                type: 'GET',
+                data: { postingIdx: postingIdx },
+                success: function(response) {
+                    // 모달의 내용 채우기
+                    $('#postingModalBody').html(response);
+                    // 모달 표시
+                    var postingModal = new bootstrap.Modal(document.getElementById('postingModal'), {});
+                    postingModal.show();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching posting details:', error);
+                    alert('공고 정보를 불러오는데 실패했습니다.');
+                }
+            });
+        }
+    });
+});
 </script>
+
 
 <!-- 공고 삭제 -->
 <script>

@@ -54,6 +54,9 @@ public interface PostingMapper {
 	void postingDelete(Long postingIdx);
 	// 공고 스킬 삭제
 	void postingSkillDelete(Long postingIdx);
+	// 공고 스크랩한거 삭제
+	void postingScrapDelete(Long postingIdx);
+
 
 
 	
@@ -159,6 +162,7 @@ public interface PostingMapper {
 	
 	// companyIdx로 스크랩한 이력서들 갖고오기. 
 	List<RScrapListDto> getRScrapList(Long companyIdx);
+
 
 	
 

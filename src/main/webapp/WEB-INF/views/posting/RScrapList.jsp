@@ -88,6 +88,25 @@ header {
 	</c:forEach>
 </div>
 
+<!-- 모달 -->
+<div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resumeModalLabel">이력서 상세</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="resumeModalBody">
+        <!-- 내용이 AJAX로 여기에 로드됩니다 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 	<%@include file="/WEB-INF/layouts/footer.jsp"%>
 	<script src="/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -99,13 +118,12 @@ document.addEventListener("DOMContentLoaded", function() {
         scrapSvgs.forEach(function(button) {
             const resumeIdx = button.getAttribute('data-resume-idx');
 
-            // 스크랩 상태 확인 요청
             fetch(`/CheckResumeScrap?resumeIdx=` + resumeIdx + `&companyIdx=` + companyIdx, {
                 method: 'GET',
             })
             .then(response => response.json())
             .then(isScraped => {
-                console.log('Scrap status for resumeIdx:', resumeIdx, 'is', isScraped); // 확인용 로그
+                console.log('Scrap status for resumeIdx:', resumeIdx, 'is', isScraped);
                 button.setAttribute('data-scraped', isScraped);
                 if (isScraped) {
                     button.setAttribute('fill', 'yellow');
@@ -119,23 +137,21 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    updatescrapSvgs(); // 페이지 로드 시 스크랩 버튼 상태 갱신
+    updatescrapSvgs();
 
     document.addEventListener('click', async function(e) {
-        const button = e.target.closest('.scrapBtn'); // 상위 요소인 버튼을 찾기
+        const button = e.target.closest('.scrapBtn');
         if (button) {
-            e.preventDefault(); // 기본 동작 방지
-            e.stopPropagation(); // 이벤트 전파 방지
+            e.preventDefault();
+            e.stopPropagation();
             const scrapSvg = button.querySelector('.scrapSvg');
             const resumeIdx = scrapSvg.getAttribute('data-resume-idx');
-            const companyIdx = document.getElementById('companyIdx').value;
             const isScraped = scrapSvg.getAttribute('data-scraped') === 'true';
             console.log('Button clicked for resumeIdx:', resumeIdx, 'isScraped:', isScraped);
             
             try {
                 let response;
                 if (isScraped) {
-                    // 스크랩 삭제 요청
                     response = await fetch(`/ResumeScrapDelete`, {
                         method: 'DELETE',
                         headers: {
@@ -144,7 +160,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         body: JSON.stringify({ resumeIdx, companyIdx }),
                     });
                 } else {
-                    // 스크랩 추가 요청
                     response = await fetch('/ResumeScrapAdd', {
                         method: 'POST',
                         headers: {
@@ -157,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (response.ok) {
                     const message = isScraped ? '스크랩이 해제되었습니다.' : '스크랩되었습니다.';
                     alert(message);
-                    updatescrapSvgs(); // 모든 스크랩 버튼 상태 갱신
+                    updatescrapSvgs();
                 } else {
                     throw new Error('error.');
                 }
@@ -165,30 +180,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error('Error:', error);
                 alert('오류가 발생했습니다. 다시 시도해주세요.');
             }
-            return; // 여기서 함수 실행 종료
+            return;
         }
 
-    });
-
-    // Resume-box click event handling
-    document.querySelectorAll('.resume-box').forEach(function(box) {
-        box.addEventListener('click', function(e) {
-            // Check if the clicked element is the scrapBtn or a child of it
-            if (e.target.closest('.scrapBtn')) {
-                // If it is, do not perform the URL redirection
-                return;
-            }
-
-            // Get the resumeIdx and personIdx values from the data attributes
-            const resumeIdx = this.getAttribute('data-resume-idx');
-            const personIdx = this.getAttribute('data-person-idx');
-
-            // Construct the URL and navigate to it
-            window.location.href = '/RScrapView?resumeIdx=' + resumeIdx + '&personIdx=' + personIdx;
-        });
+        const clickedElement = e.target.closest('.resume-box');
+        if (clickedElement) {
+            e.preventDefault();
+            e.stopPropagation();
+            const resumeIdx = clickedElement.getAttribute('data-resume-idx');
+            const personIdx = clickedElement.getAttribute('data-person-idx');
+            
+            fetch(`/RScrapView?resumeIdx=` + resumeIdx + '&personIdx=' + personIdx)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('resumeModalBody').innerHTML = html;
+                    var resumeModal = new bootstrap.Modal(document.getElementById('resumeModal'));
+                    resumeModal.show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다. 다시 시도해주세요.');
+                });
+        }
     });
 });
 </script>
+
 
 	
 </body>

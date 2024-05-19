@@ -216,7 +216,7 @@ public class PostingController {
 			postingMapper.postingSkillUpdate(postingSkill);
 		}
 
-		mv.setViewName("redirect:/postingView?postingIdx=" + postingIdx);
+		mv.setViewName("redirect:/postings");
 		return mv;
 	}
 
@@ -227,7 +227,8 @@ public class PostingController {
 		ModelAndView mv = new ModelAndView();
 
 		Long postingIdx = postingDto.getPostingIdx();
-
+		
+		postingMapper.postingScrapDelete(postingIdx);
 		postingMapper.postingSkillDelete(postingIdx);
 		postingMapper.postingDelete(postingIdx);
 		mv.setViewName("redirect:/postings");
