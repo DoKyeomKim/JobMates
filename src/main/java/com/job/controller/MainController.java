@@ -1,6 +1,8 @@
 package com.job.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,21 +18,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.ApplyDto;
 import com.job.dto.ApplyStatusDto;
+import com.job.dto.CommunityDto;
+import com.job.dto.CommunityLikesDto;
+import com.job.dto.CommunityViewDto;
 import com.job.dto.CompanyDto;
 import com.job.dto.PersonDto;
-import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingScrapDto;
 import com.job.dto.PostingWithFileDto;
+import com.job.dto.ReplyDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
-import com.job.entity.Resume;
 import com.job.service.MainService;
 
 import jakarta.servlet.http.HttpSession;
@@ -267,6 +272,7 @@ public class MainController {
 		mv.addObject("userType", userType);
 		return mv;
 	}
+
 	@GetMapping("/CompanyApply")
 	public ModelAndView companyApply(HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/companyApply");
@@ -280,6 +286,7 @@ public class MainController {
 		mv.addObject("userType", userType);
 		return mv;
 	}
+
 	@GetMapping("/PersonApply")
 	public ModelAndView personApply(HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/personApply");
@@ -353,7 +360,7 @@ public class MainController {
 		ResumeDto resume = mainService.findResumeByResumeIdx(resumeIdx);
 		ResumeFileDto resumeFile = mainService.findResumeFileByResumeIdx(resumeIdx);
 		PostingDto posting = mainService.findPostingByPostingIdx(postingIdx);
-		
+
 		ApplyDto apply = mainService.findApplyByResumeIdxAndPostingIdx(resume.getResumeIdx(), posting.getPostingIdx());
 		// skillIdx를 토대로 skill 갖고오기
 		List<SkillDto> skill = mainService.findSkillListByPersonIdx(personIdx);
@@ -368,39 +375,164 @@ public class MainController {
 		mv.setViewName("fragment/applyResumeView");
 		return mv;
 	}
-	
+
 	@GetMapping("/Community")
 	public ModelAndView community(HttpSession session) {
 		ModelAndView mv = new ModelAndView("section/community");
 		UserDto user = (UserDto) session.getAttribute("login");
-
 		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
 		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
-
-		log.info("isLoggedIn = {}", isLoggedIn);
-		log.info("user = {}", user);
 		if (isLoggedIn) {
 			if (user != null) {
 				Long userType = user.getUserType();
-				log.info("user = {}", user);
-				if (userType == 1) {
-					Long userIdx = user.getUserIdx();
-					
-					mv.addObject("userType", userType);
-				} else {
-					Long userIdx = user.getUserIdx();
-					PersonDto person = mainService.findPersonByUserIdx(userIdx);
-				
-					mv.addObject("person", person);
-					mv.addObject("userType", userType);
-					return mv;
-				}
+				mv.addObject("userType", userType);
 			}
-		} else {
-			
-			return mv;
 		}
+		List<CommunityDto> community = mainService.findAllCommunity();
+		mv.addObject("user", user);
+		mv.addObject("community", community);
+
 		return mv;
-	
+
 	}
+
+	@GetMapping("/CommunitySort")
+	public ModelAndView getCommunityData(@RequestParam("sort") String sort) {
+		ModelAndView mv = new ModelAndView("fragment/communityList");
+		List<CommunityDto> community = mainService.findSortedCommunities(sort);
+
+		mv.addObject("community", community);
+		return mv;
+	}
+
+	@PostMapping("/LikeAdd")
+	public ResponseEntity<?> addLike(@RequestBody CommunityLikesDto like) {
+		try {
+			mainService.insertLike(like);
+			log.info("like = {}", like);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("Like 추가에 실패했습니다.");
+		}
+	}
+
+	@DeleteMapping("/LikeDelete")
+	public ResponseEntity<?> deleteLike(@RequestBody CommunityLikesDto like) {
+		try {
+			mainService.deleteLike(like);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			log.info("Like = {}", like);
+			log.error("Like 삭제 처리 중 오류 발생", e); // 로그 출력 예
+			return ResponseEntity.badRequest().body("Like 삭제에 실패했습니다.");
+		}
+	}
+
+	@GetMapping("/CheckLike/{communityIdx}/{userIdx}")
+	public ResponseEntity<?> checkLike(@PathVariable("communityIdx") Long communityIdx,
+			@PathVariable("userIdx") Long userIdx) {
+		int checkLike = mainService.checkLike(communityIdx, userIdx);
+		try {
+			if (checkLike != 0) {
+				boolean isLiked = true;
+				return ResponseEntity.ok(isLiked);
+			} else {
+				boolean isLiked = false;
+				return ResponseEntity.ok(isLiked);
+			}
+
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("Like 상태 확인에 실패했습니다.");
+		}
+	}
+
+	@PostMapping("/LoadLikes")
+	@ResponseBody
+	public Long loadLikes(@RequestParam("communityIdx") Long communityIdx) {
+
+		// postId를 기반으로 좋아요 수를 업데이트하고, 업데이트된 좋아요 수를 반환하는 로직 구현
+		Long loadlikes = mainService.countLike(communityIdx);
+
+		// 업데이트된 좋아요 수를 int로 직접 반환
+		return loadlikes;
+	}
+
+	@GetMapping("/CommunityDetail/{communityIdx}")
+	public ModelAndView getCommunityData(@PathVariable("communityIdx") Long communityIdx, HttpSession session) {
+		ModelAndView mv = new ModelAndView("fragment/communityDetail");
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+		UserDto user = (UserDto) session.getAttribute("login");
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userType = user.getUserType();
+				mv.addObject("userType", userType);
+			}
+		}
+		CommunityDto community = mainService.findCommunityBycommunityIdx(communityIdx);
+		List<ReplyDto> reply = mainService.findReplysByCommunityIdx(communityIdx);
+		mv.addObject("community", community);
+		mv.addObject("reply", reply);
+		mv.addObject("isLoggedIn", isLoggedIn);
+		return mv;
+	}
+
+	@PostMapping("/ReplyInsert")
+	public ResponseEntity<?> insertComment(@RequestBody ReplyDto reply, HttpSession session) {
+	    try {
+	        UserDto user = (UserDto) session.getAttribute("login");
+	        if (user != null) {
+	            Long userType = user.getUserType();
+	            if (userType == 1) {
+	                Long userIdx = user.getUserIdx();
+	                CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
+	                reply.setUserIdx(userIdx);
+	                reply.setReplyName(company.getCompanyName());
+	                SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+	                String currentDate = formatter.format(new Date());
+	                reply.setCreatedDate(currentDate);
+	                reply.setLikeCount((long) 0);
+	                mainService.insertReply(reply);
+	            } else {
+	                Long userIdx = user.getUserIdx();
+	                PersonDto person = mainService.findPersonByUserIdx(userIdx);
+	                reply.setUserIdx(userIdx);
+	                reply.setReplyName(person.getPersonName());
+	                SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+	                String currentDate = formatter.format(new Date());
+	                reply.setCreatedDate(currentDate);
+	                reply.setLikeCount((long) 0);
+	                log.info("reply = {}", reply);
+	                mainService.insertReply(reply); // Insert reply for non-company user as well
+	            }
+	        }
+
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        log.error("댓글 추가에 실패했습니다.", e);
+	        return ResponseEntity.badRequest().body("댓글 추가에 실패했습니다.");
+	    }
+	}
+
+	
+	@GetMapping("/LoadReply/{communityIdx}")
+	@ResponseBody
+	public List<ReplyDto> loadReply(@PathVariable("communityIdx") Long communityIdx) {
+		// 특정 게시물에 대한 댓글 조회
+		List<ReplyDto> replys = mainService.findReplysByCommunityIdx(communityIdx);
+
+		return replys;
+	}
+	
+	@PostMapping("/ViewAdd")
+	public ResponseEntity<?> addView(@RequestBody CommunityViewDto view) {
+		try {
+			mainService.insertView(view);
+			log.info("like = {}", view);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("View 추가에 실패했습니다.");
+		}
+	}
+
 }

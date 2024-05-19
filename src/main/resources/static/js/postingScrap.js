@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					alert(message);
 					updatescrapSvgs(); // 모든 스크랩 버튼 상태 갱신
 				} else {
-					throw new Error('Network response was not ok.');
+					throw new Error('네크워크 에러');
 				}
 			} catch (error) {
 				console.error('Error:', error);

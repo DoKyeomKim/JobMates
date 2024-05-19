@@ -5,7 +5,7 @@
 <head>
 </head>
 <body>
- <footer class="bg-body-tertiary">
+ <footer class="bg-body-tertiary mt-3">
     <div class="container">
       <a href="#" class="text-dark" style="text-decoration: none;">고객센터</a> <!-- 링크 내용을 변경할 수 있습니다. -->
     </div>
