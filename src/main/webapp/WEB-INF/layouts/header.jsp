@@ -25,7 +25,7 @@
 										<li><a href="/postings" class="nav-link px-2 text-dark">공고
 												관리</a></li>
 										<li><a href="/ApplyPage" class="nav-link px-2 text-dark">채용 관리</a></li>
-										<li><a href="#" class="nav-link px-2 text-dark">관심 인재</a></li>
+										<li><a href="/RScrapList" class="nav-link px-2 text-dark">관심 인재</a></li>
 										<li><a href="#" class="nav-link px-2 text-dark">자유
 												게시판</a></li>
 									</ul>

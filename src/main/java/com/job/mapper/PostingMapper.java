@@ -12,6 +12,7 @@ import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingRecommendDto;
 import com.job.dto.PostingSkillDto;
+import com.job.dto.RScrapListDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
@@ -153,16 +154,14 @@ public interface PostingMapper {
 	// 스크랩 삭제
 	void deleteScrap(ResumeScrapDto resumeScrapDto);
 
+
+	//=================관심인재(이력서)=============
+	
+	// companyIdx로 스크랩한 이력서들 갖고오기. 
+	List<RScrapListDto> getRScrapList(Long companyIdx);
+
 	
 
-
-
-
-	
-
-
-
-	
 
 
 

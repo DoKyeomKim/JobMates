@@ -271,5 +271,22 @@ where p.person_idx=#{personIdx}
 	DELETE FROM resume_scrap_tb
 	WHERE resume_idx = #{resumeIdx} AND company_idx = #{companyIdx}
 </delete>
+
+<select id="getRScrapList" parameterType="com.job.dto.RScrapListDto">
+  SELECT
+  r.RESUME_TITLE,
+  r.RESUME_IDX,
+  r.USER_IDX,
+  p.PERSON_IDX,
+  p.PERSON_NAME
+FROM
+  resume_scrap_tb rs
+JOIN
+  resume_tb r ON rs.RESUME_IDX = r.RESUME_IDX
+JOIN
+  person_tb p ON r.USER_IDX = p.USER_IDX
+WHERE
+  rs.COMPANY_IDX = #{companyIdx}
+</select>
  
 </mapper>

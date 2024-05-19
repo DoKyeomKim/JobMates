@@ -28,6 +28,7 @@ import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingRecommendDto;
 import com.job.dto.PostingSkillDto;
+import com.job.dto.RScrapListDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.ResumeRecommendDto;
@@ -710,4 +711,63 @@ public class PostingController {
 	        }
 	        return response;
 	    }
+	    
+	    
+	    // =============스크랩한 인재 페이지============================
+	    // 스크랩한 리스트
+	    @GetMapping("/RScrapList")
+	    public ModelAndView PScrapList(HttpSession session) {
+	    	ModelAndView mv = new ModelAndView();
+	    	
+			UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
+		    
+		    // 스크랩한 리스트 갖고오기
+		    List<RScrapListDto> RScrapList = postingMapper.getRScrapList(companyIdx);
+		    
+		    
+		    mv.addObject("companyIdx",companyIdx);
+		    mv.addObject("RScrapList",RScrapList);
+		    mv.addObject("userType",userType);
+	    	mv.setViewName("posting/RScrapList");
+	    	return mv; 	
+	    }
+	    
+	    @GetMapping("/RScrapView")
+		public ModelAndView RScrapView(HttpSession session,PersonDto person,@RequestParam("personIdx") Long personIdx,@RequestParam("resumeIdx") Long resumeIdx) {
+			ModelAndView mv = new ModelAndView();
+			
+			UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
+		    
+		    person = postingMapper.getPersonByPersonIdx(personIdx);
+		    
+		    // 개인유저 스킬 갖고오기 
+		    List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
+
+			// Resume_tb 정보 갖고 오기
+			ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
+			if (resume == null) {
+				// 사용자 정보가 없을 경우 처리
+				mv.setViewName("redirect:/");
+				return mv;
+			}
+
+			ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
+			
+			mv.addObject("companyIdx", companyIdx);
+		    mv.addObject("userType", userType);
+		    mv.addObject("person", person);
+		    mv.addObject("skill", skill);
+		    mv.addObject("resume", resume);
+		    mv.addObject("resumeFile", resumeFile);
+			mv.setViewName("posting/RScrapView");
+
+			return mv;
+		}
+	    
 }
