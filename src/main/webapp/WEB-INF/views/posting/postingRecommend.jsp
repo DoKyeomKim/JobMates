@@ -10,7 +10,6 @@
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <style type="text/css">
 
-body
 
 .scrapBtn {
 	display: inline-block; /* 올바른 크기 조정을 위해 */
@@ -21,6 +20,29 @@ body
 
 .detail-div {
 	cursor: pointer;
+	margin-bottom: 20px;
+	
+}
+
+
+#section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 60vh;
+    text-align: center;
+    margin-bottom: 100px;
+}
+
+#result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+}
+
+.detail-div {
 }
 
 /* 추가적인 CSS 스타일링 */
@@ -40,7 +62,7 @@ header {
 </head>
 <body>
 <%@include file="/WEB-INF/layouts/header.jsp"%>
-<h3 class="my-4"> 추천 공고 </h3>
+<h3 class="my-4" style="text-align:center;"> 추천 공고 </h3>
 <hr>
 <section id="section">
 	<div id="result" class="mt-5 ms-5">
@@ -53,9 +75,9 @@ header {
 						<!-- 각 포스트를 감싸는 div 추가 -->
 						<img alt="기업 로고" style="width:250px; height: 310px;" src="${posting.filePath}"
 							class="border" style="width: 250px;">
-						<div class="d-flex justify-content-between">
+						<div class="d-flex justify-content-between mb-3">
 							<!-- flex-direction 변경 및 가운데 정렬 -->
-							<div class="d-flex flex-column">
+							<div class="d-flex flex-column" style="text-align:left;">
 								<span>${ posting.postingTitle }</span> <span>${ posting.companyName }</span>
 							</div>
 							<c:choose>
