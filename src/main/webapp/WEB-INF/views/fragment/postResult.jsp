@@ -4,18 +4,17 @@
 
 <body>
 	<c:if test="${not empty posts}">
-		<div class="d-flex flex-wrap">
+		<div class="d-flex flex-wrap whole-posting">
 			<input type="hidden" value="${person.personIdx}" id="personIdx">
 			<!-- flex-wrap 추가 가능 -->
 			<c:forEach items="${posts}" var="post">
 				<div class="me-5 detail-div"
 					data-posting-idx="${post.postingDto.postingIdx}">
 					<!-- 각 포스트를 감싸는 div 추가 -->
-					<img alt="기업 로고" src="${post.companyFileDto.filePath}"
-						class="border" style="width: 250px; height: 200px;">
-					<div class="d-flex justify-content-between">
+					<img alt="기업 로고" src="${post.companyFileDto.filePath}" class="mb-3" style="margin-left:1.5%; width: 250px; height: 200px;">
+					<div class="d-flex justify-content-between mb-3">
 						<!-- flex-direction 변경 및 가운데 정렬 -->
-						<div class="d-flex flex-column">
+						<div class="d-flex flex-column" style="text-align:left; width:200px; margin-left:3%;">
 							<span>${ post.postingDto.postingTitle }</span> <span>${ post.companyDto.companyName }</span>
 						</div>
 						<c:choose>

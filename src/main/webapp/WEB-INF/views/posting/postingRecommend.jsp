@@ -17,7 +17,7 @@
 .detail-div {
 	cursor: pointer;
 	margin-bottom: 20px;
-	border:1px solid black;
+	border:1px solid #ccc;
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
 	}
 	
