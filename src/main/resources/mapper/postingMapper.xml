@@ -157,6 +157,10 @@ DELETE FROM POSTING_TB WHERE POSTING_IDX=#{postingIdx}
 DELETE FROM POSTING_SKILL_TB WHERE POSTING_IDX=#{postingIdx}
 </delete>
 
+<delete id="postingScrapDelete">
+DELETE FROM POSTING_SCRAP_TB WHERE POSTING_IDX=#{postingIdx}
+</delete>
+
 <update id="postingUpdate">
 UPDATE POSTING_TB
 SET POSTING_TITLE=#{postingTitle}, POSTING_COMMENT=#{postingComment}, EXPERIENCE=#{experience},
@@ -183,5 +187,110 @@ ORDER BY SKILL_idx ASC
  set publish=#{publish}
  where resume_idx=#{resumeIdx}
  </update>
+ 
+ <!-- ===================== 추천공고 ===============-->
+ 
+<select id="getPostingIdxByPersonUserIdx">
+SELECT pt.POSTING_IDX,co.USER_IDX,co.COMPANY_IDX, pt.POSTING_TITLE, co.COMPANY_NAME, cf.FILE_PATH
+FROM posting_tb pt 
+JOIN company_tb co ON pt.USER_IDX = co.USER_IDX
+LEFT JOIN company_file_tb cf ON co.COMPANY_IDX = cf.COMPANY_IDX
+WHERE pt.POSTING_IDX IN (
+    SELECT pst.POSTING_IDX
+    FROM posting_skill_tb pst
+    JOIN (
+        SELECT ps.SKILL_IDX
+        FROM person_tb p
+        JOIN person_skill_tb ps ON p.PERSON_IDX = ps.PERSON_IDX
+        WHERE p.USER_IDX = #{userIdx}
+    ) ps_matched ON pst.SKILL_IDX = ps_matched.SKILL_IDX
+    GROUP BY pst.POSTING_IDX
+    HAVING COUNT(pst.SKILL_IDX) >= 1
+)
+order by pt.posting_idx ASC
+ </select>
+ 
+ <select id="getPersonIdxByUserIdx">
+select pt.person_idx
+from person_tb pt
+join user_tb ut on pt.user_idx = ut.user_idx
+where ut.user_idx = #{userIdx}
+ </select>
+ 
+ <select id="getPostingIdxByUserIdx">
+ select posting_idx
+ from posting_tb
+ where user_idx=#{userIdx}
+ </select>
+ 
+ <select id="resumeRecommend" parameterType="com.job.dto.ResumeRecommendDto">
+ SELECT 
+    distinct pt.posting_idx,
+    pt.posting_title,
+    pt.posting_deadline,
+    p.person_idx,
+    p.person_name,
+    r.resume_idx,
+    r.resume_title
+FROM 
+    posting_tb pt
+JOIN 
+    posting_skill_tb ps ON pt.posting_idx = ps.posting_idx
+JOIN 
+    person_skill_tb pk ON ps.skill_idx = pk.skill_idx
+JOIN 
+    person_tb p ON pk.person_idx = p.person_idx
+LEFT JOIN 
+    resume_tb r ON p.user_idx = r.user_idx
+WHERE 
+    pt.user_idx = #{userIdx} AND pt.posting_idx = #{postingIdx} and r.publish =1
+order by posting_idx asc
+ </select>
+ 
+ <select id="getPersonByPersonIdx">
+select p.PERSON_IDX, p.USER_IDX, p.PERSON_ADDRESS, p.PERSON_BIRTH, p.PERSON_EDUCATION, p.PERSON_NAME, p.PERSON_PHONE, u.USER_EMAIL
+from person_tb p
+join USER_TB U ON U.USER_IDX = p.USER_IDX
+where p.person_idx=#{personIdx}
+ </select>
+ 
+ <select id="getCompanyIdxByUserIdx">
+ select company_idx
+ from company_tb
+ where user_idx=#{userIdx}
+ </select>
+ 
+<select id="checkScrap">
+	SELECT COUNT(*)
+    FROM resume_scrap_tb
+	WHERE resume_idx = #{param1} AND company_idx = #{param2}
+</select>
+ 
+<insert id="insertScrap">
+    INSERT INTO resume_scrap_tb (RSCRAP_IDX,RESUME_IDX, COMPANY_IDX)
+    VALUES (RSCRAP_SEQ.NEXTVAL,#{resumeIdx}, #{companyIdx})
+</insert> 
+ 
+<delete id="deleteScrap">
+	DELETE FROM resume_scrap_tb
+	WHERE resume_idx = #{resumeIdx} AND company_idx = #{companyIdx}
+</delete>
+
+<select id="getRScrapList" parameterType="com.job.dto.RScrapListDto">
+  SELECT
+  r.RESUME_TITLE,
+  r.RESUME_IDX,
+  r.USER_IDX,
+  p.PERSON_IDX,
+  p.PERSON_NAME
+FROM
+  resume_scrap_tb rs
+JOIN
+  resume_tb r ON rs.RESUME_IDX = r.RESUME_IDX
+JOIN
+  person_tb p ON r.USER_IDX = p.USER_IDX
+WHERE
+  rs.COMPANY_IDX = #{companyIdx}
+</select>
  
 </mapper>

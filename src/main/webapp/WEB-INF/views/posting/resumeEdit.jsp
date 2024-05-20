@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,20 +33,19 @@ header {
 
 <main>
 <div>
-<form method="post" action="/resumeWrite" enctype="multipart/form-data">
+<form method="post" action="/resumeEdit" enctype="multipart/form-data">
 <div class="container" style="width: 85%;">
 
 <!--이력서 공개 여부 자동으로 공개로 해놓음 -->
-
+<input type="hidden" name="resumeIdx" value="${resume.resumeIdx}">
 <div class="mt-5">
-<input type="text" class="form-control w-100" name="resumeTitle" style="text-align:center;" placeholder="제목을 입력 해주세요." required>
-<input type="hidden" name="publish" value=1>
+<input type="text" class="form-control w-100" name="resumeTitle" value="${resume.resumeTitle}"style="text-align:center;" placeholder="제목을 입력 해주세요." required>
 </div>
 
     <div class="row">
         <!-- 왼쪽에 이미지 -->
         <div class="col-md-4 mt-5">
-            <img src="#" id="imagePreview"
+            <img src="${resumeFile.filePath }" id="imagePreview"
                 style="width:250px; height: 310px;" class="mb-2 border border-tertiary">
         </div>
 
@@ -53,7 +53,7 @@ header {
         <div class="col-md-8 mt-5">
             <div class="input-group mb-3">
                 <span class="input-group-text w-25 justify-content-center" style="background-color: #e0f7fa;">이름</span>
-                <input type="text" class="form-control" value="${person.personName }" readonly>
+                <input type="text" class="form-control" value="${person.personName}" readonly>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text w-25 justify-content-center" style="background-color: #e0f7fa;">생년월일</span>
@@ -83,39 +83,39 @@ header {
 
 
 
-				<div class="container" style="width: 85%;">
-				         <div class="row justify-content-center ">
-				             <div class="col-md-14 mx-auto mb-4">
-				                 <input type="file" name="file" id="uploadInput" class="form-control mt-2" onchange="previewImage()" required/>
-				             </div>
-				             
-							<div class="input-group mb-3">
-					            <h5>포트폴리오 주소</h5>
-					            <input type="text" class="form-control w-100" name="portfolio" required>
-							</div>
-                         	
-                        	<div class="mb-3">
+                 <div class="container" style="width: 85%;">
+                     <div class="row justify-content-center ">
+                         <div class="col-md-14 mx-auto mb-4">
+<input type="file" name="file" id="uploadInput" class="form-control mt-2" onchange="chooseImage(this)"/>
+                         </div>
+                         
+            <div class="input-group mb-3">
+            
+                <h5>포트폴리오 주소</h5>
+                <input type="text" value="${resume.portfolio}" class="form-control w-100" name="portfolio" required>
+            </div>
+           
+						<div class="form-floating my-3">
+							<div class="mt-3 mx-auto row">
 								<label for="skills" class="form-label">기술스택</label>
 								<div class="mx-auto row" id="skills">
-										
-										<c:forEach var="skill" items="${skill}">
-											<div class="col-auto">
-										   	 	<input type="checkbox" class="btn-check" id="skill_${skill.skillIdx}" value="${skill.skillIdx}" name="skillIdx" autocomplete="off"> 
-												<label class="btn btn-outline-primary" for="skill_${skill.skillIdx}">${skill.skillName}</label>
-										    </div>
-										</c:forEach>
-																			
-									<input type="hidden" id="defaultSkillIdx" name="skillIdx" value="0">
+						<c:forEach var="skill" items="${skill}">
+							<div class="col-auto">
+									<label class="btn btn-outline-primary">${skill.skillName}</label>
+							</div>
+						</c:forEach>
 								</div>
 							</div>
-                         	
+						</div>
+
+                         
                          
                          <br>
 
                          <div  style="margin-top:15px;">
                                  <h4>자기소개</h4>
                                  <textarea name="resumeComment" class="w-100" rows="10"
-                                     placeholder="내용을 입력하세요" required></textarea>
+                                     placeholder="내용을 입력하세요" required>${resume.resumeComment}</textarea>
                              </div>
                              <div class="d-flex mt-4 justify-content-center">
                                  <div class="px-2">
@@ -133,21 +133,24 @@ header {
 
 <script src="/js/bootstrap.bundle.min.js"></script>
 
-
-
 <script>
-var hiddenField = document.querySelector('input[type="hidden"][name="skillIdx"]');
-var checkboxes = document.querySelectorAll('input[type="checkbox"][name="skillIdx"]');
-var isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+function chooseImage(input) {
+    const fileInput = input.files[0];
+    const imagePreview = document.getElementById('imagePreview');
+    const currentImage = imagePreview.src;
 
-if (!isChecked) {
-    // 체크박스가 하나도 선택되지 않았다면 hidden 필드를 텍스트로 변경하고 기본값 설정
-    document.getElementById('defaultSkillIdx').type = 'hidden';
-    hiddenField.value = '0';
-    hiddenField.disabled = false;
-} else {
-    // 체크박스가 선택되었다면 hidden 필드 비활성화
-    hiddenField.disabled = true;
+    if (fileInput) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+        }
+     // 파일을 읽어 데이터 URL로 변환
+        reader.readAsDataURL(fileInput); 
+    } else {
+    	// 파일이 선택되지 않았을 때는 현재 이미지 유지
+        imagePreview.src = currentImage; 
+    }
 }
 </script>
 
@@ -157,7 +160,7 @@ document.getElementById("save-resume").addEventListener("click", function(event)
 });
 
 function confirmSubmission(event) {
-    if (!confirm("이력서를 입력 하시겠습니까?")) {
+    if (!confirm("이력서를 저장 하시겠습니까?")) {
         // confirm() 함수가 false를 반환하면 폼 제출을 막습니다.
         event.preventDefault();
     }
@@ -169,23 +172,6 @@ function confirmCancel(event) {
     event.preventDefault();
     if (confirm("목록으로 돌아가시겠습니까?")) {
         window.location.href = this.getAttribute("href");
-    }
-}
-</script>
-
-<script>
-function previewImage() {
-    const fileInput = document.getElementById('uploadInput');
-    const imagePreview = document.getElementById('imagePreview');
-    
-    if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            imagePreview.src = e.target.result;
-        }
-
-        reader.readAsDataURL(fileInput.files[0]); // 파일을 읽어 데이터 URL로 변환
     }
 }
 </script>

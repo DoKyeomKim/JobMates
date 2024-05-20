@@ -190,19 +190,16 @@ function openApplyWindow(postingIdx) {
 								<c:if test="${userType == 2}">
 									<button id="applyButton" class="btn btn-success"
 										data-posting-idx="${posting.postingIdx}" data-person-idx="${person.personIdx}">지원하기</button>
-									<button
-										class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
-										<svg
-											class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
-											data-posting-idx="${posting.postingIdx}" aria-hidden="true"
-											xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-											fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round"
-												stroke-linejoin="round" stroke-width="2"
-												d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" />
-                </svg>
-										<span>스크랩</span>
-									</button>
+							<button
+									class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
+									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
+										data-posting-idx="${posting.postingIdx}"
+										aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+										width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            		<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" /></svg>
+									<span>스크랩</span>
+								</button>
 								</c:if>
 								<!-- 이 경우에만 목록으로 버튼을 표시합니다. -->
 								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
