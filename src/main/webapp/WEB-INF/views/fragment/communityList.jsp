@@ -1,97 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<style>
-.text-truncate-2 {
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-height: 3em; /* Assuming line-height is 1.5 */
-	line-height: 1.5; /* Adjust this value based on your line height */
-}
 
-.text-truncate-2::after {
-	content: '...'; /* 말 줄임표 추가 */
-}
-
-.search-box {
-	position: relative;
-	display: flex;
-	align-items: center;
-}
-
-.search-box input {
-	padding-left: 35px; /* 왼쪽에 아이콘을 위한 여백 */
-	padding-right: 35px; /* 'X' 버튼을 위한 여백 */
-}
-
-.search-icon, .clear-icon {
-	position: absolute;
-	width: 20px;
-	height: 20px;
-	z-index: 10;
-}
-
-.search-icon {
-	left: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-}
-
-.clear-icon {
-	right: 10px; /* 입력란 바깥쪽에 위치 */
-	top: 50%;
-	cursor: pointer;
-	transform: translateY(-50%);
-	display: none; /* 초기 상태에서 숨김 */
-}
-
-/* 입력란에 값이 있을 때만 X 아이콘 표시 */
-.search-box input:not(:placeholder-shown) ~ .clear-icon {
-	display: block;
-}
-
-.nav-tabs>li {
-	flex: 1; /* flex-grow, flex-shrink 및 flex-basis를 1로 설정 */
-	text-align: center; /* 텍스트를 중앙에 정렬 */
-	border-top: 1px solid #dee2e6;
-}
-/* 모든 li 요소에 상단 테두리 추가 */
-.nav-tabs>li {
-	border-top: 1px solid #dee2e6;
-}
-
-/* 첫 번째 li에 왼쪽과 오른쪽 테두리 추가 */
-.nav-tabs>li:first-child {
-	border-left: 1px solid #dee2e6;
-	border-right: 1px solid #dee2e6;
-}
-
-/* 두 번째 li에 오른쪽 테두리 추가 */
-.nav-tabs>li:nth-child(2) {
-	border-right: 1px solid #dee2e6;
-}
-
-/* 마지막 li에 왼쪽과 오른쪽 테두리 추가 */
-.nav-tabs>li:last-child {
-	border-left: 1px solid #dee2e6;
-	border-right: 1px solid #dee2e6;
-}
-
-/* 추가적으로, 탭을 가운데 정렬 */
-.nav-tabs {
-	justify-content: center;
-}
-</style>
 <div class="d-flex justify-content-between mb-3">
 	<p>자유게시판</p>
-	<div class="search-box">
-		<input type="text" class="form-control search-input" placeholder="검색">
-		<img alt="검색 아이콘" src="/images/search.svg" class="search-icon">
-		<img alt="삭제 아이콘" src="/images/x-circle.svg" class="clear-icon">
+	<div class="mx-3 my-3 border" id="SearchCommunity">
+		<div class="search-box">
+			<input type="text" class="form-control search-input" placeholder="검색">
+			<img alt="검색 아이콘" src="/images/search.svg" class="search-icon">
+			<img alt="삭제 아이콘" src="/images/x-circle.svg" class="clear-icon">
+		</div>
 	</div>
+
 </div>
 <div>
 	<ul class="nav nav-tabs d-flex justify-content-center" id="myTab"
@@ -166,15 +86,16 @@
 				</li>
 			</c:forEach>
 		</ul>
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        <c:forEach begin="1" end="${pageCount}" var="i">
-            <li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
-                <a class="page-link" href="#" data-sort="${sort }" onclick="loadPage(event, ${i - 1})">${i}</a>
-            </li>
-        </c:forEach>
-    </ul>
-</nav>
+		<nav aria-label="Page navigation">
+			<ul class="pagination justify-content-center">
+				<c:forEach begin="1" end="${pageCount}" var="i">
+					<li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
+						<a class="page-link" href="#" data-sort="${sort }"
+						onclick="loadPage(event, ${i - 1})">${i}</a>
+					</li>
+				</c:forEach>
+			</ul>
+		</nav>
 
 
 	</div>

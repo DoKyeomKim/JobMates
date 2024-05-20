@@ -134,58 +134,59 @@ public class MainService {
 	}
 
 	public List<PostingWithFileDto> findPostingBySearchResult(String region, String experience,
-			List<Long> selectedSkills, List<String> selectedJobs) {
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+	        List<Long> selectedSkills, List<String> selectedJobs) {
+	    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+	    CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
 
-		// Posting의 처리
-		Root<Posting> postingRoot = cq.from(Posting.class);
-		Join<Posting, User> postingUserJoin = postingRoot.join("user", JoinType.INNER);
+	    // Posting의 처리
+	    Root<Posting> postingRoot = cq.from(Posting.class);
+	    Join<Posting, User> postingUserJoin = postingRoot.join("user", JoinType.INNER);
 
-		// Company와 CompanyFile의 처리
-		Root<Company> companyRoot = cq.from(Company.class);
-		Join<Company, User> companyUserJoin = companyRoot.join("user", JoinType.INNER);
+	    // Company와 CompanyFile의 처리
+	    Root<Company> companyRoot = cq.from(Company.class);
+	    Join<Company, User> companyUserJoin = companyRoot.join("user", JoinType.INNER);
 
-		Root<CompanyFile> fileRoot = cq.from(CompanyFile.class);
-		Join<CompanyFile, Company> fileCompanyJoin = fileRoot.join("company", JoinType.INNER);
+	    Root<CompanyFile> fileRoot = cq.from(CompanyFile.class);
+	    Join<CompanyFile, Company> fileCompanyJoin = fileRoot.join("company", JoinType.RIGHT);
 
-		List<Predicate> predicates = new ArrayList<>();
-		// 지역 조건 추가
-		if (region != null && !region.equals("전국")) {
-			predicates.add(cb.like(postingRoot.get("postingAddress"), "%" + region + "%"));
-		}
+	    List<Predicate> predicates = new ArrayList<>();
+	    // 지역 조건 추가
+	    if (region != null && !region.equals("전국")) {
+	        predicates.add(cb.like(postingRoot.get("postingAddress"), "%" + region + "%"));
+	    }
 
-		// 경험 조건 추가
-		if (experience != null && !experience.equals("무관")) {
-			predicates.add(cb.like(postingRoot.get("experience"), "%" + experience + "%"));
-		}
+	    // 경험 조건 추가
+	    if (experience != null && !experience.equals("무관")) {
+	        predicates.add(cb.like(postingRoot.get("experience"), "%" + experience + "%"));
+	    }
 
-		// selectedSkills 조건 처리
-		if (selectedSkills != null && !selectedSkills.isEmpty()) {
-			predicates.add(postingRoot.get("id").in(entityManager
-					.createQuery("SELECT ps.posting.id FROM PostingSkill ps WHERE ps.skill.id IN :selectedSkills")
-					.setParameter("selectedSkills", selectedSkills).getResultList()));
-		}
+	    // selectedSkills 조건 처리
+	    if (selectedSkills != null && !selectedSkills.isEmpty()) {
+	        predicates.add(postingRoot.get("id").in(entityManager
+	                .createQuery("SELECT ps.posting.id FROM PostingSkill ps WHERE ps.skill.id IN :selectedSkills")
+	                .setParameter("selectedSkills", selectedSkills).getResultList()));
+	    }
 
-		// selectedJobs 조건 처리
-		if (selectedJobs != null && !selectedJobs.isEmpty()) {
-			predicates.add(postingRoot.get("jobType").in(selectedJobs));
-		}
+	    // selectedJobs 조건 처리
+	    if (selectedJobs != null && !selectedJobs.isEmpty()) {
+	        predicates.add(postingRoot.get("jobType").in(selectedJobs));
+	    }
 
-		predicates.add(cb.equal(companyUserJoin.get("userIdx"), postingUserJoin.get("userIdx")));
-		predicates.add(cb.equal(companyRoot.get("companyIdx"), fileCompanyJoin.get("companyIdx")));
+	    predicates.add(cb.equal(companyUserJoin.get("userIdx"), postingUserJoin.get("userIdx")));
+	    predicates.add(cb.equal(companyRoot.get("companyIdx"), fileCompanyJoin.get("companyIdx")));
 
-		cq.multiselect(postingRoot, fileRoot, companyRoot).where(cb.and(predicates.toArray(new Predicate[0])));
+	    cq.multiselect(postingRoot, fileRoot, companyRoot).where(cb.and(predicates.toArray(new Predicate[0])));
 
-		cq.where(cb.and(predicates.toArray(new Predicate[0])));
-		List<Object[]> results = entityManager.createQuery(cq).getResultList();
-		List<PostingWithFileDto> postingWithFileDtos = new ArrayList<>();
-		for (Object[] result : results) {
-			PostingWithFileDto postingWithFileDto = buildPostingWithFileDto(result);
-			postingWithFileDtos.add(postingWithFileDto);
-		}
-		return postingWithFileDtos;
+	    cq.where(cb.and(predicates.toArray(new Predicate[0])));
+	    List<Object[]> results = entityManager.createQuery(cq).getResultList();
+	    List<PostingWithFileDto> postingWithFileDtos = new ArrayList<>();
+	    for (Object[] result : results) {
+	        PostingWithFileDto postingWithFileDto = buildPostingWithFileDto(result);
+	        postingWithFileDtos.add(postingWithFileDto);
+	    }
+	    return postingWithFileDtos;
 	}
+
 
 	public List<PostingWithFileDto> findAllPosting() {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -559,8 +560,8 @@ public class MainService {
 	}
 
 	public Page<CommunityDto> findSortedCommunities(Pageable pageable) {
-	    Page<Community> communityPage = communityRepository.findAll(pageable);
-	    return communityPage.map(CommunityDto::createCommunityDtoList);
+		Page<Community> communityPage = communityRepository.findAll(pageable);
+		return communityPage.map(CommunityDto::createCommunityDtoList);
 	}
 
 	@Transactional
@@ -645,13 +646,20 @@ public class MainService {
 		User user = userRepository.findById(reply.getUserIdx())
 				.orElseThrow(() -> new NoSuchElementException("해당 User를 찾을 수 없습니다."));
 		log.info("user = {}", user);
-		Long likeCount = replyRepository.countByCommunityCommunityIdx(reply.getCommunityIdx());
 
 		Reply replyEntity = Reply.builder().community(community).user(user).replyName(reply.getReplyName())
-				.replyContent(reply.getReplyContent()).createdDate(reply.getCreatedDate()).likeCount(likeCount).build();
+				.replyContent(reply.getReplyContent()).createdDate(reply.getCreatedDate())
+				.likeCount(reply.getLikeCount()).build();
 		log.info("replyEntity = {}", replyEntity);
 		replyRepository.save(replyEntity);
-
+		Long replyCount = replyRepository.countByCommunityCommunityIdx(reply.getCommunityIdx());
+		// Community 엔티티의 좋아요 수 업데이트를 위해 Builder 사용
+		Community updatedCommunity = Community.builder().communityIdx(community.getCommunityIdx()) // 기존 Community ID
+				.communityTitle(community.getCommunityTitle()).user(community.getUser())
+				.communityName(community.getCommunityName()).communityContent(community.getCommunityContent())
+				.createdDate(community.getCreatedDate()).viewCount(community.getViewCount())
+				.likeCount(community.getLikeCount()).replyCount(replyCount).build();
+		communityRepository.save(updatedCommunity);
 	}
 
 	@Transactional
@@ -681,6 +689,7 @@ public class MainService {
 					.createdDate(community.getCreatedDate()).viewCount(viewCount).likeCount(viewDto.getViewIdx())
 					.replyCount(community.getReplyCount()).build();
 			communityRepository.save(updatedCommunity);
+
 		}
 
 	}
@@ -715,11 +724,21 @@ public class MainService {
 			Community community = Community.builder().communityTitle(communityDto.getCommunityTitle())
 					.communityContent(communityDto.getCommunityContent()).createdDate(communityDto.getCreatedDate())
 					.viewCount(communityDto.getViewCount()).likeCount(communityDto.getLikeCount())
-					.replyCount(communityDto.getReplyCount()).user(user).communityName(person.getPersonName())
-					.build();
+					.replyCount(communityDto.getReplyCount()).user(user).communityName(person.getPersonName()).build();
 			communityRepository.save(community);
 		}
 
+	}
+
+	public Long countReply(Long communityIdx) {
+		// TODO Auto-generated method stub
+		return replyRepository.countByCommunityCommunityIdx(communityIdx);
+	}
+
+	public Page<CommunityDto> findCommunityByKeywordAndPage(String keyword, Pageable pageable) {
+		Page<Community> communityPage = communityRepository
+				.findByCommunityTitleContainingOrCommunityContentContainingAllIgnoreCase(keyword, keyword, pageable);
+		return communityPage.map(CommunityDto::createCommunityDtoList);
 	}
 
 }

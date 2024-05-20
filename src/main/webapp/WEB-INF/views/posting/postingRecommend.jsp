@@ -82,14 +82,18 @@ header {
 							</div>
 							<c:choose>
 								<c:when test="${sessionScope.isLoggedIn}">
+									<button
+									class="btn btn-secondary scrapBtn d-flex align-items-center ms-3" style="background-color: transparent; border-color: transparent;">
 									<svg
-										class="w-10 h-10 text-gray-800 dark:text-white scrapBtn end-0"
+										class="w-10 h-10 text-gray-800 text-dark scrapSvg end-0"
 										data-posting-idx="${posting.postingIdx}"
 										aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
 										width="50" height="50" fill="none" viewBox="0 0 24 24">
 		                            <path 	stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 											d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" />
 		                       		</svg>
+		                       		<span>스크랩</span>
+		                       		</button>
 								</c:when>
 							</c:choose>
 	
@@ -100,7 +104,7 @@ header {
 				
 				
 			</div>
-			<script src="/js/postingRecommendScrap.js"></script>
+			<script src="/js/postingScrap.js"></script>
 		</c:if>
 		<c:if test="${empty posting}">
 			<p>추천 공고가 없습니다.</p>

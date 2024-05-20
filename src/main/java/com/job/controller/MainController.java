@@ -42,6 +42,7 @@ import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
 import com.job.service.MainService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
@@ -382,62 +383,69 @@ public class MainController {
 
 	@GetMapping("/Community")
 	public ModelAndView community(@RequestParam(value = "page", defaultValue = "0") int page,
-	                              @RequestParam(value = "size", defaultValue = "5") int size, HttpSession session) {
-	    ModelAndView mv = new ModelAndView("section/community");
-	    UserDto user = (UserDto) session.getAttribute("login");
-	    Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
-	    boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
-	    if (isLoggedIn) {
-	        if (user != null) {
-	            Long userType = user.getUserType();
-	            mv.addObject("userType", userType);
-	        }
-	    }
-	    Pageable pageable = PageRequest.of(page, size);
-	    Page<CommunityDto> communityPage = mainService.findAllCommunity(pageable);
-	    log.info("communityPage = {}", communityPage);
-	    log.info("currentPage = {}", communityPage.getNumber());
-	    log.info("pageCount = {}", communityPage.getTotalPages());
-	    mv.addObject("user", user);
-	    mv.addObject("community", communityPage);
-	    mv.addObject("currentPage", communityPage.getNumber());
-	    mv.addObject("pageCount", communityPage.getTotalPages());
-	    mv.addObject("size", size); // size 추가
-	    return mv;
+			@RequestParam(value = "size", defaultValue = "5") int size, HttpSession session) {
+		ModelAndView mv = new ModelAndView("section/community");
+		UserDto user = (UserDto) session.getAttribute("login");
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userType = user.getUserType();
+				mv.addObject("userType", userType);
+			}
+		}
+		Pageable pageable = PageRequest.of(page, size);
+		Page<CommunityDto> communityPage = mainService.findAllCommunity(pageable);
+		log.info("communityPage = {}", communityPage);
+		log.info("currentPage = {}", communityPage.getNumber());
+		log.info("pageCount = {}", communityPage.getTotalPages());
+		mv.addObject("user", user);
+		mv.addObject("community", communityPage);
+		mv.addObject("currentPage", communityPage.getNumber());
+		mv.addObject("pageCount", communityPage.getTotalPages());
+		mv.addObject("size", size); // size 추가
+		return mv;
 	}
-
 
 	@GetMapping("/CommunitySort")
 	public ModelAndView getCommunityData(@RequestParam(value = "sort", defaultValue = "recent") String sort,
-	                                     @RequestParam(value = "page", defaultValue = "0") int page,
-	                                     @RequestParam(value = "size", defaultValue = "5") int size, HttpSession session) {
-	    ModelAndView mv = new ModelAndView("fragment/communityList");
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size, HttpServletRequest request) {
+		ModelAndView mv;
 
-	    Sort sortOrder;
-	    switch (sort) {
-	        case "popular":
-	            sortOrder = Sort.by(Sort.Direction.DESC, "viewCount");
-	            break;
-	        case "likes":
-	            sortOrder = Sort.by(Sort.Direction.DESC, "likeCount");
-	            break;
-	        case "comments":
-	            sortOrder = Sort.by(Sort.Direction.DESC, "replyCount");
-	            break;
-	        case "recent":
-	        default:
-	            sortOrder = Sort.by(Sort.Direction.DESC, "createdDate");
-	            break;
-	    }
+		Sort sortOrder;
+		switch (sort) {
+		case "popular":
+			sortOrder = Sort.by(Sort.Direction.DESC, "viewCount");
+			break;
+		case "likes":
+			sortOrder = Sort.by(Sort.Direction.DESC, "likeCount");
+			break;
+		case "comments":
+			sortOrder = Sort.by(Sort.Direction.DESC, "replyCount");
+			break;
+		case "recent":
+		default:
+			sortOrder = Sort.by(Sort.Direction.DESC, "createdDate");
+			break;
+		}
 
-	    Pageable pageable = PageRequest.of(page, size, sortOrder);
-	    Page<CommunityDto> communityPage = mainService.findSortedCommunities(pageable);
-	    mv.addObject("community", communityPage);
-	    mv.addObject("currentPage", communityPage.getNumber());
-	    mv.addObject("pageCount", communityPage.getTotalPages());
-	    mv.addObject("size", size);
-	    mv.addObject("sort", sort);
-	    return mv;
+		Pageable pageable = PageRequest.of(page, size, sortOrder);
+		Page<CommunityDto> communityPage = mainService.findSortedCommunities(pageable);
+
+		// AJAX 요청인지 확인
+		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+			mv = new ModelAndView("fragment/communityMain");
+		} else {
+			mv = new ModelAndView("section/community"); // 전체 페이지를 로드
+		}
+
+		mv.addObject("community", communityPage);
+		mv.addObject("currentPage", communityPage.getNumber());
+		mv.addObject("pageCount", communityPage.getTotalPages());
+		mv.addObject("size", size);
+		mv.addObject("sort", sort);
+		return mv;
 	}
 
 	@PostMapping("/LikeAdd")
@@ -493,23 +501,30 @@ public class MainController {
 	}
 
 	@GetMapping("/CommunityDetail/{communityIdx}")
-	public ModelAndView getCommunityData(@PathVariable("communityIdx") Long communityIdx, HttpSession session) {
-		ModelAndView mv = new ModelAndView("fragment/communityDetail");
+	public ModelAndView getCommunityData(@PathVariable("communityIdx") Long communityIdx, HttpSession session,
+			HttpServletRequest request) {
+		ModelAndView mv;
 		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
 		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
 		UserDto user = (UserDto) session.getAttribute("login");
-		if (isLoggedIn) {
-			if (user != null) {
-				Long userType = user.getUserType();
-				mv.addObject("userType", userType);
+
+		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+			mv = new ModelAndView("fragment/communityDetail");
+			if (isLoggedIn) {
+				if (user != null) {
+					Long userType = user.getUserType();
+					mv.addObject("userType", userType);
+				}
 			}
+			CommunityDto community = mainService.findCommunityBycommunityIdx(communityIdx);
+			List<ReplyDto> reply = mainService.findReplysByCommunityIdx(communityIdx);
+			mv.addObject("community", community);
+			mv.addObject("reply", reply);
+			mv.addObject("isLoggedIn", isLoggedIn);
+		} else {
+			mv = new ModelAndView("community"); // 전체 페이지를 로드
 		}
-		CommunityDto community = mainService.findCommunityBycommunityIdx(communityIdx);
-		List<ReplyDto> reply = mainService.findReplysByCommunityIdx(communityIdx);
-		mv.addObject("community", community);
-		mv.addObject("reply", reply);
-		mv.addObject("isLoggedIn", isLoggedIn);
-		
+
 		return mv;
 	}
 
@@ -577,6 +592,15 @@ public class MainController {
 		Long loadView = mainService.countView(communityIdx);
 
 		return loadView;
+	}
+
+	@PostMapping("/UpdateReply")
+	@ResponseBody
+	public Long updateReply(@RequestParam("communityIdx") Long communityIdx) {
+
+		Long updateReply = mainService.countReply(communityIdx);
+
+		return updateReply;
 	}
 
 	@GetMapping("/CommunityWrite")
@@ -650,4 +674,25 @@ public class MainController {
 		return mv;
 	}
 
+    @GetMapping("/SearchCommunity")
+    public ModelAndView searchCommunity(@RequestParam("keyword") String keyword, HttpServletRequest request,
+                                        @RequestParam(value = "page", defaultValue = "0") int page,
+                                        @RequestParam(value = "size", defaultValue = "5") int size) {
+        ModelAndView mv;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CommunityDto> communityPage = mainService.findCommunityByKeywordAndPage(keyword, pageable);
+
+        // AJAX 요청인지 확인
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            mv = new ModelAndView("fragment/communityMain");
+        } else {
+            mv = new ModelAndView("section/community"); // 전체 페이지를 로드
+        }
+
+        mv.addObject("community", communityPage);
+        mv.addObject("currentPage", communityPage.getNumber());
+        mv.addObject("pageCount", communityPage.getTotalPages());
+        mv.addObject("size", size);
+        return mv;
+    }
 }

@@ -173,7 +173,7 @@ padding-left : 30px;
     <div class="details-container">
 
         <div class="input-group mb-3">
-            <span class="input-group-text">이름</span>
+            <span class="input-group-text">아이디</span>
             <label class="form-control">${userId}</label>
         </div>
         <div class="input-group mb-3">
