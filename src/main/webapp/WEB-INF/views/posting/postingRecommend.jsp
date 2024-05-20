@@ -78,7 +78,7 @@ header {
 				<c:forEach var="posting" items="${posting}">
 					<div class="me-5 detail-div" data-posting-idx="${posting.postingIdx}">
 						<!-- 각 포스트를 감싸는 div 추가 -->
-						<img alt="기업 로고" style="height:200px; width:250px;" src="${posting.filePath}" class="mb-3">
+						<img alt="기업 로고" style="display: block; margin-left: auto; margin-right: auto; height:200px; width:250px;" src="${posting.filePath}" class="mb-3">
 						<div class="d-flex justify-content-between mb-3">
 							<!-- flex-direction 변경 및 가운데 정렬 -->
 							<div class="d-flex flex-column" style="text-align:left; width:200px; margin-left:3%;">
