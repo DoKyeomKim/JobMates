@@ -35,7 +35,7 @@
                                     <path
 						d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
                                 </svg>
-			</span> <span>${community.viewCount}</span>
+			</span> <span id="view${community.communityIdx}">${community.viewCount}</span>
 		</div>
 		<span class="vr ms-3 align-self-center" style="height: 50%"></span>
 		<div class="ms-3">
@@ -75,7 +75,7 @@
 		<hr class="container">
 	</div>
 </div>
-<div class="border container py-3 mt-2">
+<div class="border container py-3 mt-2 mb-3">
 	<div>
 		<p class="container">댓글</p>
 		<div class="mt-3 reply-container">

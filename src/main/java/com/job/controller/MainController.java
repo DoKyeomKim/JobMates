@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -377,32 +381,63 @@ public class MainController {
 	}
 
 	@GetMapping("/Community")
-	public ModelAndView community(HttpSession session) {
-		ModelAndView mv = new ModelAndView("section/community");
-		UserDto user = (UserDto) session.getAttribute("login");
-		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
-		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
-		if (isLoggedIn) {
-			if (user != null) {
-				Long userType = user.getUserType();
-				mv.addObject("userType", userType);
-			}
-		}
-		List<CommunityDto> community = mainService.findAllCommunity();
-		mv.addObject("user", user);
-		mv.addObject("community", community);
-
-		return mv;
-
+	public ModelAndView community(@RequestParam(value = "page", defaultValue = "0") int page,
+	                              @RequestParam(value = "size", defaultValue = "5") int size, HttpSession session) {
+	    ModelAndView mv = new ModelAndView("section/community");
+	    UserDto user = (UserDto) session.getAttribute("login");
+	    Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+	    boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+	    if (isLoggedIn) {
+	        if (user != null) {
+	            Long userType = user.getUserType();
+	            mv.addObject("userType", userType);
+	        }
+	    }
+	    Pageable pageable = PageRequest.of(page, size);
+	    Page<CommunityDto> communityPage = mainService.findAllCommunity(pageable);
+	    log.info("communityPage = {}", communityPage);
+	    log.info("currentPage = {}", communityPage.getNumber());
+	    log.info("pageCount = {}", communityPage.getTotalPages());
+	    mv.addObject("user", user);
+	    mv.addObject("community", communityPage);
+	    mv.addObject("currentPage", communityPage.getNumber());
+	    mv.addObject("pageCount", communityPage.getTotalPages());
+	    mv.addObject("size", size); // size 추가
+	    return mv;
 	}
 
-	@GetMapping("/CommunitySort")
-	public ModelAndView getCommunityData(@RequestParam("sort") String sort) {
-		ModelAndView mv = new ModelAndView("fragment/communityList");
-		List<CommunityDto> community = mainService.findSortedCommunities(sort);
 
-		mv.addObject("community", community);
-		return mv;
+	@GetMapping("/CommunitySort")
+	public ModelAndView getCommunityData(@RequestParam(value = "sort", defaultValue = "recent") String sort,
+	                                     @RequestParam(value = "page", defaultValue = "0") int page,
+	                                     @RequestParam(value = "size", defaultValue = "5") int size, HttpSession session) {
+	    ModelAndView mv = new ModelAndView("fragment/communityList");
+
+	    Sort sortOrder;
+	    switch (sort) {
+	        case "popular":
+	            sortOrder = Sort.by(Sort.Direction.DESC, "viewCount");
+	            break;
+	        case "likes":
+	            sortOrder = Sort.by(Sort.Direction.DESC, "likeCount");
+	            break;
+	        case "comments":
+	            sortOrder = Sort.by(Sort.Direction.DESC, "replyCount");
+	            break;
+	        case "recent":
+	        default:
+	            sortOrder = Sort.by(Sort.Direction.DESC, "createdDate");
+	            break;
+	    }
+
+	    Pageable pageable = PageRequest.of(page, size, sortOrder);
+	    Page<CommunityDto> communityPage = mainService.findSortedCommunities(pageable);
+	    mv.addObject("community", communityPage);
+	    mv.addObject("currentPage", communityPage.getNumber());
+	    mv.addObject("pageCount", communityPage.getTotalPages());
+	    mv.addObject("size", size);
+	    mv.addObject("sort", sort);
+	    return mv;
 	}
 
 	@PostMapping("/LikeAdd")
@@ -474,47 +509,47 @@ public class MainController {
 		mv.addObject("community", community);
 		mv.addObject("reply", reply);
 		mv.addObject("isLoggedIn", isLoggedIn);
+		
 		return mv;
 	}
 
 	@PostMapping("/ReplyInsert")
 	public ResponseEntity<?> insertComment(@RequestBody ReplyDto reply, HttpSession session) {
-	    try {
-	        UserDto user = (UserDto) session.getAttribute("login");
-	        if (user != null) {
-	            Long userType = user.getUserType();
-	            if (userType == 1) {
-	                Long userIdx = user.getUserIdx();
-	                CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
-	                reply.setUserIdx(userIdx);
-	                reply.setReplyName(company.getCompanyName());
-	                SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
-	                String currentDate = formatter.format(new Date());
-	                reply.setCreatedDate(currentDate);
-	                reply.setLikeCount((long) 0);
-	                mainService.insertReply(reply);
-	            } else {
-	                Long userIdx = user.getUserIdx();
-	                PersonDto person = mainService.findPersonByUserIdx(userIdx);
-	                reply.setUserIdx(userIdx);
-	                reply.setReplyName(person.getPersonName());
-	                SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
-	                String currentDate = formatter.format(new Date());
-	                reply.setCreatedDate(currentDate);
-	                reply.setLikeCount((long) 0);
-	                log.info("reply = {}", reply);
-	                mainService.insertReply(reply); // Insert reply for non-company user as well
-	            }
-	        }
+		try {
+			UserDto user = (UserDto) session.getAttribute("login");
+			if (user != null) {
+				Long userType = user.getUserType();
+				if (userType == 1) {
+					Long userIdx = user.getUserIdx();
+					CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
+					reply.setUserIdx(userIdx);
+					reply.setReplyName(company.getCompanyName());
+					SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+					String currentDate = formatter.format(new Date());
+					reply.setCreatedDate(currentDate);
+					reply.setLikeCount((long) 0);
+					mainService.insertReply(reply);
+				} else {
+					Long userIdx = user.getUserIdx();
+					PersonDto person = mainService.findPersonByUserIdx(userIdx);
+					reply.setUserIdx(userIdx);
+					reply.setReplyName(person.getPersonName());
+					SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+					String currentDate = formatter.format(new Date());
+					reply.setCreatedDate(currentDate);
+					reply.setLikeCount((long) 0);
+					log.info("reply = {}", reply);
+					mainService.insertReply(reply); // Insert reply for non-company user as well
+				}
+			}
 
-	        return ResponseEntity.ok().build();
-	    } catch (Exception e) {
-	        log.error("댓글 추가에 실패했습니다.", e);
-	        return ResponseEntity.badRequest().body("댓글 추가에 실패했습니다.");
-	    }
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			log.error("댓글 추가에 실패했습니다.", e);
+			return ResponseEntity.badRequest().body("댓글 추가에 실패했습니다.");
+		}
 	}
 
-	
 	@GetMapping("/LoadReply/{communityIdx}")
 	@ResponseBody
 	public List<ReplyDto> loadReply(@PathVariable("communityIdx") Long communityIdx) {
@@ -523,7 +558,7 @@ public class MainController {
 
 		return replys;
 	}
-	
+
 	@PostMapping("/ViewAdd")
 	public ResponseEntity<?> addView(@RequestBody CommunityViewDto view) {
 		try {
@@ -533,6 +568,86 @@ public class MainController {
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("View 추가에 실패했습니다.");
 		}
+	}
+
+	@PostMapping("/LoadView")
+	@ResponseBody
+	public Long loadView(@RequestParam("communityIdx") Long communityIdx) {
+
+		Long loadView = mainService.countView(communityIdx);
+
+		return loadView;
+	}
+
+	@GetMapping("/CommunityWrite")
+	public ModelAndView communityWriteForm(HttpSession session) {
+		ModelAndView mv = new ModelAndView("fragment/communityWrite");
+		UserDto user = (UserDto) session.getAttribute("login");
+
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userType = user.getUserType();
+				log.info("user = {}", user);
+				if (userType == 1) {
+					Long userIdx = user.getUserIdx();
+					CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
+					mv.addObject("userType", userType);
+					mv.addObject("name", company.getCompanyName());
+					return mv;
+				} else {
+					Long userIdx = user.getUserIdx();
+					PersonDto person = mainService.findPersonByUserIdx(userIdx);
+					mv.addObject("name", person.getPersonName());
+					mv.addObject("userType", userType);
+					return mv;
+				}
+			}
+		} else {
+			mv.setViewName("redirect:/personlogin");
+			return mv;
+		}
+		return mv;
+	}
+
+	@PostMapping("/CommunityWrite")
+	public ModelAndView communityWriteForm(HttpSession session, CommunityDto community) {
+		ModelAndView mv = new ModelAndView();
+		UserDto user = (UserDto) session.getAttribute("login");
+		if (user != null) {
+			Long userType = user.getUserType();
+			if (userType == 1) {
+				Long userIdx = user.getUserIdx();
+				CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
+				community.setUserIdx(userIdx);
+				community.setCommunityName(company.getCompanyName());
+				SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+				String currentDate = formatter.format(new Date());
+				community.setCreatedDate(currentDate);
+				community.setViewCount((long) 0);
+				community.setLikeCount((long) 0);
+				community.setReplyCount((long) 0);
+				log.info("community = {}", community);
+				mainService.insertCommunity(community, userIdx);
+			} else {
+				Long userIdx = user.getUserIdx();
+				PersonDto person = mainService.findPersonByUserIdx(userIdx);
+				community.setUserIdx(userIdx);
+				community.setCommunityName(person.getPersonName());
+				SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+				String currentDate = formatter.format(new Date());
+				community.setCreatedDate(currentDate);
+				community.setViewCount((long) 0);
+				community.setLikeCount((long) 0);
+				community.setReplyCount((long) 0);
+				log.info("community = {}", community);
+				mainService.insertCommunity(community, userIdx);
+			}
+		}
+		mv.setViewName("redirect:/Community");
+		return mv;
 	}
 
 }

@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.job.dto.ApplyDto;
@@ -25,6 +27,7 @@ import com.job.dto.ReplyDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
+import com.job.dto.UserDto;
 import com.job.entity.Apply;
 import com.job.entity.Community;
 import com.job.entity.CommunityLikes;
@@ -547,35 +550,17 @@ public class MainService {
 		return applyDto;
 	}
 
-	public List<CommunityDto> findAllCommunity() {
-		List<Community> communityList = communityRepository.findAll();
+	public Page<CommunityDto> findAllCommunity(Pageable pageable) {
+		Page<Community> communityPage = communityRepository.findAll(pageable);
 
 		// createCommunitDtoList 메서드를 사용하여 Community 리스트를 CommunityDto 리스트로 변환
 
-		return communityList.stream().map(community -> CommunityDto.createCommunitDtoList(community))
-				.collect(Collectors.toList());
+		return communityPage.map(CommunityDto::createCommunityDtoList);
 	}
 
-	public List<CommunityDto> findSortedCommunities(String sort) {
-		List<Community> communityList = communityRepository.findAll();
-
-		switch (sort) {
-		case "popular":
-			communityList.sort(Comparator.comparingLong(Community::getViewCount).reversed());
-			break;
-		case "likes":
-			communityList.sort(Comparator.comparingLong(Community::getLikeCount).reversed());
-			break;
-		case "comments":
-			communityList.sort(Comparator.comparingLong(Community::getReplyCount).reversed());
-			break;
-		case "recent":
-			communityList.sort(Comparator.comparing(Community::getCreatedDate).reversed());
-			break;
-		}
-
-		return communityList.stream().map(community -> CommunityDto.createCommunitDtoList(community))
-				.collect(Collectors.toList());
+	public Page<CommunityDto> findSortedCommunities(Pageable pageable) {
+	    Page<Community> communityPage = communityRepository.findAll(pageable);
+	    return communityPage.map(CommunityDto::createCommunityDtoList);
 	}
 
 	@Transactional
@@ -640,7 +625,7 @@ public class MainService {
 		if (!communityOpt.isPresent()) {
 			return null; // 또는 예외 처리
 		}
-		CommunityDto communityDto = CommunityDto.createCommunitDtoList(communityOpt.get());
+		CommunityDto communityDto = CommunityDto.createCommunityDtoList(communityOpt.get());
 		return communityDto;
 	}
 
@@ -668,6 +653,7 @@ public class MainService {
 		replyRepository.save(replyEntity);
 
 	}
+
 	@Transactional
 	public void insertView(CommunityViewDto viewDto) {
 		Long userIdx = viewDto.getUserIdx();
@@ -688,15 +674,51 @@ public class MainService {
 
 			Long viewCount = communityViewRepository.countByCommunityCommunityIdx(viewDto.getCommunityIdx());
 			// Community 엔티티의 좋아요 수 업데이트를 위해 Builder 사용
-			Community updatedCommunity = Community.builder().communityIdx(community.getCommunityIdx()) // 기존 Community ID
+			Community updatedCommunity = Community.builder().communityIdx(community.getCommunityIdx()) // 기존 Community
+																										// ID
 					.communityTitle(community.getCommunityTitle()).user(community.getUser())
 					.communityName(community.getCommunityName()).communityContent(community.getCommunityContent())
-					.createdDate(community.getCreatedDate()).viewCount(community.getViewCount()).likeCount(viewCount)
+					.createdDate(community.getCreatedDate()).viewCount(viewCount).likeCount(viewDto.getViewIdx())
 					.replyCount(community.getReplyCount()).build();
 			communityRepository.save(updatedCommunity);
 		}
 
+	}
 
+	public Long countView(Long communityIdx) {
+
+		return communityViewRepository.countByCommunityCommunityIdx(communityIdx);
+
+	}
+
+	public void insertCommunity(CommunityDto communityDto, Long userIdx) {
+
+		User user = userRepository.findById(userIdx)
+				.orElseThrow(() -> new NoSuchElementException("해당 User를 찾을 수 없습니다."));
+		Long userType = user.getUserType();
+		if (userType == 1) {
+			Company company = companyRepository.findCompanyByUserUserIdx(userIdx)
+					.orElseThrow(() -> new NoSuchElementException("해당 Company를 찾을 수 없습니다."));
+
+			Community community = Community.builder().communityTitle(communityDto.getCommunityTitle())
+					.communityContent(communityDto.getCommunityContent()).createdDate(communityDto.getCreatedDate())
+					.viewCount(communityDto.getViewCount()).likeCount(communityDto.getLikeCount())
+					.replyCount(communityDto.getReplyCount()).user(user).communityName(company.getCompanyName())
+					.build();
+
+			communityRepository.save(community);
+
+		} else {
+
+			Person person = personRepository.findByUserUserIdx(userIdx)
+					.orElseThrow(() -> new NoSuchElementException("해당 Person를 찾을 수 없습니다."));
+			Community community = Community.builder().communityTitle(communityDto.getCommunityTitle())
+					.communityContent(communityDto.getCommunityContent()).createdDate(communityDto.getCreatedDate())
+					.viewCount(communityDto.getViewCount()).likeCount(communityDto.getLikeCount())
+					.replyCount(communityDto.getReplyCount()).user(user).communityName(person.getPersonName())
+					.build();
+			communityRepository.save(community);
+		}
 
 	}
 

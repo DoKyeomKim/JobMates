@@ -9,11 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class CommunityDto {
 	private Long communityIdx;
 	private String communityTitle;
@@ -25,7 +27,7 @@ public class CommunityDto {
 	private Long likeCount;
 	private Long replyCount;
 
-	public static CommunityDto createCommunitDtoList(Community community) {
+	public static CommunityDto createCommunityDtoList(Community community) {
 		LocalDateTime createdDate = TimeAgo.stringToLocalDateTime(community.getCreatedDate());
 		return CommunityDto.builder().communityIdx(community.getCommunityIdx())
 				.communityTitle(community.getCommunityTitle()).userIdx(community.getUser().getUserIdx())

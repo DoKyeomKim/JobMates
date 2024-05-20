@@ -10,15 +10,27 @@
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <style>
 /* 추가적인 CSS 스타일링 */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 footer {
-	bottom: 0;
-	width: 100%;
-	padding: 20px 0;
-	text-align: center;
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    margin-top: auto;
+    padding: 1rem;
+    width: 100%;
 }
 
 header {
 	background-color: #e0f7fa;
+}
+#section {
+    flex-grow: 1;
 }
 </style>
 

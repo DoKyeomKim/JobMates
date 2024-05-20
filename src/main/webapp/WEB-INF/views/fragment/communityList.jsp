@@ -115,7 +115,8 @@
 <div id="communityList" class="tab-content">
 	<div class="tab-pane fade show active">
 		<ul class="list-group mb-3">
-			<c:forEach items="${community}" var="community">
+			<c:forEach items="${community.content}" var="community">
+
 				<li
 					class="list-group-item list-group-item-action py-3 community-detail"
 					data-community-idx="${community.communityIdx}">
@@ -132,7 +133,7 @@
                                     <path
 											d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
                                 </svg>
-								</span> <span>${community.viewCount}</span>
+								</span> <span id="view${community.communityIdx}">${community.viewCount}</span>
 							</div>
 							<span class="vr ms-3 align-self-center" style="height: 50%"></span>
 							<div class="ms-3">
@@ -165,9 +166,22 @@
 				</li>
 			</c:forEach>
 		</ul>
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <c:forEach begin="1" end="${pageCount}" var="i">
+            <li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
+                <a class="page-link" href="#" data-sort="${sort }" onclick="loadPage(event, ${i - 1})">${i}</a>
+            </li>
+        </c:forEach>
+    </ul>
+</nav>
+
+
 	</div>
 </div>
-
+<div class="d-flex justify-content-end mb-3">
+	<button class="btn btn-primary writeBtn">글쓰기</button>
+</div>
 
 
 
