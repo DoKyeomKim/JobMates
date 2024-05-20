@@ -129,7 +129,7 @@ padding-left : 30px;
                             <span>${userId}</span>
                         </div>
                     </div>
-
+                                        
                     <div class="form-group row">
                         <label for="inputPassword3" class="col-sm-1 col-form-label">주소</label>
                         <div class="col-sm-7" style="width:50%;">
