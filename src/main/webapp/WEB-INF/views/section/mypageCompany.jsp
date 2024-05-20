@@ -168,7 +168,7 @@ padding-left : 30px;
 <div class="card-body1">
 
     <div class="image-container">
-        <img src="${companyFile.filePath}" style="height:190px; width:250px;" id="imagePreview" class="image-preview mb-2 border border-tertiary">
+        <img src="${companyFile.filePath}" style="height:200px; width:250px;" id="imagePreview" class="image-preview mb-2 border border-tertiary">
     </div>
     <div class="details-container">
 

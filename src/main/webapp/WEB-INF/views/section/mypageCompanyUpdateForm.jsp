@@ -11,7 +11,6 @@
 <style>
 .info {
 	margin-top:7%;
-	margin-bottom: 0;
 }
 
 .card-body1 {
@@ -19,7 +18,6 @@
     margin: 0 auto;
     margin-top: 30px; 
     margin-left:20%;
-    margin-bottom:20px;
     padding: 0;
     display: flex;
     align-items: flex-start;
@@ -169,7 +167,7 @@ padding-left : 30px;
 				<input type="hidden" name="userIdx" value="${userIdx}">
 				<input type="hidden" name="companyIdx" value="${companyIdx}">
 			<div>
-				<img src="${companyFile.filePath}" id="imagePreview" style="width:250px; height: 190px;" class="mb-2 border border-tertiary">
+				<img src="${companyFile.filePath}" id="imagePreview" style="width:250px; height: 200px;" class="mb-2 border border-tertiary">
 					<div class="row justify-content-center">
 						<div class="col mb-4 row" >
 							<input type="file" name="file" id="uploadInput" class="form-control mt-1" onchange="chooseImage(this)"/>

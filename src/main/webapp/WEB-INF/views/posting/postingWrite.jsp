@@ -46,18 +46,55 @@ header {
 						<div class="col-md-6 mt-5">
 							<div class="input-group mb-3">
 								<span class="input-group-text w-25 justify-content-center"
-									style="background-color: #e0f7fa;">근무형태</span> <input
-									type="text" name="empType" class="form-control" required>
+									style="background-color: #e0f7fa;">근무형태</span> 
+									<select name="empType" class="form-control" required>
+									<option>정규직</option>
+									<option>계약직</option>
+									<option>프리랜서</option>
+									<option>아르바이트</option>
+									<option>기타</option>
+									</select>
 							</div>
 							<div class="input-group mb-3">
 								<span class="input-group-text w-25 justify-content-center"
-									style="background-color: #e0f7fa;">경력</span> <input type="text"
-									name="experience" class="form-control" required>
+									style="background-color: #e0f7fa;">경력</span> 
+									<select name="experience" class="form-control" required>
+									<option>무관</option>
+									<option>신입</option>
+									<option>1년차</option>
+									<option>2년차</option>
+									<option>3년차</option>
+									<option>4년차</option>
+									<option>5년차</option>
+									<option>6년차</option>
+									<option>7년차</option>
+									<option>8년차</option>
+									<option>9년차</option>
+									<option>10년차 이상</option>
+									</select>
 							</div>
 							<div class="input-group mb-3">
 								<span class="input-group-text w-25 justify-content-center"
-									style="background-color: #e0f7fa;">근무지역</span> <input
-									type="text" name="postingAddress" class="form-control" required>
+									style="background-color: #e0f7fa;">근무지역</span> 
+									<select name="postingAddress" class="form-control" required>
+									<option>전국</option>
+									<option>서울</option>
+									<option>부산</option>
+									<option>대구</option>
+									<option>인천</option>
+									<option>광주</option>
+									<option>대전</option>
+									<option>울산</option>
+									<option>경기도</option>
+									<option>강원도</option>
+									<option>충청북도</option>
+									<option>충청남도</option>
+									<option>전라북도</option>
+									<option>전라북도</option>
+									<option>경상북도</option>
+									<option>경상남도</option>
+									<option>제주도</option>
+									</select>
 							</div>
 						</div>
 

@@ -85,6 +85,9 @@
 
 <section>
     <article>
+    
+    <h3 class="mb-3 mt-3" style="text-align:center;"> 내 이력서 관리 </h3>
+	<hr>
 
         <div class="mt-5">
 		   <div id="resumes-container">		   

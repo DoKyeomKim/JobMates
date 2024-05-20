@@ -24,10 +24,10 @@ font-weight: bold;
 		<div class="container-fluid">
 			<div
 				class="d-flex flex-wrap align-items-center justify-content-between">
-				<div class="d-flex align-items-center">
+				<div class="d-flex align-items-center" style="margin-left:10%;">
 					<a href="/"
 						class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none me-3">
-						<img alt="로고" src="/images/Logo.png" style="width: 100px;">
+						<img alt="로고" src="/images/Logo.png" style="width: 130px;">
 					</a>
 					<c:choose>
 						<c:when test="${sessionScope.isLoggedIn}">
@@ -75,7 +75,7 @@ font-weight: bold;
 					</c:choose>
 
 				</div>
-				<div>
+				<div style="margin-right:10%;">
 					<c:choose>
 						<c:when test="${sessionScope.isLoggedIn}">
 							<ul

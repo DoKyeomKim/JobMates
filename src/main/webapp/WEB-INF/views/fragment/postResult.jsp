@@ -12,7 +12,7 @@
 					data-posting-idx="${post.postingDto.postingIdx}">
 					<!-- 각 포스트를 감싸는 div 추가 -->
 					<img alt="기업 로고" src="${post.companyFileDto.filePath}"
-						class="border" style="width: 250px;">
+						class="border" style="width: 250px; height: 200px;">
 					<div class="d-flex justify-content-between">
 						<!-- flex-direction 변경 및 가운데 정렬 -->
 						<div class="d-flex flex-column">
