@@ -3,12 +3,14 @@ package com.job.dto;
 import com.job.entity.CompanyFile;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CompanyFileDto {   
 	private Long companyFileIdx;
 	private Long companyIdx;

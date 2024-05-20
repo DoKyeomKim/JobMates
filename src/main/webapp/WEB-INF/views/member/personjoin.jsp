@@ -142,10 +142,15 @@ width : 150px;}
    <tr>
     <td>
         <div style="display: flex;">
+<<<<<<< HEAD
+            <input type="checkbox" name="userType" value="2" style="margin-right: 5px; width: 20px; height: 20px;" checked onclick="document.querySelector('[name=userType][value=\'2\']').checked = false;"><label style="margin-right: 10px;">개인</label>
+            <input type="checkbox" name="userType" value="1" style="margin-left: 20px; margin-right: 5px; width: 20px; height: 20px;" onclick="return false;"><label style="margin-right: 10px;">기업</label>
+=======
 
             <input type="checkbox" name="userType" value="2" style="margin-right: 5px; width: 20px; height: 20px;" checked onclick="document.querySelector('[name=userType][value=\'2\']').checked = false;"><label style="margin-right: 10px;">개인</label>
             <input type="checkbox" name="userType" value="1" style="margin-left: 20px; margin-right: 5px; width: 20px; height: 20px;" onclick="return false;"><label style="margin-right: 10px;">기업</label>
 
+>>>>>>> branch 'mainPage' of https://github.com/DoKyeomKim/JobMates.git
         </div>
     </td>
 </tr>

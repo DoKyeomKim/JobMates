@@ -40,8 +40,7 @@ font-weight: bold;
 												관리</a></li>
 										<li><a href="/ApplyPage" class="nav-link px-2 text-dark">채용 관리</a></li>
 										<li><a href="/RScrapList" class="nav-link px-2 text-dark">관심 인재</a></li>
-										<li><a href="#" class="nav-link px-2 text-dark">자유
-												게시판</a></li>
+										<li><a href="/Community"" class="nav-link px-2 text-dark">자유 게시판</a></li>
 									</ul>
 								</c:when>
 								<c:when test="${userType == 2}">
@@ -52,7 +51,7 @@ font-weight: bold;
 												관리</a></li>
 										<li><a href="/ApplyPage" class="nav-link px-2 text-dark">지원 현황</a></li>
 										<li><a href="#" class="nav-link px-2 text-dark">관심 기업</a></li>
-										<li><a href="#" class="nav-link px-2 text-dark">자유
+										<li><a href="/Community" class="nav-link px-2 text-dark">자유
 												게시판</a></li>
 									</ul>
 								</c:when>
@@ -69,7 +68,7 @@ font-weight: bold;
 										현황</a></li>
 								<li><a href="/personlogin" class="nav-link px-2 text-dark">관심
 										기업</a></li>
-								<li><a href="/personlogin" class="nav-link px-2 text-dark">자유
+								<li><a href="/Community" class="nav-link px-2 text-dark">자유
 										게시판</a></li>
 							</ul>
 						</c:otherwise>

@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostingWithFileDto {
-	private PostingDto postingDto;
-    private CompanyFileDto companyFileDto;
-    private CompanyDto companyDto;
+public class CommunityLikesDto {
+	private Long likesIdx;
+	private Long communityIdx;
+	private Long userIdx;
 
-    
-    
 }

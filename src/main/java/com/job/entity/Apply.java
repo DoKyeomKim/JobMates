@@ -35,10 +35,6 @@ public class Apply {
 	private Long applyIdx;
 
 	@ManyToOne // 관계 : 다대일 설정 (USER <-> Company)
-	@JoinColumn(name = "person_idx", nullable = false) // 외래키 칼럼 (부모키 USER idx칼럼)
-	private Person person;
-
-	@ManyToOne // 관계 : 다대일 설정 (USER <-> Company)
 	@JoinColumn(name = "posting_idx", nullable = false) // 외래키 칼럼 (부모키 USER idx칼럼)
 	private Posting posting;
 
@@ -53,6 +49,10 @@ public class Apply {
 	private Long applyStatus;
 
 	@ManyToOne
+	@JoinColumn(name = "person_idx", nullable = false)
+	private Person person;
+	
+	@ManyToOne
 	@JoinColumn(name = "company_idx", nullable = false)
 	private Company company;
 
@@ -64,5 +64,10 @@ public class Apply {
 	public void prePersist() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		this.createdDate = LocalDateTime.now().format(formatter);
+	}
+
+	public void changeApplyStatus(Long applyStatus) {
+		 this.applyStatus = applyStatus;
+		
 	}
 }
