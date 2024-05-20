@@ -259,17 +259,21 @@ header {
 		}
 	</script>
 
-	<!-- 공고 마감일 현재로 value값 설정 -->
-	<script>
-		//현재 날짜를 가져옵니다.
-		const today = new Date();
+	<!-- 공고 마감일 1주일뒤로 value값 설정 -->
+    <script>
+        // 현재 날짜를 가져옵니다.
+        const today = new Date();
 
-		// 날짜를 YYYY-MM-DD 형식으로 변환합니다.
-		const formattedDate = today.toISOString().split('T')[0];
+        // 7일을 더합니다.
+        const oneWeekLater = new Date(today);
+        oneWeekLater.setDate(today.getDate() + 7);
 
-		// 변환한 날짜를 input 태그의 value로 설정합니다.
-		document.getElementById('postingDeadline').value = formattedDate;
-	</script>
+        // 날짜를 YYYY-MM-DD 형식으로 변환합니다.
+        const formattedDate = oneWeekLater.toISOString().split('T')[0];
+
+        // 변환한 날짜를 input 태그의 value로 설정합니다.
+        document.getElementById('postingDeadline').value = formattedDate;
+    </script>
 
 </body>
 </html>
