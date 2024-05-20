@@ -114,7 +114,8 @@ header {
 	position: fixed;
 	top: 0;
 	height:100px;
-	width: 100%
+	width: 100%;
+	z-index: 1000;
 }
 
 .detail-info {

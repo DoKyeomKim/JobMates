@@ -3,6 +3,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <body>
+<h3 class="mt-3" style="text-align:center;"> 채용 관리 </h3>
+<hr class="mb-3">
 	<div class="container mt-3">
 		<table class="table" id="myTable">
 			<thead class="table-secondary">

@@ -36,7 +36,6 @@
     flex-direction: column;
     min-height: 40vh;
     text-align: center;
-    margin-left:100px;
     margin-bottom: 100px;
 }
 
