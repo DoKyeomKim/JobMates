@@ -95,6 +95,10 @@ label {
     background-color: #ddd; /* 마우스 오버 시 배경색 변경 */
 }
 
+input {
+border:none !important;
+outline:none !important;
+}
 
 </style>
 </head>
@@ -127,7 +131,7 @@ label {
 					 <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-1 col-form-label">아이디</label>
                         <div class="col-sm-7"  style="width:80%; padding-left:30px;">
-                            <span class="form-control">${userId}</span>
+                            <span class="form-control" style="border:none; outline:none;">${userId}</span>
                         </div>
                     </div>
                     
@@ -206,7 +210,7 @@ label {
 
                 </div>
 			    <div class="mt-5" style="text-align: center;">
-                    <button type="submit" style="width:15%; margin-left:30px;" class="btn btn-primary">저장</button>
+                    <button type="submit" style="width:15%; margin-left:30px;" class="btn btn-outline-primary">저장</button>
                 </div>
 
 
