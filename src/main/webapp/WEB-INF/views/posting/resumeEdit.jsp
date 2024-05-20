@@ -99,19 +99,11 @@ header {
 							<div class="mt-3 mx-auto row">
 								<label for="skills" class="form-label">기술스택</label>
 								<div class="mx-auto row" id="skills">
-									<c:forEach var="skill" items="${allSkills}">
-										<div class="col-auto">
-											<input type="checkbox" class="btn-check" name="skillIdx"
-												id="skill_${skill.skillIdx }" value="${skill.skillIdx}"  
-												<c:forEach var="userSkill" items="${userSkills}">
-									                <c:if test="${skill.skillIdx == userSkill.skillIdx}">
-									                    checked="checked"
-									                </c:if>
-									            </c:forEach>>
-											<label class="btn btn-outline-primary"
-												for="skill_${skill.skillIdx }">${skill.skillName}</label>
-										</div>
-									</c:forEach>
+						<c:forEach var="skill" items="${skill}">
+							<div class="col-auto">
+									<label class="btn btn-outline-primary">${skill.skillName}</label>
+							</div>
+						</c:forEach>
 								</div>
 							</div>
 						</div>

@@ -7,12 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class UserDto {   
+public class RScrapListDto {
+	private String resumeTitle;
+	private Long resumeIdx;
 	private Long userIdx;
-	private String userId;
-	private String userPw;
-	private Long userType;
-	private String createdDate;
-	private String userEmail;
+	private Long personIdx;
+	private String personName;	
 }

@@ -176,7 +176,7 @@
 								</button>
 							</c:when>
 							<c:otherwise>
-								<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
+									<a class="btn btn-info ms-3" href="javascript:history.back();">목록으로</a>
 							</c:otherwise>
 						</c:choose>
 					</div>

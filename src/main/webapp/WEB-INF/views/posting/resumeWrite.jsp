@@ -98,12 +98,11 @@ header {
 								<label for="skills" class="form-label">기술스택</label>
 								<div class="mx-auto row" id="skills">
 										
-										<c:forEach var="skill" items="${skill}">
-											<div class="col-auto">
-										   	 	<input type="checkbox" class="btn-check" id="skill_${skill.skillIdx}" value="${skill.skillIdx}" name="skillIdx" autocomplete="off"> 
-												<label class="btn btn-outline-primary" for="skill_${skill.skillIdx}">${skill.skillName}</label>
-										    </div>
-										</c:forEach>
+						<c:forEach var="skill" items="${skill}">
+							<div class="col-auto">
+									<label class="btn btn-outline-primary">${skill.skillName}</label>
+							</div>
+						</c:forEach>
 																			
 									<input type="hidden" id="defaultSkillIdx" name="skillIdx" value="0">
 								</div>

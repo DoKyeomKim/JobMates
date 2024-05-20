@@ -12,23 +12,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.CompanyDto;
-import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PersonSkillDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingRecommendDto;
 import com.job.dto.PostingSkillDto;
+import com.job.dto.RScrapListDto;
 import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
+import com.job.dto.ResumeRecommendDto;
+import com.job.dto.ResumeScrapDto;
 import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
 import com.job.mapper.MypageMapper;
@@ -212,7 +216,7 @@ public class PostingController {
 			postingMapper.postingSkillUpdate(postingSkill);
 		}
 
-		mv.setViewName("redirect:/postingView?postingIdx=" + postingIdx);
+		mv.setViewName("redirect:/postings");
 		return mv;
 	}
 
@@ -223,7 +227,8 @@ public class PostingController {
 		ModelAndView mv = new ModelAndView();
 
 		Long postingIdx = postingDto.getPostingIdx();
-
+		
+		postingMapper.postingScrapDelete(postingIdx);
 		postingMapper.postingSkillDelete(postingIdx);
 		postingMapper.postingDelete(postingIdx);
 		mv.setViewName("redirect:/postings");
@@ -290,6 +295,7 @@ public class PostingController {
 
 		ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
 		Long userType = user.getUserType();
+		
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("resume", resume);
@@ -351,9 +357,13 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
+		
+		Long personIdx = person.getPersonIdx();
 
-		// 스킬 들고 오기
-		List<SkillDto> skill = postingMapper.getAllSkill();
+		
+		// skillIdx를 토대로 skill 갖고오기
+		List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
+
 		Long userType = user.getUserType();
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
@@ -366,7 +376,7 @@ public class PostingController {
 	// 이력서 작성
 	@PostMapping("/resumeWrite")
 	@Transactional
-	public ModelAndView resumwWrite(HttpSession session, ResumeDto resumeDto, PersonSkillDto personSkill,
+	public ModelAndView resumwWrite(HttpSession session, ResumeDto resumeDto,
 			ResumeFileDto resumeFileDto, @RequestParam("file") MultipartFile file) {
 		ModelAndView mv = new ModelAndView();
 
@@ -387,11 +397,9 @@ public class PostingController {
 		resumeDto.setUserIdx(userIdx);
 
 		// personSkillDto에 현재 세션의 personIdx를 넣음
-		personSkill.setPersonIdx(personIdx);
 
 		postingMapper.rResumeWrite(resumeDto);
 
-		postingMapper.resumeSkillWrite(personSkill);
 
 		// 파일이 업로드되지 않았을 경우 처리
 		if (file.isEmpty()) {
@@ -458,12 +466,9 @@ public class PostingController {
 		Long personIdx = person.getPersonIdx();
 		
 		// skillIdx를 토대로 skill 갖고오기
-		List<SkillDto> userSkills = postingMapper.getUserSkill(personIdx);
+		List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
 		
 		
-		// 모든 skill_tb에 있는 모든 skill
-		List<SkillDto> allSkills = postingMapper.getAllSkill();
-
 		// 이력서에 사용된 resume_tb 갖고 오기
 		ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
 		if (resume == null) {
@@ -479,8 +484,7 @@ public class PostingController {
 		mv.addObject("userType", userType);
 		mv.addObject("person", person);
 		mv.addObject("resume", resume);
-		mv.addObject("allSkills", allSkills);
-		mv.addObject("userSkills", userSkills);
+		mv.addObject("skill", skill);
 		mv.addObject("resumeIdx", resumeIdx);
 		mv.addObject("resumeFile", resumeFile);
 		mv.setViewName("posting/resumeEdit");
@@ -492,8 +496,7 @@ public class PostingController {
 	@PostMapping("/resumeEdit")
 	@Transactional
 	public ModelAndView resumeEdit(HttpSession session, 
-			@RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto,
-			@RequestParam("skillIdx") List<Long> skillIdxList, PersonDto person,
+			@RequestParam("resumeIdx") Long resumeIdx, ResumeDto resumeDto, PersonDto person,
 			ResumeFileDto resumeFileDto, 
 			@RequestParam("file") MultipartFile file) {
 		
@@ -505,29 +508,6 @@ public class PostingController {
 
 		// 세션에서 user_idx 갖고오기
 		Long userIdx = user.getUserIdx();
-		//System.out.println("userIdx========================="+userIdx);
-		
-		
-		// 세션에서 user_idx로 person_idx 갖고오기 스킬용으로(나중에 삭제)
-				
-		//Long personIdx = postingMapper.getPeronIdxByUserIdx(userIdx); 이게 문제인데 왜 이게 문제인지 모르겠음.
-		// 찾아서 해결해본 결과로는 이제 내가 매퍼에 userIdx로 personIdx를 갖고오는게 1개뿐인데 
-		// 이걸 한개만 찾아오니 다 못집어넣어서 생기는 문제다. 라고 생각하면 될거 같음.
-
-	    List<Long> personIdxList = postingMapper.getPeronIdxByUserIdx(userIdx);
-	    System.out.println("personIdxList========================="+personIdxList);
-		
-	    for (Long personIdx : personIdxList) {
-	        postingMapper.deletePersonSkill(personIdx);
-		
-			for (Long skillIdx : skillIdxList) {
-				PersonSkillDto personSkillDto = new PersonSkillDto();
-				personSkillDto.setPersonIdx(personIdx); // 사용자 ID 설정
-				personSkillDto.setSkillIdx(skillIdx); // 스킬 인덱스 설정
-				postingMapper.insertSkill(personSkillDto); // 스킬 정보 삽입
-			}
-	    }
-		
 		
 		
 		// 파일 수정부분
@@ -615,7 +595,6 @@ public class PostingController {
 			
 			// 위에서 찾은 회사 user_idx(세션에 있는 user_idx가 아님)로 file_path 찾아오기
 
-			System.out.println("============================================="+personIdx);
 			
 			mv.addObject("person", personDto);
 			mv.addObject("userType", userType);
@@ -627,17 +606,169 @@ public class PostingController {
 	// ==================================================================
 	// == 기업 유저가 보는 추천 이력서(스킬 기반)
 		
-		//추천 이력서 페이지 이동
 		@GetMapping("/resumeRecommend")
-		public ModelAndView resumeRecommend(HttpSession session) {
+		public ModelAndView resumeRecommend(HttpSession session, ResumeDto resumeDto, UserDto userDto) {
+		    ModelAndView mv = new ModelAndView();
+		    
+		    UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
+
+		    
+		    // user_idx로 posting_idx 갖고 옴
+		    List<Long> postingIdxList = postingMapper.getPostingIdxByUserIdx(userIdx);
+		    // posting_idx에 값을 설정하기 위해서 hashmap 씀 
+		    Map<Long, List<ResumeRecommendDto>> resumeRecMap = new HashMap<>();
+		    
+		    // 배열에 postingIdx 넣기
+		    for (Long postingIdx : postingIdxList) {
+		        Map<String, Object> params = new HashMap<>();
+		        params.put("postingIdx", postingIdx);
+		        params.put("userIdx", userIdx);
+		        List<ResumeRecommendDto> resumeRecs = postingMapper.resumeRecommend(params);
+		        resumeRecMap.put(postingIdx, resumeRecs);
+		    }
+		    
+			mv.addObject("companyIdx", companyIdx);
+		    mv.addObject("resumeRecMap", resumeRecMap);
+		    mv.addObject("userType", userType);
+		    mv.setViewName("posting/resumeRecommend");
+		    return mv;
+		}
+
+		
+		// 추천 이력서 보기(기업이 보는 이력서)
+		@GetMapping("/resumeRecommendView")
+		public ModelAndView resumeRecommendView(HttpSession session,PersonDto person,@RequestParam("personIdx") Long personIdx,@RequestParam("resumeIdx") Long resumeIdx) {
 			ModelAndView mv = new ModelAndView();
 			
+			UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
+		    
+		    person = postingMapper.getPersonByPersonIdx(personIdx);
+		    
+		    // 개인유저 스킬 갖고오기 
+		    List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
+
+			// Resume_tb 정보 갖고 오기
+			ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
+			if (resume == null) {
+				// 사용자 정보가 없을 경우 처리
+				mv.setViewName("redirect:/");
+				return mv;
+			}
+
+			ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
 			
-			
-			mv.setViewName("posting/resumeRecommend");
+			mv.addObject("companyIdx", companyIdx);
+		    mv.addObject("userType", userType);
+		    mv.addObject("person", person);
+		    mv.addObject("skill", skill);
+		    mv.addObject("resume", resume);
+		    mv.addObject("resumeFile", resumeFile);
+			mv.setViewName("posting/resumeRecommendView");
+
 			return mv;
 		}
 	
+		// ================ 이력서 스크랩 =====================
 		
+		// 스크랩 상태 확인
+		@GetMapping("/CheckResumeScrap")
+		public ResponseEntity<Boolean> checkScrap(@RequestParam("resumeIdx") Long resumeIdx, @RequestParam("companyIdx") Long companyIdx) {
+		    boolean isScraped = postingService.checkResumeScrap(resumeIdx, companyIdx);
+		    return ResponseEntity.ok(isScraped);
+		}
 		
+	    // 스크랩 추가
+	    @PostMapping("/ResumeScrapAdd")
+	    @ResponseBody
+	    public Map<String, Object> addScrap(@RequestBody ResumeScrapDto resumeScrapDto) {
+	        Map<String, Object> response = new HashMap<>();
+	        try {
+	            postingService.addScrap(resumeScrapDto);
+	            response.put("success", true);
+	        } catch (Exception e) {
+	            response.put("success", false);
+	            response.put("message", e.getMessage());
+	        }
+	        return response;
+	    }
+
+	    // 스크랩 삭제
+	    @DeleteMapping("/ResumeScrapDelete")
+	    @ResponseBody
+	    public Map<String, Object> deleteScrap(@RequestBody ResumeScrapDto resumeScrapDto) {
+	        Map<String, Object> response = new HashMap<>();
+	        try {
+	            postingService.deleteScrap(resumeScrapDto);
+	            response.put("success", true);
+	        } catch (Exception e) {
+	            response.put("success", false);
+	            response.put("message", e.getMessage());
+	        }
+	        return response;
+	    }
+	    
+	    
+	    // =============스크랩한 인재 페이지============================
+	    // 스크랩한 리스트
+	    @GetMapping("/RScrapList")
+	    public ModelAndView PScrapList(HttpSession session) {
+	    	ModelAndView mv = new ModelAndView();
+	    	
+			UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
+		    
+		    // 스크랩한 리스트 갖고오기
+		    List<RScrapListDto> RScrapList = postingMapper.getRScrapList(companyIdx);
+		    
+		    
+		    mv.addObject("companyIdx",companyIdx);
+		    mv.addObject("RScrapList",RScrapList);
+		    mv.addObject("userType",userType);
+	    	mv.setViewName("posting/RScrapList");
+	    	return mv; 	
+	    }
+	    
+	    @GetMapping("/RScrapView")
+		public ModelAndView RScrapView(HttpSession session,PersonDto person,@RequestParam("personIdx") Long personIdx,@RequestParam("resumeIdx") Long resumeIdx) {
+			ModelAndView mv = new ModelAndView();
+			
+			UserDto user = (UserDto) session.getAttribute("login");
+		    Long userType = user.getUserType();
+		    Long userIdx = user.getUserIdx();
+		    Long companyIdx = postingMapper.getCompanyIdxByUserIdx(userIdx);
+		    
+		    person = postingMapper.getPersonByPersonIdx(personIdx);
+		    
+		    // 개인유저 스킬 갖고오기 
+		    List<SkillDto> skill = postingMapper.getSkillBySkillIdx(personIdx);
+
+			// Resume_tb 정보 갖고 오기
+			ResumeDto resume = postingMapper.getResumeByResumeIdx(resumeIdx);
+			if (resume == null) {
+				// 사용자 정보가 없을 경우 처리
+				mv.setViewName("redirect:/");
+				return mv;
+			}
+
+			ResumeFileDto resumeFile = postingMapper.getResumeFile(resumeIdx);
+			
+			mv.addObject("companyIdx", companyIdx);
+		    mv.addObject("userType", userType);
+		    mv.addObject("person", person);
+		    mv.addObject("skill", skill);
+		    mv.addObject("resume", resume);
+		    mv.addObject("resumeFile", resumeFile);
+			mv.setViewName("posting/RScrapView");
+
+			return mv;
+		}
+	    
 }

@@ -112,11 +112,29 @@
 
     </article>
 </section>
+
+<div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resumeModalLabel">선택하신 이력서</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="resumeModalBody">
+        <!-- Content will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%@include file="/WEB-INF/layouts/footer.jsp"%>
 <script src="/js/bootstrap.bundle.min.js"></script>
 
 <!-- div 클릭시 이동  -->
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function() {
     var resumesContainer = document.getElementById('resumes-container');
 
@@ -140,7 +158,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+</script> -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var resumesContainer = document.getElementById('resumes-container');
+
+    resumesContainer.addEventListener('click', function(event) {
+        var target = event.target;
+
+        // 버튼이나 링크 클릭 시 이동하지 않음
+        if (target.tagName.toLowerCase() === 'button' || target.tagName.toLowerCase() === 'a') {
+            return;
+        }
+
+        // 클릭된 요소부터 상위 요소로 거슬러 올라가며 resume-box 클래스를 가진 div 탐색
+        while (target != null && !target.classList.contains('resume-box')) {
+            target = target.parentElement;
+        }
+
+        // resume-box를 찾았다면 페이지 이동 대신 모달 띄우기
+        if (target != null) {
+            const resumeIdx = target.getAttribute('data-resume-idx');
+
+            fetch('/resumeView?resumeIdx=' + resumeIdx)
+                .then(response => response.text())
+                .then(html => {
+                    // 모달의 내용 채우기
+                    document.getElementById('resumeModalBody').innerHTML = html;
+                    // 모달 표시
+                    var resumeModal = new bootstrap.Modal(document.getElementById('resumeModal'), {});
+                    resumeModal.show();
+                })
+                .catch(error => {
+                    console.error('Error fetching resume details:', error);
+                    alert('이력서 정보를 불러오는데 실패했습니다.');
+                });
+        }
+    });
+});
 </script>
+
 
 <!-- 공개 비공개 -->
 <script>

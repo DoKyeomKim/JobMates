@@ -4,6 +4,20 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+@font-face {
+    font-family: 'Binggrae';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Binggrae.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+*{
+font-family: 'Binggrae';
+font-weight: bold;
+
+}
+</style>
 </head>
 <body>
 	<header class="border-bottom">
@@ -21,11 +35,11 @@
 								<c:when test="${userType == 1}">
 									<ul
 										class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-										<li><a href="#" class="nav-link px-2 text-dark">추천 인재</a></li>
+										<li><a href="/resumeRecommend" class="nav-link px-2 text-dark">추천 인재</a></li>
 										<li><a href="/postings" class="nav-link px-2 text-dark">공고
 												관리</a></li>
 										<li><a href="/ApplyPage" class="nav-link px-2 text-dark">채용 관리</a></li>
-										<li><a href="#" class="nav-link px-2 text-dark">관심 인재</a></li>
+										<li><a href="/RScrapList" class="nav-link px-2 text-dark">관심 인재</a></li>
 										<li><a href="#" class="nav-link px-2 text-dark">자유
 												게시판</a></li>
 									</ul>

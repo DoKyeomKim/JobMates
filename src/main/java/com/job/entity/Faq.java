@@ -12,8 +12,8 @@ import lombok.Getter;
 @Table(name = "FAQ_TB")  //  table 이름과 클래스 이름이 다를때 사용 (oracle은 user table 못만듬)
 @Getter
 @Entity
-@SequenceGenerator(name="FAQL_SEQ_GENERATOR", 
-sequenceName   = "FAQL_SEQ", 
+@SequenceGenerator(name="FAQ_SEQ_GENERATOR", 
+sequenceName   = "FAQ_SEQ", 
 initialValue   = 1,     // 초기값
 allocationSize = 1 )   // 증가치
 public class Faq {   
