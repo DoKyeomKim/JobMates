@@ -1,12 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <title>취업동무</title>
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -96,9 +98,7 @@
         left: 10px;
         color: #aaa;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-    #login tr.buttons td {
+   #login tr.buttons td {
     text-align: center;
 }
 
@@ -114,7 +114,8 @@
     transition: background-color 0.3s;
 }
 
-#perlog:hover, #comlog:hover {
+#perlog:hover,
+#comlog:hover {
     background-color: #1e7fd7;
 }
 </style>
@@ -124,7 +125,7 @@
 			<div class="main">
         <a href="/">
             <img alt="Logo" src="/images/logo.png" style="width:250px;  margin-top : 20px; margin-left: 25px;">
-        </a><br><br><br>
+        </a><br>
     </div>
     <table id="login">
     	<form action="/companylogin" method="POST">
@@ -136,13 +137,15 @@
 	   <td>비밀번호</td>
 	   <td><input type="password" name="userPw" id="userPw" /></td>
 	 </tr>	
-					 <tr class="buttons">
+	     <tr class="buttons">
     <td colspan="2">
         <a href="/personlogin" id="perlog">개인회원</a>
         <a href="/companylogin" id="comlog">기업회원</a>
     </td>
 </tr>
-					<tr>
+
+  
+  <tr>
 	   <td colspan="2">
 	    <input type="submit" value="로그인" />
 	    <input type="button" value="회원가입" id="goList" />
@@ -152,117 +155,10 @@
 		
 	</main>
 <script>
-  	const  goListEl  = document.getElementById('goList');
-  	goListEl.addEventListener('click', function(e) {
-  		location.href = '/companyjoin';
-
-    #perlog, #comlog {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 0 10px;
-    background-color: #054FA3;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    transition: background-color 0.3s;
-}
-
-#perlog:hover, #comlog:hover {
-    background-color: #1e7fd7;
-}
-</style>
-</head>
-<body>
-	<main>
-			<div class="main">
-        <a href="/companylogin">
-            <img alt="Logo" src="/images/logo.png" style="width:250px;  margin-top : 20px;">
-        </a><br><br><br>
-    </div>
-    <table id="login">
-    	<form action="/companylogin" method="POST">
-				 <tr>
-	   <td>아이디</td>
-	   <td><input type="text" name="userId" id="userId" /></td>
-	 </tr>
-	 <tr>
-	   <td>비밀번호</td>
-	   <td><input type="password" name="userPw" id="userPw" /></td>
-	 </tr>	
-					<tr>
-				<td ><a href="/personlogin" id="perlog">개인회원</a></td>
-				<td ><a href="/companylogin" id="comlog">기업회원</a></td>
-			</tr>
-					<tr>
-	   <td colspan="2">
-	    <input type="submit" value="로그인" />
-	    <input type="button" value="취소" id="goList" />
-	   </td>
-	 </tr>
-	</table>
-		
-	</main>
-<script>
-  	const  goListEl  = document.getElementById('goList');
-  	goListEl.addEventListener('click', function(e) {
-  		location.href = '/';
->>>>>>> branch 'user' of https://github.com/DoKyeomKim/JobMates.git
-=======
-    #perlog, #comlog {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 0 10px;
-    background-color: #054FA3;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    transition: background-color 0.3s;
-}
-
-#perlog:hover, #comlog:hover {
-    background-color: #1e7fd7;
-}
-</style>
-</head>
-<body>
-	<main>
-			<div class="main">
-        <a href="/companylogin">
-            <img alt="Logo" src="/images/logo.png" style="width:250px;  margin-top : 20px;">
-        </a><br><br><br>
-    </div>
-    <table id="login">
-    	<form action="/companylogin" method="POST">
-				 <tr>
-	   <td>아이디</td>
-	   <td><input type="text" name="userId" id="userId" /></td>
-	 </tr>
-	 <tr>
-	   <td>비밀번호</td>
-	   <td><input type="password" name="userPw" id="userPw" /></td>
-	 </tr>	
-					<tr>
-				<td ><a href="/personlogin" id="perlog">개인회원</a></td>
-				<td ><a href="/companylogin" id="comlog">기업회원</a></td>
-			</tr>
-					<tr>
-	   <td colspan="2">
-	    <input type="submit" value="로그인" />
-	    <input type="button" value="취소" id="goList" />
-	   </td>
-	 </tr>
-	</table>
-		
-	</main>
-<script>
-  	const  goListEl  = document.getElementById('goList');
-  	goListEl.addEventListener('click', function(e) {
-  		location.href = '/';
->>>>>>> branch 'newUser' of https://github.com/DoKyeomKim/JobMates.git
-  	})
-  	
-  
-  
+  const  goListEl  = document.getElementById('goList');
+	goListEl.addEventListener('click', function(e) {
+		location.href = '/companyjoin';
+	})
   </script>
 
 </body>

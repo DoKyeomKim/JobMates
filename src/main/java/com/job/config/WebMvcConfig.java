@@ -19,8 +19,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor( loginCheckInterceptor )
                 .addPathPatterns("/**")      // http://localhost:9090/
                 .addPathPatterns("/**/*")    
-                .excludePathPatterns("/IdDupCheck","/personjoin","/member/personjoin",
-                		"/IdDupCheck1","/join","/personlogin","/companylogin","/companyjoin",
+                .excludePathPatterns("/IdDupCheck","/personjoin",
+                		"/join","/personlogin","/companylogin","/companyjoin",
                 		"/ApplyPage","/Search*","/comlogin","/logout","/submit","/log", "/", " /log*", "/css/**", "/images/**", "/js/**");
         
     }

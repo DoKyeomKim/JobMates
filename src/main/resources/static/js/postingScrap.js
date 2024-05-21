@@ -77,6 +77,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			const detailDiv = e.target.closest('.detail-div');
 			const postingIdx = detailDiv.getAttribute('data-posting-idx');
 			window.location.href = '/MainPosting/' + postingIdx;
+		
 		}
 	});
 });

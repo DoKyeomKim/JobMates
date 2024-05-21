@@ -194,8 +194,8 @@ width : 150px;}
     const btnIdCheckEl = document.querySelector('#btnIdCheck');
     btnIdCheckEl.onclick = function(e) {     
         const outputEl = document.querySelector('#output');	 
-        let intext = document.querySelector('[name=user_id]');
-        fetch('/IdDupCheck?user_id=' + intext.value)
+        let intext = document.querySelector('[name=userId]');
+        fetch('/IdDupCheck?userId=' + intext.value)
             .then(response => response.text())
             .then((data) => {
                 console.log(data);
@@ -204,6 +204,8 @@ width : 150px;}
     }
 
 </script>
+
+
 <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <script>
     function daumPost() {
@@ -247,23 +249,6 @@ width : 150px;}
         }).open();
     }
 </script>
-<script>
 
-const  btnIdCheckEl = document.querySelector('#btnIdCheck');
-btnIdCheckEl.onclick = function(e) {     
-	// alert('중복확인체크');
-	 const  outputEl = document.querySelector('#output');
-	 	  	 
-    let    intext    = document.querySelector('[name=userId]');
-    // 서버 Controller에 있는 /IdDupCheck 주소를 실행 
-    fetch('/IdDupCheck?userId=' + intext.value)
-      .then(response => response.text())  // 서버 data 가 html
-      .then((data) => {   // data <- response.text()
-     	  console.log(data);
-		  outputEl.innerHTML = data;    	 
-      });        	 
-}
-
-</script>
 </body>
 </html>

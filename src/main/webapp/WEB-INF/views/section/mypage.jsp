@@ -186,5 +186,6 @@ padding-left : 30px;
     </section>
     <%@include file="/WEB-INF/layouts/footer.jsp"%>
     <script src="/js/bootstrap.bundle.min.js"></script>
+    	<script src="/js/postingScrap.js"></script>
 </body>
 </html>

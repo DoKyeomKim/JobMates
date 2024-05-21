@@ -7,144 +7,96 @@
 <title>스크랩 기능 구현</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.png">
     <link href="/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  
 <style>
 /* 스타일 설정 */
-main {
-   display: flex;
-   justify-content: center;
-   height: 800px;
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
 }
 
-.content {
-   display: flex;
-   justify-content: center; /* 중앙 정렬 */
+header {
+    background-color: #e0f7fa;
+    margin-bottom : 20px;
 }
 
+        /* 직접 스타일 추가하기 */
+        .tab-panel {
+             width: 60%;
+    margin: 0 auto;
+    margin-top: 30px; 
+    margin-left:450px;
+   
+    padding: 0;
+    box-sizing: border-box;
+        }
+        
+        #scrap {
+            width: 100%;
+            border-collapse: collapse;
+             margin-top: 40px;
+        }
+        
+        #scrap th, #scrap td {
+            border: 1px solid #000;
+            text-align: center;
+            padding: 10px;
+            width: 100px; /* 셀의 너비를 150px로 설정 (필요에 따라 조정 가능) */
+            height: 50px; /* 셀의 높이를 50px로 설정 (필요에 따라 조정 가능) */
+        }
+        
+        #scrap th {
+            background-color: #e0f7fa;
+        }
 
-
-.content .left {
-   flex: 1;
-   padding: 20px;
-   margin-top: 75px;
-}
-
-.content .right {
-   flex: 3;
-   padding: 20px;
-}
-
-.content .tabs {
-   display: flex;
-}
-
-.content .tab {
-   background-color: #f7faf9;
-   border: none;
-   padding: 10px 20px;
-   cursor: pointer;
-}
-
-.content .tab:hover {
-   background-color: #ccc;
-   font-weight: bold;
-}
-
-.content .tab.active {
-   font-weight: bold;
-}
-
-.content .tab-panel {
-   display: none;
-}
-
-.content .tab-panel.active {
-   display: block;
-}
-
-table {
-   border-collapse: collapse;
-   width: 100%;
-}
-
-th, td {
-   padding: 10px;
-   border: 1px solid #ddd;
-   text-align: center;
-}
-
-.pagination {
-   display: flex;
-   justify-content: center;
-   margin-top: 20px;
-}
-
-.pagination .page-link {
-   color: black;
-}
-
-main button {
-   background-color: inherit;
-   border: none;
-   padding: 0;
-}
-
-main button.bookmark {
-   background: url("/img/bookmark-check.svg");
-   background-size: cover;
-   display: inline-block;
-   width: 30px;
-   height: 30px;
-   margin-top: 2px;
-}
-
-main button.bookmark:hover {
-   background: url("/img/bookmark-check-fill.svg");
-   background-size: cover;
-}
-
-main button.bookmarkOn {
-   background: url("/img/bookmark-check-fill.svg");
-   background-size: cover;
-}
-
-li {
-   list-style: none;
-}
-</style>
+    </style>
 </head>
 <body>
+<main>
 <%@include file="/WEB-INF/layouts/header.jsp"%>
+  <h3 style="text-align:center;">관심기업</h3>
 <div class="tab-panel" id="book-id">
+  
   <table id="scrap">
-    <h2>관심기업</h2>
-    <ul class="job-list">
-      <li>
-        <thead>
-          <tr>
-            <th>회사명</th>
-            <th>공고 제목</th>
-            <th>분야</th>
-            <th>마감일자</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach var="item" items="${book}" varStatus="loop">
-            <tr>
-              <td>${item.company_name}</td>
-              <td>${item.posting_title}</td>
-              <td>${item.job_type}</td>
-              <td>${item.posting_deadline}</td>
-            </tr>
-          </c:forEach>
-        </tbody>
-      </li>
-    </ul>
+    <thead>
+      <tr>
+        <th>회사명</th>	
+        <th>공고 제목</th>
+        <th>분야</th>
+        <th>마감일자</th>
+        <th>스크랩</th>
+      
+      </tr>
+    </thead>
+    <tbody>
+      <c:forEach var="bookmark" items="${bookmarks}">
+        <tr>
+          <td>${bookmark.companyName}</td>
+          <td>${bookmark.postingTitle}</td>
+          <td>${bookmark.jobType}</td>
+          <td>${bookmark.postingDeadline}</td>
+          <td><button
+									class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
+									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
+										data-posting-idx="${posting.postingIdx}"
+										aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+										width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            		<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" /></svg>
+							
+								</button></td>
+        </tr>
+      </c:forEach>
+    </tbody>
   </table>
 </div>
 <%@include file="/WEB-INF/layouts/footer.jsp"%>
+</main>
 <script src="/js/bootstrap.bundle.min.js"></script>
-<script>
-</script>
+	<script src="/js/postingScrap.js"></script>
+
 </body>
 </html>
