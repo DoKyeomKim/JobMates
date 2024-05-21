@@ -17,19 +17,18 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.CompanyDto;
 import com.job.dto.PersonDto;
-import com.job.dto.PostingScrapDto;
+
 import com.job.dto.UserDto;
 import com.job.mapper.CompanyMapper;
 import com.job.mapper.PersonMapper;
 import com.job.mapper.UserMapper;
 
-import ch.qos.logback.core.model.Model;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+
 @Slf4j 
 @Controller
 public class UserController {
@@ -41,11 +40,6 @@ public class UserController {
 	
 	@Autowired
 	private CompanyMapper companyMapper;
-	
-
-
-	
-	
 	
 	// 로그인 페이지
 	@GetMapping("/personlogin")
@@ -71,12 +65,11 @@ public class UserController {
 	public  String  companyjoin() {
 		return "member/companyjoin"; 
 	}
-	
-	// 관심기업 페이지로 이동
-    @GetMapping("/postingScrap")
-    public String postingScrap() {
-        return "member/postingScrap"; 
-    }
+	// 관심기업 페이지
+	@GetMapping("/postingScrap")
+	public  String  postingScrap() {
+		return "member/postingScrap"; 
+	}
 	
 	// 개인 회원가입을 한다
 	
@@ -196,11 +189,7 @@ public class UserController {
 					mv.setViewName("redirect:/");
 					return mv;
 				}
-				
-				
-				
-		
-		
+
 				
 }
 

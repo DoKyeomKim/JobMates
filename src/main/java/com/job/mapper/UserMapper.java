@@ -1,6 +1,7 @@
 package com.job.mapper;
 
 import java.util.HashMap;
+
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -18,4 +19,5 @@ public interface UserMapper {
 
 	HashMap<String, Object> getUser(UserDto userDto);
 	List<HashMap<String, Object>> getCtlBookList(PostingScrapDto request);
+
 }

@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.job.entity.Person;
-import com.job.entity.Posting;
 import com.job.entity.PostingScrap;
 
 public interface PostingScrapRepository extends JpaRepository<PostingScrap, Long> {
@@ -17,7 +15,7 @@ public interface PostingScrapRepository extends JpaRepository<PostingScrap, Long
 
 	void deleteByPostingPostingIdx(Long postingIdx);
 
-	Optional<PostingScrap> findByPersonAndPosting(Long personIdx, Long postingIdx);
+
 
 	void deleteByPostingPostingIdxAndPersonPersonIdx(Long postingIdx, Long personIdx);
 

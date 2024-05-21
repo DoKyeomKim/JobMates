@@ -50,7 +50,11 @@ font-weight: bold;
 										<li><a href="/resumes" class="nav-link px-2 text-dark">이력서
 												관리</a></li>
 										<li><a href="/ApplyPage" class="nav-link px-2 text-dark">지원 현황</a></li>
+
 										<li><a href="/postingScrap" class="nav-link px-2 text-dark">관심 기업</a></li>
+
+									
+
 										<li><a href="/Community" class="nav-link px-2 text-dark">자유
 												게시판</a></li>
 									</ul>
