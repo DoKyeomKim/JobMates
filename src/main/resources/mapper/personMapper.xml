@@ -11,9 +11,7 @@
 		PERSON_NAME,
 		PERSON_PHONE,
 		PERSON_ADDRESS,
-		PERSON_BIRTH,
-
-		USER_EMAIL
+		PERSON_BIRTH
 		)
 		VALUES (
 		USER_SEQ.CURRVAL,
@@ -21,9 +19,7 @@
 		#{ personName},
 		#{ personPhone},
 		#{ personAddress },
-		#{ personBirth },
-
-		#{ userEmail}
+		#{ personBirth }
 		)
 
 	</insert>

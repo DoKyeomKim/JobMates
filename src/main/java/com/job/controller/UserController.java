@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.CompanyDto;
+import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
 
 import com.job.dto.UserDto;
@@ -176,11 +177,11 @@ public class UserController {
 			
 				@PostMapping("/companyjoin")
 				@Transactional
-				public ModelAndView write(CompanyDto companyDto,UserDto userDto) {
+				public ModelAndView write(CompanyDto companyDto,UserDto userDto,CompanyFileDto companyFile) {
 					//저장
 					userMapper.insertUser(userDto);
 					companyMapper.insertCompany(companyDto);
-					
+					companyMapper.insertCompanyFile(companyFile);
 
 					
 					//데이터를 가지고 이동한다
