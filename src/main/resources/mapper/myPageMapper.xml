@@ -101,5 +101,8 @@ WHERE COMPANY_IDX = #{companyIdx}
 		USER_IDX = #{ userIdx }
 	</select>
 	
+	<delete id="accountDelete">
+		DELETE FROM USER_TB WHERE USER_IDX=#{userIdx}
+	</delete>
 
 </mapper>

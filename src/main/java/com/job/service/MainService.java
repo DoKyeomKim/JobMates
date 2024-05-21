@@ -272,6 +272,7 @@ public class MainService {
 	private PostingDto convertToPostingDto(Posting posting) {
 		PostingDto postingDto = new PostingDto();
 		postingDto.setPostingIdx(posting.getPostingIdx());
+		postingDto.setPostingDeadline(posting.getPostingDeadline());
 		postingDto.setUserIdx(posting.getUser().getUserIdx());
 		postingDto.setPostingTitle(posting.getPostingTitle());
 		postingDto.setSalary(posting.getSalary());

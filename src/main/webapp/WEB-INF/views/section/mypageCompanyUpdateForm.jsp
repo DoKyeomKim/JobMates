@@ -149,7 +149,7 @@ padding-left : 30px;
             <ul class="nav flex-column">
                 <li class="nav-item"><a class="nav-link" href="/mypage">회원 정보</a></li>
                 <li class="nav-item"><a class="nav-link" href="/mypageCompanyUpdateForm">정보 수정</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">회원 탈퇴</a></li>
+                <li class="nav-item"><a class="nav-link" href="/accountDeleteForm">회원 탈퇴</a></li>
             </ul>
         </nav>
     </aside>
@@ -219,9 +219,9 @@ padding-left : 30px;
 					<div class="form-group row">
 						<label class="col-sm-2 col-form-label">회사직원수</label>
 						<div class="col-sm-6" style="width:83%;">
-							<input type="text" class="form-control" id="companyEmp" style="outline:none; border:none;"
+							<input type="number" min="1" max="99999999" class="form-control" id="companyEmp" style="outline:none; border:none;"
 								placeholder="회사직원수" value="${company.companyEmp}"
-								name="companyEmp">
+								name="companyEmp" required>
 						</div>
 					</div>
 
@@ -230,7 +230,7 @@ padding-left : 30px;
 						<div class="col-sm-6" style="width:83%;">
 							<input type="text" class="form-control" id="companySize" style="outline:none; border:none;"
 								placeholder="회사규모" value="${company.companySize}"
-								name="companySize">
+								name="companySize" required>
 						</div>
 					</div>
 
@@ -266,9 +266,9 @@ padding-left : 30px;
 					<div class="form-group row">
 						<label for="inputEmail3" class="col-sm-2 col-form-label">설립 연도</label>
 						<div class="col-sm-6" style="width:83%;">
-							<input type="text" class="form-control" id="companyYear" style="outline:none; border:none;"
+						<select id="yearSelect" class="form-control"  style="outline:none; border:none;"
 								placeholder="설립연도" value="${company.companyYear}"
-								name="companyYear">
+								name="companyYear"></select>						
 						</div>
 					</div>
 
@@ -329,6 +329,38 @@ function chooseImage(input) {
         imagePreview.src = currentImage; 
     }
 }
+</script>
+<script>
+  var companyYear = "${company.companyYear}"; // 서버에서 받아온 기본 연도 값
+  var year = new Date().getFullYear(); // 현재 연도
+  var startYear = year - 94; // 시작 연도
+  var endYear = year + 5; // 종료 연도
+  var select = document.getElementById('yearSelect');
+
+  for(var i = startYear; i <= endYear; i++) {
+    var option = document.createElement('option');
+    option.value = option.textContent = i;
+    if(i == companyYear) {
+      option.selected = true; // 기본 값 설정
+    }
+    select.appendChild(option);
+  }
+</script>
+<script>
+document.querySelector('input[type="number"]').addEventListener('input', function(e) {
+  // 숫자만 입력되도록 검사
+  if (!/^\d*$/.test(e.target.value)) { // 숫자와 빈 문자열 허용
+    alert('숫자만 입력해주세요.');
+    e.target.value = '';
+  }
+});
+
+document.querySelector('input[type="number"]').addEventListener('blur', function(e) {
+  // 입력 필드가 비어있을 때 경고 표시
+  if (e.target.value === '') {
+    alert('직원수를 입력해주세요.');
+  }
+});
 </script>
 </body>
 </html>

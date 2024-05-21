@@ -43,7 +43,12 @@ public interface MypageMapper {
 	void updateCompany(CompanyDto company);
 
 
+	// 기업 사진 업데이트
 	void updateCompanyFile(CompanyFileDto companyFileDto);
+
+
+	// 회원탈퇴
+	void accountDelete(Long userIdx);
 
 
 

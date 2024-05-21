@@ -112,7 +112,7 @@ outline:none !important;
             <ul class="nav flex-column">
                 <li class="nav-item"><a class="nav-link" href="/mypage">회원 정보</a></li>
                 <li class="nav-item"><a class="nav-link" href="/mypageUpdateForm">정보 수정</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">회원 탈퇴</a></li>
+                <li class="nav-item"><a class="nav-link" href="/accountDeleteForm">회원 탈퇴</a></li>
             </ul>
         </nav>
     </aside>
@@ -148,7 +148,7 @@ outline:none !important;
                     <div class="form-group row">
                         <label for="inputPassword3" class="col-sm-1 col-form-label">생년월일</label>
                         <div class="col-sm-7" style="width:80%; padding-left:30px;">
-                            <input type="text" class="form-control" id="birth"
+                            <input type="date" class="form-control" id="birth"
                                 placeholder="생년월일" value="${person.personBirth}"
                                 name="personBirth" required>
                         </div>

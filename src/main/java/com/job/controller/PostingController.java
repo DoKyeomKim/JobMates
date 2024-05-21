@@ -715,9 +715,9 @@ public class PostingController {
 	    
 	    
 	    // =============스크랩한 인재 페이지============================
-	    // 스크랩한 리스트
+	    // 스크랩한 공고 리스트
 	    @GetMapping("/RScrapList")
-	    public ModelAndView PScrapList(HttpSession session) {
+	    public ModelAndView RScrapList(HttpSession session) {
 	    	ModelAndView mv = new ModelAndView();
 	    	
 			UserDto user = (UserDto) session.getAttribute("login");
@@ -770,5 +770,6 @@ public class PostingController {
 
 			return mv;
 		}
+	    
 	    
 }

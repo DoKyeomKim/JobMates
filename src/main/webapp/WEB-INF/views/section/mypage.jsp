@@ -109,7 +109,7 @@ padding-left : 30px;
             <ul class="nav flex-column">
                 <li class="nav-item"><a class="nav-link" href="/mypage">회원 정보</a></li>
                 <li class="nav-item"><a class="nav-link" href="/mypageUpdateForm">정보 수정</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">회원 탈퇴</a></li>
+                <li class="nav-item"><a class="nav-link" href="/accountDeleteForm">회원 탈퇴</a></li>
             </ul>
         </nav>
     </aside>

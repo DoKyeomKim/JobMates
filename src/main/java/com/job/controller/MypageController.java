@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -254,6 +255,33 @@ public class MypageController {
 	    mv.setViewName("redirect:/mypage");
 		return mv;
 
+	}
+	
+	//회원탈퇴 폼으로 이동
+	@GetMapping("/accountDeleteForm")
+	public ModelAndView accountDeleteForm(HttpSession session) {
+		ModelAndView mv = new ModelAndView();
+		UserDto user = (UserDto) session.getAttribute("login");
+		Long userType = user.getUserType();
+		Long userIdx = user.getUserIdx();
+		String userId = user.getUserId();
+		
+		mv.addObject("userId", userId);
+		mv.addObject("userIdx", userIdx);
+		mv.addObject("userType", userType);
+		mv.setViewName("section/accountDeleteForm");
+		return mv;
+	} 
+	
+	@RequestMapping("/accountDelete")
+	public ModelAndView accountDelete(HttpSession session,@RequestParam("userIdx") Long userIdx) {
+		ModelAndView mv = new ModelAndView();
+		
+		mypageMapper.accountDelete(userIdx);
+		session.invalidate();
+
+		mv.setViewName("redirect:/");
+		return mv;
 	}
 	
 
