@@ -30,7 +30,7 @@ header {
 	
 	<div class="delete-info mt-5 mb-5" style="text-align:center;">
 	<h2 class="mb-5">정말 회원탈퇴 하시겠습니까?</h2>
-	<h4>회원탈퇴 후 작성하신 글 들의 수정,삭제가 불가능하며 복구가 어려울 수 있습니다.</h4>
+	<h4>회원탈퇴 후 작성하신 글의 수정,삭제가 불가능하며 복구가 어려울 수 있습니다.</h4>
 	<a class="mt-5 mb-5" href="javascript:history.back()" style="text-decoration:none;">회원을 유지하겠습니다.</a>
 	</div>
 	
