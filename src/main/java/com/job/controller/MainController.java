@@ -410,9 +410,9 @@ public class MainController {
 	@GetMapping("/CommunitySort")
 	public ModelAndView getCommunityData(@RequestParam(value = "sort", defaultValue = "recent") String sort,
 			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size, HttpServletRequest request) {
+			@RequestParam(value = "size", defaultValue = "5") int size, HttpServletRequest request, HttpSession session) {
 		ModelAndView mv;
-
+		UserDto user = (UserDto) session.getAttribute("login");
 		Sort sortOrder;
 		switch (sort) {
 		case "popular":
@@ -436,6 +436,14 @@ public class MainController {
 		// AJAX 요청인지 확인
 		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
 			mv = new ModelAndView("fragment/communityMain");
+			Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+			boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+			if (isLoggedIn) {
+				if (user != null) {
+					Long userType = user.getUserType();
+					mv.addObject("userType", userType);
+				}
+			}
 		} else {
 			mv = new ModelAndView("section/community"); // 전체 페이지를 로드
 		}
@@ -514,6 +522,7 @@ public class MainController {
 				if (user != null) {
 					Long userType = user.getUserType();
 					mv.addObject("userType", userType);
+					mv.addObject("user", user);
 				}
 			}
 			CommunityDto community = mainService.findCommunityBycommunityIdx(communityIdx);
@@ -539,20 +548,18 @@ public class MainController {
 					CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
 					reply.setUserIdx(userIdx);
 					reply.setReplyName(company.getCompanyName());
-					SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 					String currentDate = formatter.format(new Date());
 					reply.setCreatedDate(currentDate);
-					reply.setLikeCount((long) 0);
 					mainService.insertReply(reply);
 				} else {
 					Long userIdx = user.getUserIdx();
 					PersonDto person = mainService.findPersonByUserIdx(userIdx);
 					reply.setUserIdx(userIdx);
 					reply.setReplyName(person.getPersonName());
-					SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 					String currentDate = formatter.format(new Date());
 					reply.setCreatedDate(currentDate);
-					reply.setLikeCount((long) 0);
 					log.info("reply = {}", reply);
 					mainService.insertReply(reply); // Insert reply for non-company user as well
 				}
@@ -637,43 +644,90 @@ public class MainController {
 	}
 
 	@PostMapping("/CommunityWrite")
-	public ModelAndView communityWriteForm(HttpSession session, CommunityDto community) {
-		ModelAndView mv = new ModelAndView();
-		UserDto user = (UserDto) session.getAttribute("login");
-		if (user != null) {
-			Long userType = user.getUserType();
-			if (userType == 1) {
-				Long userIdx = user.getUserIdx();
-				CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
-				community.setUserIdx(userIdx);
-				community.setCommunityName(company.getCompanyName());
-				SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
-				String currentDate = formatter.format(new Date());
-				community.setCreatedDate(currentDate);
-				community.setViewCount((long) 0);
-				community.setLikeCount((long) 0);
-				community.setReplyCount((long) 0);
-				log.info("community = {}", community);
-				mainService.insertCommunity(community, userIdx);
-			} else {
-				Long userIdx = user.getUserIdx();
-				PersonDto person = mainService.findPersonByUserIdx(userIdx);
-				community.setUserIdx(userIdx);
-				community.setCommunityName(person.getPersonName());
-				SimpleDateFormat formatter = new SimpleDateFormat("yy/MM/dd");
-				String currentDate = formatter.format(new Date());
-				community.setCreatedDate(currentDate);
-				community.setViewCount((long) 0);
-				community.setLikeCount((long) 0);
-				community.setReplyCount((long) 0);
-				log.info("community = {}", community);
-				mainService.insertCommunity(community, userIdx);
-			}
-		}
-		mv.setViewName("redirect:/Community");
-		return mv;
+	public ResponseEntity<?> communityWriteForm(HttpSession session, CommunityDto community) {
+	    try {
+	        UserDto user = (UserDto) session.getAttribute("login");
+	        if (user != null) {
+	            Long userType = user.getUserType();
+	            if (userType == 1) {
+	                Long userIdx = user.getUserIdx();
+	                CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
+	                community.setUserIdx(userIdx);
+	                community.setCommunityName(company.getCompanyName());
+	                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	                String currentDate = formatter.format(new Date());
+	                community.setCreatedDate(currentDate);
+	                community.setViewCount((long) 0);
+	                community.setLikeCount((long) 0);
+	                community.setReplyCount((long) 0);
+	                log.info("community = {}", community);
+	                mainService.insertCommunity(community, userIdx);
+	            } else {
+	                Long userIdx = user.getUserIdx();
+	                PersonDto person = mainService.findPersonByUserIdx(userIdx);
+	                community.setUserIdx(userIdx);
+	                community.setCommunityName(person.getPersonName());
+	                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	                String currentDate = formatter.format(new Date());
+	                community.setCreatedDate(currentDate);
+	                community.setViewCount((long) 0);
+	                community.setLikeCount((long) 0);
+	                community.setReplyCount((long) 0);
+	                log.info("community = {}", community);
+	                mainService.insertCommunity(community, userIdx);
+	            }
+	        }
+	        return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 추가되었습니다.\"}");
+	    } catch (Exception e) {
+	        log.error("게시글 추가에 실패했습니다.", e);
+	        return ResponseEntity.badRequest().body("{\"message\": \"게시글 추가에 실패했습니다.\"}");
+	    }
 	}
 
+	@PatchMapping("/updateCommunity")
+	public ResponseEntity<?> communityUpdate(HttpSession session, @RequestBody CommunityDto community) {
+	    try {
+	        	mainService.updateCommunity(community);
+	        
+	        return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 수정되었습니다.\"}");
+	    } catch (Exception e) {
+	        log.error("게시글 추가에 실패했습니다.", e);
+	        return ResponseEntity.badRequest().body("{\"message\": \"게시글 수정에 실패했습니다.\"}");
+	    }
+	}
+	@DeleteMapping("/DeleteCommunity")
+	public ResponseEntity<?> communityDelete(HttpSession session, @RequestBody CommunityDto communityDto) {
+		try {
+			mainService.deleteCommunity(communityDto);
+			
+			return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 삭제되었습니다.\"}");
+		} catch (Exception e) {
+			log.error("댓글 삭제에 실패했습니다.", e);
+			return ResponseEntity.badRequest().body("{\"message\": \"게시글 삭제에 실패했습니다.\"}");
+		}
+	}
+	@PatchMapping("/UpdateReply")
+	public ResponseEntity<?> replyUpdate(HttpSession session, @RequestBody ReplyDto replyDto) {
+		try {
+			mainService.updateReply(replyDto);
+			
+			return ResponseEntity.ok().body("{\"message\": \"댓글이 성공적으로 수정되었습니다.\"}");
+		} catch (Exception e) {
+			log.error("댓글 수정에 실패했습니다.", e);
+			return ResponseEntity.badRequest().body("{\"message\": \"댓글 수정에 실패했습니다.\"}");
+		}
+	}
+	@DeleteMapping("/DeleteReply")
+	public ResponseEntity<?> replyDelete(HttpSession session, @RequestBody ReplyDto replyDto) {
+		try {
+			mainService.deleteReply(replyDto);
+			
+			return ResponseEntity.ok().body("{\"message\": \"댓글이 성공적으로 삭제되었습니다.\"}");
+		} catch (Exception e) {
+			log.error("댓글 삭제에 실패했습니다.", e);
+			return ResponseEntity.badRequest().body("{\"message\": \"댓글 삭제에 실패했습니다.\"}");
+		}
+	}
     @GetMapping("/SearchCommunity")
     public ModelAndView searchCommunity(@RequestParam("keyword") String keyword, HttpServletRequest request,
                                         @RequestParam(value = "page", defaultValue = "0") int page,

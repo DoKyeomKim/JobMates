@@ -20,7 +20,7 @@
 				</div>
 				<div class="my-2 d-flex justify-content-center align-items-center">
 					<div>
-						<button type="submit" id="btn-submit" class="btn btn-primary me-2">등록</button>
+						<button type="button" id="community-write" class="btn btn-primary me-2">등록</button>
 						<button type="reset" id="btn-cancel" class="btn border ">취소</button>
 					</div>
 				</div>

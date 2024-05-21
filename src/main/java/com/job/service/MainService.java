@@ -273,6 +273,7 @@ public class MainService {
 	private PostingDto convertToPostingDto(Posting posting) {
 		PostingDto postingDto = new PostingDto();
 		postingDto.setPostingIdx(posting.getPostingIdx());
+		postingDto.setPostingDeadline(posting.getPostingDeadline());
 		postingDto.setUserIdx(posting.getUser().getUserIdx());
 		postingDto.setPostingTitle(posting.getPostingTitle());
 		postingDto.setSalary(posting.getSalary());
@@ -648,8 +649,7 @@ public class MainService {
 		log.info("user = {}", user);
 
 		Reply replyEntity = Reply.builder().community(community).user(user).replyName(reply.getReplyName())
-				.replyContent(reply.getReplyContent()).createdDate(reply.getCreatedDate())
-				.likeCount(reply.getLikeCount()).build();
+				.replyContent(reply.getReplyContent()).createdDate(reply.getCreatedDate()).build();
 		log.info("replyEntity = {}", replyEntity);
 		replyRepository.save(replyEntity);
 		Long replyCount = replyRepository.countByCommunityCommunityIdx(reply.getCommunityIdx());
@@ -739,6 +739,38 @@ public class MainService {
 		Page<Community> communityPage = communityRepository
 				.findByCommunityTitleContainingOrCommunityContentContainingAllIgnoreCase(keyword, keyword, pageable);
 		return communityPage.map(CommunityDto::createCommunityDtoList);
+	}
+
+	public void updateCommunity(CommunityDto communityDto) {
+		Community community = communityRepository.findById(communityDto.getCommunityIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Community를 찾을 수 없습니다."));
+		Community updatedCommunity = Community.builder().communityIdx(community.getCommunityIdx()) // 기존 Community ID
+				.communityTitle(communityDto.getCommunityTitle()).user(community.getUser())
+				.communityName(community.getCommunityName()).communityContent(communityDto.getCommunityContent())
+				.createdDate(community.getCreatedDate()).viewCount(community.getViewCount()).likeCount(community.getLikeCount())
+				.replyCount(community.getReplyCount()).build();
+		communityRepository.save(updatedCommunity);
+	}
+
+	public void updateReply(ReplyDto replyDto) {
+		Reply reply = replyRepository.findById(replyDto.getReplyIdx())
+				.orElseThrow(() -> new NoSuchElementException("해당 Reply를 찾을 수 없습니다."));
+		Reply updatedReply = Reply.builder().replyIdx(replyDto.getReplyIdx()).community(reply.getCommunity()).user(reply.getUser()).replyName(reply.getReplyName()).replyContent(replyDto.getReplyContent()).createdDate(reply.getCreatedDate()).build();
+		replyRepository.save(updatedReply);
+		
+	}
+
+	public void deleteReply(ReplyDto replyDto) {
+		Long replyIdx = replyDto.getReplyIdx();
+		
+		replyRepository.deleteById(replyIdx);
+		
+	}
+
+	public void deleteCommunity(CommunityDto communityDto) {
+		Long communityIdx = communityDto.getCommunityIdx();
+		communityRepository.deleteById(communityIdx);
+		
 	}
 
 }

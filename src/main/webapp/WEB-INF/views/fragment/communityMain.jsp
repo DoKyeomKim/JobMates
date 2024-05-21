@@ -122,7 +122,7 @@ header {
 	<div class="container mt-4" id="communityMain">
 		<%@ include file="/WEB-INF/views/fragment/communityList.jsp"%>
 	</div>
-	<script>
+<script>
     function loadPage(event, page) {
         event.preventDefault(); // 기본 동작(링크 이동) 방지
         const sort = event.target.getAttribute('data-sort'); // 클릭된 링크의 sort 값 가져오기
@@ -180,7 +180,7 @@ header {
         }
     }
 
-    async function loadDetail(communityIdx) {
+    async function loadDetail(communityIdx, isPopState = false) {
         try {
             const response = await fetch(`/CommunityDetail/` + communityIdx, {
                 method: 'GET',
@@ -199,10 +199,10 @@ header {
                     updateLikeButtons();
                     updateView(communityIdx);
                 });
-
-                // 페이지 상태를 히스토리에 추가
-                history.pushState({ communityIdx: communityIdx }, '', `?communityIdx=` + communityIdx);
-
+                if (!isPopState) {
+                    // 페이지 상태를 히스토리에 추가
+                    history.pushState({ communityIdx: communityIdx }, '', `?communityIdx=` + communityIdx);
+                }
             } else {
                 console.error('데이터를 가져오지 못했습니다 : ', response.status, response.statusText);
             }
@@ -291,6 +291,7 @@ header {
             alert('오류가 발생했습니다. 다시 시도해주세요.');
         }
     }
+
     async function UpdateReply(communityIdx) {
         try {
             const UpdateReplyResponse = await fetch('/UpdateReply', {
@@ -323,13 +324,131 @@ header {
         } else {
             loadContent(sort || 'recent', 0);
         }
-
+        if (!communityIdx) {
+            loadContent(sort || 'recent', 0);
+        }
+        
         document.body.addEventListener('click', async (event) => {
             const likeButton = event.target.closest('.like_btn');
             const communityDetail = event.target.closest('.community-detail');
             const writeBtn = event.target.closest('.writeBtn');
             const clearIcon = event.target.closest('.clear-icon');
+            const updateBtn = document.querySelector('.updateBtn');
+            const editBtn = document.querySelector('.editBtn'); 
+        	const deleteBtn = document.querySelector('.deleteBtn');
+            const btnSubmit = document.getElementById('community-write');
+            const replyEditBtn = event.target.closest('.replyEditBtn');
+            const replyEditSave = event.target.closest('.replyEditSave');
+            const replyDeleteCancel = event.target.closest('.replyDeleteCancel');
+            const replyDeleteBtn = event.target.closest('.replyDeleteBtn');
 
+            const cancelBtn = event.target.closest('.cancelBtn');
+
+  if (btnSubmit) {
+                // 기존 이벤트 리스너를 제거합니다.
+                btnSubmit.removeEventListener('click', submitForm);
+
+                // 새로운 이벤트 리스너를 추가합니다.
+                btnSubmit.addEventListener('click', submitForm);
+            }
+
+            if (deleteBtn) {
+            	deleteBtn.removeEventListener('click', handleDeleteClick); // 기존 리스너 제거
+            	deleteBtn.addEventListener('click', handleDeleteClick); // 새로운 리스너 추가
+            	
+            }
+            
+            
+            if (cancelBtn) {
+                document.getElementById('editForm').style.display = 'none';
+                document.getElementById('communityDetail').style.display = 'block';
+            }
+            
+            if (replyDeleteBtn) {
+                // 댓글 삭제 버튼 클릭 시
+                const replyIdx = replyDeleteBtn.closest('.px-3').getAttribute('data-reply-idx');
+                const confirmation = confirm('정말로 댓글을 삭제하시겠습니까?');
+                
+                if (confirmation) {
+                    try {
+                        const response = await fetch('/DeleteReply', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                replyIdx: replyIdx
+                            })
+                        });
+
+                        if (response.ok) {
+                            // 삭제가 성공하면 UI에서 해당 댓글을 제거합니다
+                            document.getElementById('replyCurrentForm' + replyIdx).remove();
+                            document.getElementById('replyEditForm' + replyIdx).remove();
+                        } else {
+                            alert('댓글 삭제에 실패했습니다.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('댓글 삭제 중 오류가 발생했습니다.');
+                    }
+                }
+            }
+            
+            
+            if (replyEditBtn) {
+                // 댓글 수정 버튼 클릭 시
+                const replyIdx = replyEditBtn.closest('.px-3').getAttribute('data-reply-idx');
+                document.getElementById('replyCurrentForm' + replyIdx).style.display = 'none';
+                document.getElementById('replyEditForm' + replyIdx).style.display = 'block';
+            } else if (replyEditSave) {
+                // 댓글 저장 버튼 클릭 시
+                const replyIdx = replyEditSave.closest('.px-3').getAttribute('data-reply-idx');
+                const newContent = document.getElementById('replyEditForm' + replyIdx).querySelector('.replyeditContent').value;
+                
+                // 여기서 댓글 업데이트 요청을 서버로 보냅니다
+                try {
+                    const response = await fetch('/UpdateReply', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            replyIdx: replyIdx,
+                            replyContent: newContent
+                        })
+                    });
+
+                    if (response.ok) {
+                        // 성공적으로 업데이트되면 UI를 업데이트합니다
+                        document.getElementById('replyCurrentForm' + replyIdx).querySelector('.replyContent').textContent = newContent;
+                        document.getElementById('replyCurrentForm' + replyIdx).style.display = 'block';
+                        document.getElementById('replyEditForm' + replyIdx).style.display = 'none';
+                    } else {
+                        alert('댓글 업데이트에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('댓글 업데이트 중 오류가 발생했습니다.');
+                }
+            } else if (replyDeleteCancel) {
+                // 댓글 수정 취소 버튼 클릭 시
+                const replyIdx = replyDeleteCancel.closest('.px-3').getAttribute('data-reply-idx');
+                document.getElementById('replyCurrentForm' + replyIdx).style.display = 'block';
+                document.getElementById('replyEditForm' + replyIdx).style.display = 'none';
+            }
+            
+            
+            if (updateBtn) {
+                updateBtn.removeEventListener('click', handleUpdateClick); // 기존 리스너 제거
+                updateBtn.addEventListener('click', handleUpdateClick); // 새로운 리스너 추가
+            }
+
+            if (editBtn) {
+                editBtn.removeEventListener('click', handleEditClick); // 기존 리스너 제거
+                editBtn.addEventListener('click', handleEditClick); // 새로운 리스너 추가
+            }
+            
             if (clearIcon) { // 삭제 아이콘 클릭 시
                 event.stopPropagation();
                 const input = clearIcon.parentNode.querySelector('.search-input');
@@ -339,10 +458,55 @@ header {
                 searchIcon.style.display = 'block'; // 검색 아이콘 표시합니다.
             } else if (likeButton) {
                 // 좋아요 버튼 클릭 시의 로직
+                event.stopPropagation();
+                const communityIdx = likeButton.getAttribute('data-community-idx');
+                const userIdx = document.getElementById('userIdx').value;
+                const isLiked = likeButton.getAttribute('data-liked') === 'true';
+                const url = isLiked ? '/LikeDelete' : '/LikeAdd';
+                const method = isLiked ? 'DELETE' : 'POST';
+
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            communityIdx: communityIdx,
+                            userIdx: userIdx
+                        })
+                    });
+
+                    if (response.ok) {
+                        updateLikeButtons();
+                        const loadLikesResponse = await fetch('/LoadLikes', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'communityIdx=' + communityIdx + '&userIdx=' + userIdx
+                        });
+
+                        if (loadLikesResponse.ok) {
+                            const loadlikes = await loadLikesResponse.text();
+                            document.getElementById('communityIdx' + communityIdx).innerText = loadlikes;
+                        } else {
+                            alert('오류가 발생했습니다. 다시 시도해주세요.');
+                        }
+                    } else {
+                        alert('오류가 발생했습니다. 다시 시도해주세요.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다. 다시 시도해주세요.');
+                }
             } else if (communityDetail) {
                 // 커뮤니티 디테일 클릭 시의 로직
+                const communityIdx = communityDetail.getAttribute('data-community-idx');
+                loadDetail(communityIdx);
             } else if (writeBtn) {
-                // 글쓰기 버튼 클릭 시의 로직
+                const userIdx = document.getElementById('userIdx').value;
+                loadWrite(userIdx);
             } else {
                 const searchInput = document.querySelector('.search-input');
                 if (searchInput && searchInput.value !== '') {
@@ -350,12 +514,12 @@ header {
                     const searchIcon = searchInput.parentNode.querySelector('.search-icon');
                     searchIcon.style.display = 'none'; // 검색 아이콘 숨깁니다.
                 }
-                
+
                 document.querySelectorAll(".search-box input").forEach(function (input) {
                     input.addEventListener("input", function () {
                         const clearIcon = input.parentNode.querySelector('.clear-icon');
                         const searchIcon = input.parentNode.querySelector('.search-icon');
-                        
+
                         if (this.value == "") {
                             // 입력값이 없는 경우
                             clearIcon.style.display = "none"; // 'X' 아이콘 숨기기
@@ -367,12 +531,9 @@ header {
                         }
                     });
                 });
-                
             }
         });
 
- 
-        
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
                 const searchInput = document.querySelector('.search-input');
@@ -383,25 +544,23 @@ header {
                     event.preventDefault(); // 폼 제출을 방지합니다.
                     var keyword = searchInput.value.trim(); // 입력된 검색어를 가져옵니다.
                     if (keyword !== '') {
-                    	
                         // 검색어가 비어있지 않다면 검색 요청을 보냅니다.
-                    	fetch("/SearchCommunity?keyword=" + keyword, {
-                    	    method: 'GET',
-                    	    headers: {
-                    	    	'X-Requested-With': 'XMLHttpRequest',
-                    	        'Content-Type': 'text/html'
-                    	        
-                    	    }
-                    	})
-                    	.then(response => response.text()) // 텍스트 형식의 데이터로 변환
-                        .then(data => {
-                            // 검색 결과를 처리하고 화면에 표시하는 로직을 작성합니다.
-                            document.getElementById('communityMain').innerHTML = data;
+                        fetch("/SearchCommunity?keyword=" + keyword, {
+                            method: 'GET',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'text/html'
+                            }
                         })
-                        .catch(error => {
-                            console.error("Error: " + error);
-                            // 에러 처리 로직을 작성합니다.
-                        });
+                            .then(response => response.text()) // 텍스트 형식의 데이터로 변환
+                            .then(data => {
+                                // 검색 결과를 처리하고 화면에 표시하는 로직을 작성합니다.
+                                document.getElementById('communityMain').innerHTML = data;
+                            })
+                            .catch(error => {
+                                console.error("Error: " + error);
+                                // 에러 처리 로직을 작성합니다.
+                            });
                     }
                 } else if (replyBox === document.activeElement) {
                     // 댓글 입력란에서 Enter 키가 눌렸을 때
@@ -446,15 +605,143 @@ header {
 
         window.addEventListener('popstate', function (event) {
             if (event.state && event.state.communityIdx) {
-                loadDetail(event.state.communityIdx);
+                loadDetail(event.state.communityIdx, true);
             } else {
                 loadContent(sort || 'recent', 0);
             }
         });
+
+        function replyUpdateClick() {
+            document.getElementById('communityDetail').style.display = 'none';
+            document.getElementById('editForm').style.display = 'block';
+        }
+
+        function replyEditClick() {
+            const editTitle = document.getElementById('editTitle').value;
+            const editContent = document.getElementById('editContent').value;
+            const replyeditContent = document.getElementById('replyeditContent').value;
+            const replyeditParam = {
+            		replyContent: replyeditContent
+            };
+
+            fetch('/updateCommunity', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(editParam),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('communityTitle').textContent = editTitle;
+                document.getElementById('communityContent').textContent = editContent;
+                document.getElementById('communityDetail').style.display = 'block';
+                document.getElementById('editForm').style.display = 'none';
+            })
+            .catch(error => {
+                alert('수정 실패: ' + error);
+            });
+        }
+        function handleUpdateClick() {
+            document.getElementById('communityDetail').style.display = 'none';
+            document.getElementById('editForm').style.display = 'block';
+        }
+
+        function handleDeleteClick() {
+            const communityIdx = document.getElementById('communityIdx').value;
+            const confirmation = confirm('정말로 게시물을 삭제하시겠습니까?');
+            const sort = urlParams.get('sort');
+            if (confirmation) {
+                try {
+                    fetch('/DeleteCommunity', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            communityIdx: communityIdx
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('게시물 삭제에 실패했습니다.');
+                        }
+                    })
+                    .then(data => {
+                        loadContent(sort || 'recent', 0);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('게시물 삭제 중 오류가 발생했습니다.');
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('게시물 삭제 중 오류가 발생했습니다.');
+                }
+            }
+        }
         
-       
-        
+        function handleEditClick() {
+            const editTitle = document.getElementById('editTitle').value;
+            const editContent = document.getElementById('editContent').value;
+            const communityIdx = document.getElementById('communityIdx').value;
+            const editParam = {
+                communityIdx: communityIdx,
+                communityContent: editContent,
+                communityTitle: editTitle
+            };
+
+            fetch('/updateCommunity', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(editParam),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('communityTitle').textContent = editTitle;
+                document.getElementById('communityContent').textContent = editContent;
+                document.getElementById('communityDetail').style.display = 'block';
+                document.getElementById('editForm').style.display = 'none';
+            })
+            .catch(error => {
+                alert('수정 실패: ' + error);
+            });
+        }
+
+        function submitForm(event) {
+            event.preventDefault(); // 버튼 클릭 시 기본 동작을 막음
+
+            const form = document.getElementById('postWrite');
+            const formData = new FormData(form);
+
+            fetch('/CommunityWrite', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('서버 응답이 올바르지 않습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('성공:', data);
+                    loadContent(sort || 'recent', 0);
+                })
+                .catch(error => {
+                    console.error('오류:', error);
+                });
+        }
     });
+    function removeQueryParamsFromUrl() {
+        const cleanUrl = window.location.href.split('?')[0]; // 현재 페이지의 URL에서 '?'를 기준으로 자른 후 첫 번째 부분만 선택하여 query parameter를 제거한 깨끗한 URL을 생성
+        window.history.replaceState({}, document.title, cleanUrl); // 브라우저의 히스토리를 깨끗한 URL로 업데이트하여 페이지 이동 없이 주소가 변경되도록 함
+    }
+    window.onload = removeQueryParamsFromUrl;
 </script>
 	
 

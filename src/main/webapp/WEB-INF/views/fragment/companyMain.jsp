@@ -18,7 +18,7 @@
 						<div class="d-flex justify-content-between">
 							<!-- flex-direction 변경 및 가운데 정렬 -->
 							<div class="d-flex flex-column">
-								<span>${ post.postingDto.postingTitle }</span> <span>${ post.companyDto.companyName }</span>
+								<span>${ post.postingDto.postingTitle }</span> <span>${ post.companyDto.companyName }</span> <span>${ post.postingDto.postingDeadline }</span>
 							</div>
 						</div>
 					</div>
