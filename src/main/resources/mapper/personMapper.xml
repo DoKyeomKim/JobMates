@@ -28,6 +28,12 @@
 
 	</insert>
 
+	    <select id="getUserBookmarks" parameterType="String" resultType="com.job.dto.PostingScrapDto">
+        SELECT COMPANY_NAME, POSTING_TITLE, JOB_TYPE, POSTING_DEADLINE 
+        FROM POSTING_TB, COMPANY_TB
+     
+    </select>
+
 
 </mapper>
 	

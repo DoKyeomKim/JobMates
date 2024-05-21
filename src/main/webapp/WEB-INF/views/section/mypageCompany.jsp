@@ -10,7 +10,7 @@
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <style>
 .info {
-	margin-top:10%;
+	margin-top:7%;
 }
 
 .card-body1 {
@@ -114,7 +114,8 @@ header {
 	position: fixed;
 	top: 0;
 	height:100px;
-	width: 100%
+	width: 100%;
+	z-index: 1000;
 }
 
 .detail-info {
@@ -161,19 +162,19 @@ padding-left : 30px;
 		<div class="info">
 		
 			<div class="card-header">
-				<h3 class="card-title mt-2" style="text-align:center;">기업회원정보 보기</h3>
+				<h3 class="card-title mt-2" style="text-align:center;">기업 회원정보 보기</h3>
 			</div>
 		
 
 <div class="card-body1">
 
     <div class="image-container">
-        <img src="${companyFile.filePath}" style="height:190px; width:250px;" id="imagePreview" class="image-preview mb-2 border border-tertiary">
+        <img src="${companyFile.filePath}" style="height:200px; width:250px;" id="imagePreview" class="image-preview mb-2 border border-tertiary">
     </div>
     <div class="details-container">
 
         <div class="input-group mb-3">
-            <span class="input-group-text">이름</span>
+            <span class="input-group-text">아이디</span>
             <label class="form-control">${userId}</label>
         </div>
         <div class="input-group mb-3">

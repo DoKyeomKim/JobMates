@@ -54,6 +54,15 @@
         .posting-write-container {
             text-align: center;
         }
+        .posting-write-container {
+            text-align: center;
+        }
+        
+         .posting-write {
+  			width: 50%; /* 부모 요소의 가로 길이에 맞추기 위해 100%로 설정 */
+			padding-top: 20px;
+    		padding-bottom: 20px;
+		}
 
         /* 추가적인 CSS 스타일링 */
         footer {
@@ -76,6 +85,9 @@
 
 <section>
     <article>
+    
+    <h3 class="mb-3 mt-3" style="text-align:center;"> 내 공고 관리 </h3>
+	<hr>
 
         <div class="mt-5">
 		   <div id="postings-container">		   
@@ -92,7 +104,7 @@
 		  </div>
             <br>
             <div class="posting-write-container">
-                <a href="/postingWriteForm" class="btn btn-primary posting-write" >공고 작성</a>
+                <a href="/postingWriteForm" class="btn btn-outline-primary posting-write" >공고 작성</a>
             </div>
         </div>
 

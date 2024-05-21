@@ -86,7 +86,7 @@
 }
 </style>
 <div class="d-flex justify-content-between mb-3">
-	<p>자유게시판</p>
+	<p class="fs-3">자유게시판</p>
 	<div class="search-box">
 		<input type="text" class="form-control search-input" placeholder="검색">
 		<img alt="검색 아이콘" src="/images/search.svg" class="search-icon">

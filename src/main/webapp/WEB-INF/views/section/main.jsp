@@ -9,9 +9,28 @@
 <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 <link href="/css/bootstrap.min.css" rel="stylesheet" />
 <style>
+
+.detail-div {
+	cursor: pointer;
+	margin-bottom: 20px;
+	border:1px solid #ccc;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	}
+	
+
+.detail-div:hover{
+	transform: scale(1.03);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+}
+.whole-posting{
+margin-bottom:10%;
+}
+
+
 /* 추가적인 CSS 스타일링 */
 footer {
-	position: fixed;
+	position: fixed; 
 	bottom: 0;
 	width: 100%;
 	padding: 20px 0;

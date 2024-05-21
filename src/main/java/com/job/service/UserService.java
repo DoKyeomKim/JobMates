@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import com.job.dto.CompanyDto;
 import com.job.dto.PersonDto;
 import com.job.dto.UserDto;
-import com.job.mapper.CompanyMapper;
 import com.job.mapper.PersonMapper;
 import com.job.mapper.UserMapper;
 
@@ -28,7 +27,13 @@ public class UserService {
 
         
     }
+
+
+
+
+
+	
     
-  
+   
 }
     

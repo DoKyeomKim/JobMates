@@ -95,6 +95,10 @@ label {
     background-color: #ddd; /* 마우스 오버 시 배경색 변경 */
 }
 
+input {
+border:none !important;
+outline:none !important;
+}
 
 </style>
 </head>
@@ -127,7 +131,7 @@ label {
 					 <div class="form-group row">
                         <label for="inputEmail3" class="col-sm-1 col-form-label">아이디</label>
                         <div class="col-sm-7"  style="width:80%; padding-left:30px;">
-                            <span class="form-control">${userId}</span>
+                            <span class="form-control" style="border:none; outline:none;">${userId}</span>
                         </div>
                     </div>
                     
@@ -137,7 +141,7 @@ label {
                         <div class="col-sm-7"  style="width:80%; padding-left:30px;">
                             <input type="text" class="form-control" id="address"
                                 placeholder="주소" value="${person.personAddress}"
-                                name="personAddress">
+                                name="personAddress" required>
                         </div>
                     </div>
                     
@@ -146,7 +150,7 @@ label {
                         <div class="col-sm-7" style="width:80%; padding-left:30px;">
                             <input type="text" class="form-control" id="birth"
                                 placeholder="생년월일" value="${person.personBirth}"
-                                name="personBirth">
+                                name="personBirth" required>
                         </div>
                     </div>
 
@@ -154,7 +158,7 @@ label {
                         <label for="inputPassword3" class="col-sm-1 col-form-label">학력</label>
                         <div class="col-sm-7" style="width:80%; padding-left:30px;">
                             <input type="text" class="form-control" id="edu" placeholder="학력"
-                                value="${person.personEducation}" name="personEducation">
+                                value="${person.personEducation}" name="personEducation" required>
                         </div>
                     </div>
 
@@ -163,7 +167,7 @@ label {
                         <div class="col-sm-7" style="width:80%; padding-left:30px;">
                             <input type="text" class="form-control" id="name"
                                 placeholder="이름" value="${person.personName}"
-                                name="personName">
+                                name="personName" required>
                         </div>
                     </div>
 
@@ -172,7 +176,7 @@ label {
                         <div class="col-sm-7" style="width:80%; padding-left:30px;">
                             <input type="text" class="form-control" id="phone"
                                 placeholder="전화번호" value="${person.personPhone}"
-                                name="personPhone">
+                                name="personPhone" required>
                         </div>
                     </div>
 
@@ -181,7 +185,7 @@ label {
                         <div class="col-sm-7" style="width:80%; padding-left:30px;">
                             <input type="email" class="form-control" id="email"
                                 placeholder="이메일" value="${userEmail}"
-                                name="userEmail">
+                                name="userEmail" required>
                         </div>
                     </div>
                    
@@ -191,7 +195,7 @@ label {
                         <div class="col-auto" style="padding-left:20px;">
                     <c:forEach var="skill" items="${allSkills}">
                         <div class="col-auto">
-                            <input type="checkbox" class="btn-check" name="skillIdx"
+                            <input type="checkbox" class="btn-check" name="skillIdx" required
                                 id="skill_${skill.skillIdx }" value="${skill.skillIdx}"  
                                 <c:forEach var="userSkill" items="${userSkills}">
                                      <c:if test="${skill.skillIdx == userSkill.skillIdx}">
@@ -206,7 +210,7 @@ label {
 
                 </div>
 			    <div class="mt-5" style="text-align: center;">
-                    <button type="submit" style="width:15%; margin-left:30px;" class="btn btn-primary">저장</button>
+                    <button type="submit" style="width:15%; margin-left:30px;" class="btn btn-outline-primary">저장</button>
                 </div>
 
 
