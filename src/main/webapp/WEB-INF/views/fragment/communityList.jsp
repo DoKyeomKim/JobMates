@@ -3,13 +3,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <div class="d-flex justify-content-between mb-3">
-	<p>자유게시판</p>
-	<div class="mx-3 my-3 border" id="SearchCommunity">
-		<div class="search-box">
-			<input type="text" class="form-control search-input" placeholder="검색">
-			<img alt="검색 아이콘" src="/images/search.svg" class="search-icon">
-			<img alt="삭제 아이콘" src="/images/x-circle.svg" class="clear-icon">
-		</div>
+	<p class="fs-3">자유게시판</p>
+	<div class="search-box">
+		<input type="text" class="form-control search-input" placeholder="검색">
+		<img alt="검색 아이콘" src="/images/search.svg" class="search-icon">
+		<img alt="삭제 아이콘" src="/images/x-circle.svg" class="clear-icon">
+>>>>>>> branch 'develop' of https://github.com/DoKyeomKim/JobMates.git
 	</div>
 
 </div>

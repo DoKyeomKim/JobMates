@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.job.dto.CompanyDto;
+import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
+
 import com.job.dto.UserDto;
 import com.job.mapper.CompanyMapper;
 import com.job.mapper.PersonMapper;
@@ -27,7 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+
 @Slf4j 
 @Controller
 public class UserController {
@@ -63,6 +65,11 @@ public class UserController {
 	@GetMapping("/companyjoin")
 	public  String  companyjoin() {
 		return "member/companyjoin"; 
+	}
+	// 관심기업 페이지
+	@GetMapping("/postingScrap")
+	public  String  postingScrap() {
+		return "member/postingScrap"; 
 	}
 	
 	// 개인 회원가입을 한다
@@ -170,11 +177,11 @@ public class UserController {
 			
 				@PostMapping("/companyjoin")
 				@Transactional
-				public ModelAndView write(CompanyDto companyDto,UserDto userDto) {
+				public ModelAndView write(CompanyDto companyDto,UserDto userDto,CompanyFileDto companyFile) {
 					//저장
 					userMapper.insertUser(userDto);
 					companyMapper.insertCompany(companyDto);
-					
+					companyMapper.insertCompanyFile(companyFile);
 
 					
 					//데이터를 가지고 이동한다
@@ -183,6 +190,7 @@ public class UserController {
 					mv.setViewName("redirect:/");
 					return mv;
 				}
+
 				
 }
 

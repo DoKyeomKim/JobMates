@@ -45,15 +45,52 @@ header {
         <div class="col-md-6 mt-5">
 			<div class="input-group mb-3">
 				<span class="input-group-text w-25 justify-content-center" style="background-color: #e0f7fa;">근무형태</span>
-				<input type="text" name="empType" class="form-control" value="${posting.empType }" required>
+					<select name="empType" id="empTypeSelect" class="form-control" required>
+					<option>정규직</option>
+					<option>계약직</option>
+					<option>프리랜서</option>
+					<option>아르바이트</option>
+					<option>기타</option>
+					</select>
 			</div>
 			<div class="input-group mb-3">
-			    <span class="input-group-text w-25 justify-content-center" style="background-color: #e0f7fa;">경력</span>
-				<input type="text" name="experience" class="form-control" value="${posting.experience }" required>
+			    <span class="input-group-text w-25 justify-content-center" style="background-color: #e0f7fa;">경력</span> 
+			    <select name="experience" id="experienceSelect" class="form-control" required>
+			        <option value="무관">무관</option>
+			        <option value="신입">신입</option>
+			        <option value="1년차">1년차</option>
+			        <option value="2년차">2년차</option>
+			        <option value="3년차">3년차</option>
+			        <option value="4년차">4년차</option>
+			        <option value="5년차">5년차</option>
+			        <option value="6년차">6년차</option>
+			        <option value="7년차">7년차</option>
+			        <option value="8년차">8년차</option>
+			        <option value="9년차">9년차</option>
+			        <option value="10년차 이상">10년차 이상</option>
+			    </select>
 			</div>
 		    <div class="input-group mb-3">
 		        <span class="input-group-text w-25 justify-content-center" style="background-color: #e0f7fa;">근무지역</span>
-		        <input type="text" name="postingAddress" class="form-control" value="${posting.postingAddress }" required>
+       				<select name="postingAddress" id="postingAddressSelect" class="form-control" required>
+						<option>전국</option>
+						<option>서울</option>
+						<option>부산</option>
+						<option>대구</option>
+						<option>인천</option>
+						<option>광주</option>
+						<option>대전</option>
+						<option>울산</option>
+						<option>경기도</option>
+						<option>강원도</option>
+						<option>충청북도</option>
+						<option>충청남도</option>
+						<option>전라북도</option>
+						<option>전라북도</option>
+						<option>경상북도</option>
+						<option>경상남도</option>
+						<option>제주도</option>
+					</select>
 		    </div>
   		</div>
 
@@ -155,7 +192,27 @@ header {
 
 <script src="/js/bootstrap.bundle.min.js"></script>
 
-
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var experienceValue = "${posting.experience}"; // 서버로부터 받은 경력 값
+        var selectElement = document.getElementById('experienceSelect');
+        selectElement.value = experienceValue; // 해당 값에 맞는 option을 선택
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var postingAddressValue = "${posting.postingAddress}"; // 서버로부터 받은 경력 값
+        var selectElement = document.getElementById('postingAddressSelect');
+        selectElement.value = postingAddressValue; // 해당 값에 맞는 option을 선택
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var empTypeValue = "${posting.empType}"; // 서버로부터 받은 경력 값
+        var selectElement = document.getElementById('empTypeSelect');
+        selectElement.value = empTypeValue; // 해당 값에 맞는 option을 선택
+    });
+</script>
 
 <script>
 document.getElementById("save-write").addEventListener("click", function(event) {
@@ -179,17 +236,21 @@ function confirmCancel(event) {
 }
 </script>
 
-<!-- 공고 마감일 현재로 value값 설정 -->
-<script>
-//현재 날짜를 가져옵니다.
-const today = new Date();
+<!-- 공고 마감일 1주일뒤 value값 설정 -->
+    <script>
+        // 현재 날짜를 가져옵니다.
+        const today = new Date();
 
-// 날짜를 YYYY-MM-DD 형식으로 변환합니다.
-const formattedDate = today.toISOString().split('T')[0];
+        // 7일을 더합니다.
+        const oneWeekLater = new Date(today);
+        oneWeekLater.setDate(today.getDate() + 7);
 
-// 변환한 날짜를 input 태그의 value로 설정합니다.
-document.getElementById('postingDeadline').value = formattedDate;
-</script>
+        // 날짜를 YYYY-MM-DD 형식으로 변환합니다.
+        const formattedDate = oneWeekLater.toISOString().split('T')[0];
+
+        // 변환한 날짜를 input 태그의 value로 설정합니다.
+        document.getElementById('postingDeadline').value = formattedDate;
+    </script>
 
 </body>
 </html>
