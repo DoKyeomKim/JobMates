@@ -104,6 +104,7 @@ header {
 				
 			</div>
 			<script src="/js/postingScrap.js"></script>
+
 			</c:if>
 		<c:if test="${empty posting}">
 			<p>추천 공고가 없습니다.</p>
