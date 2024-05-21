@@ -71,6 +71,11 @@
             text-align: center;
             margin-bottom: 20px; 
         }
+
+
+        li{
+        	list-style: none;
+        }
         
     </style>
 </head>
@@ -83,12 +88,18 @@
                 <ul class="category">
                     <li>
                         <button type="button" class="btm_image" onclick="location.href='/personjoin'">
-                            <img src="/img/personal.png" alt="개인 회원가입">
+                            <img src="/images/user1.png" alt="개인 회원가입">
                         </button>
                     </li>
                     <li>
                         <button type="button" class="btm_image" onclick="location.href='/companyjoin'">
-                            <img src="/img/business.png" alt="기업 회원가입">
+                            <img src="/images/person.png" alt="기업 회원가입">
+
+
+    
+
+
+
                         </button>
                     </li>
                 </ul>
