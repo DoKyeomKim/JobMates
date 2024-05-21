@@ -85,7 +85,12 @@
 
 <section>
     <article>
-    
+    <input type="hidden" id="companyValue1" value="${company.companySector}">
+    <input type="hidden" id="companyValue2" value="${company.companyEmp}">
+    <input type="hidden" id="companyValue3" value="${company.companySize}">
+    <input type="hidden" id="companyValue4" value="${company.companyPhone}">
+    <input type="hidden" id="companyValue5" value="${company.companyMgrName}">
+    <input type="hidden" id="companyValue6" value="${company.companyMgrPhone}">
     <h3 class="mb-3 mt-3" style="text-align:center;"> 내 공고 관리 </h3>
 	<hr>
 
@@ -104,7 +109,7 @@
 		  </div>
             <br>
             <div class="posting-write-container">
-                <a href="/postingWriteForm" class="btn btn-outline-primary posting-write" >공고 작성</a>
+                <a href="/postingWriteForm" id="postingWriteBtn" class="btn btn-outline-primary posting-write" >공고 작성</a>
             </div>
         </div>
 
@@ -132,20 +137,6 @@
 <%@include file="/WEB-INF/layouts/footer.jsp"%>
 <script src="/js/bootstrap.bundle.min.js"></script>
 
-<!-- div 클릭시 이동  -->
-<!-- <script>
-$(document).ready(function() {
-    // 게시물 박스 클릭 이벤트
-    $('#postings-container').on('click', '.posting-box', function(e) {
-        // 삭제 버튼 클릭 이벤트가 버블링되는 것을 방지
-        if (!$(e.target).closest('.posting-delete').length) {
-            var postingIdx = $(this).data('postings-idx'); // 게시물 인덱스 가져오기
-            window.location.href = '/postingView?postingIdx=' + postingIdx; // 상세 페이지로 이동
-        }
-    });
-
-});
-</script> -->
 
 <script>
 $(document).ready(function() {
@@ -200,6 +191,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
+
+<!-- 회사정보에 비어있는 정보 확인 -->
+<script>
+    // 회사 정보 값 확인 함수
+    function checkCompanyValues() {
+        var companyValue1 = $('#companyValue1').val();
+        var companyValue2 = $('#companyValue2').val();
+        var companyValue3 = $('#companyValue3').val();
+        var companyValue4 = $('#companyValue4').val();
+        var companyValue5 = $('#companyValue5').val();
+        var companyValue6 = $('#companyValue6').val();
+
+        return [companyValue1, companyValue2, companyValue3, companyValue4, companyValue5, companyValue6].some(value => value === null || value === '');
+    }
+
+    // 공고 작성 버튼 클릭 이벤트
+    $('#postingWriteBtn').click(function(event) {
+        if (checkCompanyValues()) {
+            event.preventDefault(); // 기본 동작 중단
+
+            var confirmResult = confirm('채워지지 않은 정보가 있습니다. 추가 하시겠습니까?');
+            if (confirmResult) {
+                window.location.href = '/mypageCompanyUpdateForm';
+            } else {
+                window.location.href = '/postingWriteForm';
+            }
+        }
+    });
 </script>
 
 </body>

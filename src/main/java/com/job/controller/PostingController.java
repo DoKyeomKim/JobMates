@@ -67,9 +67,13 @@ public class PostingController {
 			// 로그인 페이지로 리다이렉트하거나 에러 메시지 처리
 			return new ModelAndView("redirect:/login");
 		}
-
+		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
+		System.out.println("==============================="+company);
+		
+		
 		List<PostingDto> posting = postingMapper.getPostListByUserIdx(userIdx);
 		Long userType = user.getUserType();
+		mv.addObject("company", company);
 		mv.addObject("userType", userType);
 		mv.addObject("posting", posting);
 		mv.setViewName("posting/postings");
@@ -93,6 +97,7 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
+		
 
 		// posting_tb 갖고오기
 		PostingDto posting = postingMapper.getPostingByPostingIdx(postingIdx);
@@ -102,7 +107,6 @@ public class PostingController {
 		}
 		Long userType = user.getUserType();
 		mv.addObject("userType", userType);
-		mv.addObject("company", company);
 		mv.addObject("posting", posting);
 		mv.addObject("skill", skill);
 		mv.setViewName("posting/postingView");
@@ -123,6 +127,7 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
+		
 
 		// 스킬 들고 오기
 		List<SkillDto> skill = postingMapper.getAllSkill();
