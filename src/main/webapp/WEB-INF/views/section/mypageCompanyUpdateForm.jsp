@@ -220,8 +220,8 @@ padding-left : 30px;
 						<label class="col-sm-2 col-form-label">회사직원수</label>
 						<div class="col-sm-6" style="width:83%;">
 							<input type="number" min="1" max="99999999" class="form-control" id="companyEmp" style="outline:none; border:none;"
-								placeholder="회사직원수" value="${company.companyEmp}"
-								name="companyEmp" required>
+								placeholder="숫자만 입력해주세요" value="${company.companyEmp}"
+								name="companyEmp">
 						</div>
 					</div>
 
@@ -350,18 +350,11 @@ function chooseImage(input) {
 </script>
 <script>
 document.querySelector('input[type="number"]').addEventListener('input', function(e) {
-  // 숫자만 입력되도록 검사
-  if (!/^\d*$/.test(e.target.value)) { // 숫자와 빈 문자열 허용
-    alert('숫자만 입력해주세요.');
-    e.target.value = '';
-  }
-});
+	  if (!/^\d+$/.test(e.target.value)) {
+	    alert('숫자만 입력해주세요!');
+	    e.target.value = '';
+	  }
 
-document.querySelector('input[type="number"]').addEventListener('blur', function(e) {
-  // 입력 필드가 비어있을 때 경고 표시
-  if (e.target.value === '') {
-    alert('직원수를 입력해주세요.');
-  }
 });
 </script>
 
