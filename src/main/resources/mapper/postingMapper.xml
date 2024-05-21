@@ -106,6 +106,10 @@ JOIN person_skill_tb ps ON p.PERSON_IDX = ps.PERSON_IDX
 WHERE p.USER_IDX = #{userIdx}
 </select>
 
+<select id="getPersonSkillByPersonIdx">
+select skill_idx from person_skill_tb where person_idx = #{personIdx}
+</select>
+
 
 
 <!-- 개인 -->

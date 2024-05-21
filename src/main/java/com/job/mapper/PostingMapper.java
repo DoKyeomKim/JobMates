@@ -66,6 +66,9 @@ public interface PostingMapper {
 	// 내 이력서 리스트
 	List<ResumeDto> getResumeListByUserIdx(Long userIdx);
 	
+	// 이력서 리스트에서 스킬 정보 불러오기
+	List<Long> getPersonSkillByPersonIdx(Long personIdx);
+
 	//이력서 작성자 정보 userIdx로 불러오기
 	PersonDto getPersonByUserIdx(Long userIdx);
 
@@ -162,6 +165,7 @@ public interface PostingMapper {
 	
 	// companyIdx로 스크랩한 이력서들 갖고오기. 
 	List<RScrapListDto> getRScrapList(Long companyIdx);
+
 
 
 	
