@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Sort;
 import com.job.dto.ApplyDto;
 import com.job.dto.ApplyStatusDto;
 import com.job.dto.CommunityDto;
@@ -129,7 +129,7 @@ public class MainService {
 	}
 
 	public List<SkillDto> findAllSkills() {
-		List<Skill> skillList = skillRepository.findAll();
+		List<Skill> skillList = skillRepository.findAll(Sort.by(Sort.Direction.ASC, "skillIdx"));
 		System.out.println("스킬 = "+skillList);
 		return skillList.stream().map(skill -> SkillDto.createSkillDto(skill)).collect(Collectors.toList());
 	}
