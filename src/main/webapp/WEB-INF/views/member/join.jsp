@@ -94,12 +94,6 @@
                     <li>
                         <button type="button" class="btm_image" onclick="location.href='/companyjoin'">
                             <img src="/images/person.png" alt="기업 회원가입">
-
-
-    
-
-
-
                         </button>
                     </li>
                 </ul>

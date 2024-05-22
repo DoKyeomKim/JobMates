@@ -54,9 +54,6 @@
         .posting-write-container {
             text-align: center;
         }
-        .posting-write-container {
-            text-align: center;
-        }
         
          .posting-write {
   			width: 50%; /* 부모 요소의 가로 길이에 맞추기 위해 100%로 설정 */
