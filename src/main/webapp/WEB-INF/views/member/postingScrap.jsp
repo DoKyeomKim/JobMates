@@ -55,11 +55,12 @@ header {
     </style>
 </head>
 <body>
+
 <main>
 <%@include file="/WEB-INF/layouts/header.jsp"%>
+<input type="hidden" value="${personIdx}" id="personIdx">
   <h3 style="text-align:center;">관심기업</h3>
 <div class="tab-panel" id="book-id">
-  
   <table id="scrap">
     <thead>
       <tr>
@@ -79,15 +80,15 @@ header {
           <td>${bookmark.jobType}</td>
           <td>${bookmark.postingDeadline}</td>
           <td><button
-									class="btn btn-outline-secondary scrapBtn d-flex align-items-center ms-3">
+									class="btn btn-outline-secondary scrapBtn">
 									<svg class="w-6 h-6 text-gray-800 dark:text-white scrapSvg me-2"
-										data-posting-idx="${posting.postingIdx}"
+										data-posting-idx="${bookmark.postingIdx}"
 										aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
 										width="24" height="24" fill="none" viewBox="0 0 24 24">
                             		<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 											d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z" /></svg>
 							
-								</button></td>
+								<span>스크랩</button></span></td>
         </tr>
       </c:forEach>
     </tbody>
@@ -96,7 +97,9 @@ header {
 <%@include file="/WEB-INF/layouts/footer.jsp"%>
 </main>
 <script src="/js/bootstrap.bundle.min.js"></script>
-	<script src="/js/postingScrap.js"></script>
+<script src="/js/postingScrap.js"></script>
+<script>
+</script>	
 
 </body>
 </html>

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CScrapListDto {
 	private Long personIdx;
+	private Long postingIdx;
 	private String companyName;
 	private String postingTitle;
 	private String jobType;

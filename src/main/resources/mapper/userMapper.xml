@@ -55,7 +55,8 @@
             COMPANY_TB.COMPANY_NAME, 
             POSTING_TB.POSTING_TITLE, 
             POSTING_TB.JOB_TYPE, 
-            POSTING_TB.POSTING_DEADLINE 
+            POSTING_TB.POSTING_DEADLINE, 
+            POSTING_TB.POSTING_IDX
         FROM 
             POSTING_TB
         JOIN 

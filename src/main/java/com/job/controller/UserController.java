@@ -218,6 +218,7 @@ public class UserController {
 				    System.out.println(bookmarks);
 				    log.info("personIdx = {}", personIdx);
 				    log.info("bookmarks = {}", bookmarks);
+				    mv.addObject("personIdx", personIdx);
 				    mv.addObject("bookmarks", bookmarks);
 				    mv.addObject("userType", userType);
 				    mv.setViewName("member/postingScrap");
