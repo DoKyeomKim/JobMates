@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
 
 <script
-	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+   src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+   src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 
@@ -91,47 +91,50 @@ width : 150px;}
 
     
     /* 중복아이디 존재하지 않는경우 */
-	.id_input_re_1{
-		color : green;
-		display : none;
-	}
-	/* 중복아이디 존재하는 경우 */
-	.id_input_re_2{
-		color : red;
-		display : none;
-	}
+   .id_input_re_1{
+      color : green;
+      display : none;
+   }
+   /* 중복아이디 존재하는 경우 */
+   .id_input_re_2{
+      color : red;
+      display : none;
+   }
 </style>
 </head>
 <body>
 <main>
     <h2>개인회원가입</h2>
     <form id="signupForm" action="/personjoin" method="POST" onsubmit="return validateForm()">
+    <input type="hidden" name="userType" value="2" checked onclick="document.querySelector('[name=userType][value=\'2\']').checked = false;">
+    <input type="hidden" name="userType" value="1" onclick="return false;">
+    
         <table>
             <tr>
-    <td>
-        <div style="display: flex;">
-            <input type="text" id="userId" name="userId" maxlength="15" placeholder="아이디를 입력하세요" required />
-            <input type="button" value="중복확인" id="btnIdCheck" style="background-color: #054FA3; color: white; border: none; cursor: pointer; padding: 10px; border-radius: 5px; margin-left: 10px;"/>
-        </div>
-        <div id="output"></div>
-    </td>
-</tr>
-           <tr>	
-    <td>
-        <input type="password" name="userPw" id="pw1" placeholder="비밀번호를 입력하세요" oninput="pwCheck()" />
-    </td>
-</tr>
-<tr>
-    <td>
-        <input type="password" name="passwd" id="pw2" placeholder="비밀번호를 다시 입력하세요" oninput="pwCheck()" />
-        <span id="pwConfirm" style="display: block; margin-top: 5px;"></span>
-    </td>
-</tr>
+			    <td>
+			        <div style="display: flex;">
+			            <input type="text" id="userId" name="userId" maxlength="15" placeholder="아이디를 입력하세요" required />
+			            <input type="button" value="중복확인" id="btnIdCheck" style="background-color: #054FA3; color: white; border: none; cursor: pointer; padding: 10px; border-radius: 5px; margin-left: 10px;"/>
+			        </div>
+			        <div id="output"></div>
+			    </td>
+			</tr>
+			<tr>   
+			    <td>
+			        <input type="password" name="userPw" id="pw1" placeholder="비밀번호를 입력하세요" oninput="pwCheck()" />
+			    </td>
+			</tr>
+			<tr>
+			    <td>
+			        <input type="password" name="passwd" id="pw2" placeholder="비밀번호를 다시 입력하세요" oninput="pwCheck()" />
+			        <span id="pwConfirm" style="display: block; margin-top: 5px;"></span>
+			    </td>
+			</tr>
             <tr>
                 <td><input type="text" name="personName" placeholder="이름을 입력하세요" /></td>
             </tr>
             <tr>
-                <td><input type="text" name="personBirth" id="personBirth" placeholder="생년월일 8자리를 입력하세요"  oninput="limitLength(this, 8)"/></td>
+                <td><input type="text" name="personBirth" id="personBirth" placeholder="생년월일 8자리를 입력하세요"/></td>
             </tr>
             <tr>
                 <td><input type="text" name="personPhone" placeholder="전화번호를 입력하세요"  /></td>
@@ -139,27 +142,17 @@ width : 150px;}
             <tr>
                 <td><input type="text" name="userEmail" placeholder="이메일을 입력하세요" maxlength="20" /></td>
             </tr>
-   <tr>
-    <td>
-        <div style="display: flex;">
-
-            <input type="checkbox" name="userType" value="2" style="margin-right: 5px; width: 20px; height: 20px;" checked onclick="document.querySelector('[name=userType][value=\'2\']').checked = false;"><label style="margin-right: 10px;">개인</label>
-            <input type="checkbox" name="userType" value="1" style="margin-left: 20px; margin-right: 5px; width: 20px; height: 20px;" onclick="return false;"><label style="margin-right: 10px;">기업</label>
 
 
-        </div>
-    </td>
-</tr>
             <tr>
-    <td>
-        <div style="display: flex;">
-          
-            <input type="button" onclick="daumPost()" value="우편번호 찾기" style="width: calc(50% - 10px); margin-left: 10px;" />
-        </div>
-        <br>
-        <input type="text" name="personAddress" placeholder="상세주소" style="width: calc(100% - 10px);" />
-    </td>
-</tr>
+			    <td>
+			        <div style="display: flex;">
+			          
+			            <input type="button" onclick="daumPost()" value="우편번호 찾기" style="width: calc(50% - 10px);" />
+			        </div>
+			        <input type="text" name="personAddress" placeholder="상세주소" style="width: calc(100% - 10px);" />
+			    </td>
+			</tr>
          
           <tr>
     <td colspan="2" style="text-align: center;">
@@ -193,17 +186,19 @@ width : 150px;}
 <script>
     const btnIdCheckEl = document.querySelector('#btnIdCheck');
     btnIdCheckEl.onclick = function(e) {     
-        const outputEl = document.querySelector('#output');	 
-        let intext = document.querySelector('[name=user_id]');
-        fetch('/IdDupCheck?user_id=' + intext.value)
+        const outputEl = document.querySelector('#output');    
+        let intext = document.querySelector('[name=userId]');
+        fetch('/IdDupCheck?userId=' + intext.value)
             .then(response => response.text())
             .then((data) => {
                 console.log(data);
-                outputEl.innerHTML = data;    	 
-            });        	 
+                outputEl.innerHTML = data;        
+            });            
     }
 
 </script>
+
+
 <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <script>
     function daumPost() {
@@ -247,23 +242,6 @@ width : 150px;}
         }).open();
     }
 </script>
-<script>
 
-const  btnIdCheckEl = document.querySelector('#btnIdCheck');
-btnIdCheckEl.onclick = function(e) {     
-	// alert('중복확인체크');
-	 const  outputEl = document.querySelector('#output');
-	 	  	 
-    let    intext    = document.querySelector('[name=userId]');
-    // 서버 Controller에 있는 /IdDupCheck 주소를 실행 
-    fetch('/IdDupCheck?userId=' + intext.value)
-      .then(response => response.text())  // 서버 data 가 html
-      .then((data) => {   // data <- response.text()
-     	  console.log(data);
-		  outputEl.innerHTML = data;    	 
-      });        	 
-}
-
-</script>
 </body>
 </html>
