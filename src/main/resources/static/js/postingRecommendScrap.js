@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	updateScrapButtons(); // 페이지 로드 시 스크랩 버튼 상태 갱신
 
 	document.addEventListener('click', async function(e) {
-    if (e.target && e.target.classList.contains('scrapBtn')) {
+    if (e.target && e.target.classList.contains('.scrapBtn')) {
         const button = e.target;
         const postingIdx = button.getAttribute('data-posting-idx');
         const isScraped = button.getAttribute('data-scraped') === 'true';

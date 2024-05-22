@@ -46,10 +46,7 @@ public class Reply {
 	
 	@Column(name = "created_date", nullable = false)
 	private String createdDate;
-	
-	@Column(name = "like_count")
-	private Long likeCount;
-	
+
 	   protected Reply() {
 	        // 보호된 기본 생성자
 	    }

@@ -28,11 +28,12 @@ public class CommunityDto {
 	private Long replyCount;
 
 	public static CommunityDto createCommunityDtoList(Community community) {
-		LocalDateTime createdDate = TimeAgo.stringToLocalDateTime(community.getCreatedDate());
+		LocalDateTime createdDateTime = TimeAgo.stringToLocalDateTime(community.getCreatedDate());
+        String timeAgo = TimeAgo.calculateTimeAgo(createdDateTime);
 		return CommunityDto.builder().communityIdx(community.getCommunityIdx())
 				.communityTitle(community.getCommunityTitle()).userIdx(community.getUser().getUserIdx())
 				.communityName(community.getCommunityName()).communityContent(community.getCommunityContent())
-				.createdDate(TimeAgo.calculateTimeAgo(createdDate)).viewCount(community.getViewCount()).likeCount(community.getLikeCount()).replyCount(community.getReplyCount()).build();
+				.createdDate(timeAgo).viewCount(community.getViewCount()).likeCount(community.getLikeCount()).replyCount(community.getReplyCount()).build();
 	}
 
 	public CommunityDto createCommunityDto(Community community) {

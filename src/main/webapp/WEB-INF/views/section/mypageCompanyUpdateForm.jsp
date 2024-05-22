@@ -187,19 +187,19 @@ padding-left : 30px;
 			            <span class="input-group-text">기업 이름</span>
 							<input type="text" class="form-control" id="companyName"
 								placeholder="기업이름" value="${company.companyName}"
-								name="companyName">
+								name="companyName" required>
 			        </div>
 			        <div class="input-group mb-3">
 			            <span class="input-group-text">대표 이름</span>
 							<input type="text" class="form-control" id="companyRepName"
 								placeholder="대표이름" value="${company.companyRepName}"
-								name="companyRepName">
+								name="companyRepName" required>
 			        </div>
 			        <div class="input-group mb-3">
 			            <span class="input-group-text">회사 직종</span>
 							<input type="text" class="form-control" id="companySector"
 								placeholder="회사직종" value="${company.companySector}"
-								name="companySector">
+								name="companySector" required>
 			        </div>
 			        
 			    </div>
@@ -212,7 +212,7 @@ padding-left : 30px;
 						<div class="col-sm-6" style="width:83%;">
 							<input type="text" class="form-control" id="companyAddress" style="outline:none; border:none;"
 								placeholder="회사주소" value="${company.companyAddress}"
-								name="companyAddress">
+								name="companyAddress" required>
 						</div>
 					</div>
 
@@ -220,8 +220,8 @@ padding-left : 30px;
 						<label class="col-sm-2 col-form-label">회사직원수</label>
 						<div class="col-sm-6" style="width:83%;">
 							<input type="number" min="1" max="99999999" class="form-control" id="companyEmp" style="outline:none; border:none;"
-								placeholder="회사직원수" value="${company.companyEmp}"
-								name="companyEmp" required>
+								placeholder="숫자만 입력해주세요" value="${company.companyEmp}"
+								name="companyEmp">
 						</div>
 					</div>
 
@@ -240,7 +240,7 @@ padding-left : 30px;
 						<div class="col-sm-6" style="width:83%;">
 							<input type="text" class="form-control" id="companyPhone" style="outline:none; border:none;"
 								placeholder="회사전화번호" value="${company.companyPhone}"
-								name="companyPhone">
+								name="companyPhone" >
 						</div>
 					</div>
 
@@ -277,7 +277,7 @@ padding-left : 30px;
 						<div class="col-sm-6" style="width:83%;">
 							<input type="email" class="form-control" id="email" style="outline:none; border:none;"
 								placeholder="이메일" value="${userEmail}"
-								name="userEmail">
+								name="userEmail" required>
 						</div>
 					</div>
 
@@ -293,6 +293,8 @@ padding-left : 30px;
 	<%@include file="/WEB-INF/layouts/footer.jsp"%>
 
 	<script src="/js/bootstrap.bundle.min.js"></script>
+
+	
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var saveButton = document.querySelector('button[type="submit"]');
@@ -348,19 +350,13 @@ function chooseImage(input) {
 </script>
 <script>
 document.querySelector('input[type="number"]').addEventListener('input', function(e) {
-  // 숫자만 입력되도록 검사
-  if (!/^\d*$/.test(e.target.value)) { // 숫자와 빈 문자열 허용
-    alert('숫자만 입력해주세요.');
-    e.target.value = '';
-  }
-});
+	  if (!/^\d+$/.test(e.target.value)) {
+	    alert('숫자만 입력해주세요!');
+	    e.target.value = '';
+	  }
 
-document.querySelector('input[type="number"]').addEventListener('blur', function(e) {
-  // 입력 필드가 비어있을 때 경고 표시
-  if (e.target.value === '') {
-    alert('직원수를 입력해주세요.');
-  }
 });
 </script>
+
 </body>
 </html>

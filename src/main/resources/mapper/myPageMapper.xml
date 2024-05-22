@@ -62,7 +62,7 @@ WHERE COMPANY_IDX = #{companyIdx}
 	<update id="updateCompany" parameterType="com.job.dto.CompanyDto">
 		UPDATE COMPANY_TB
 		SET
-		COMPANY_EMP = #{companyEmp},
+		COMPANY_EMP = #{companyEmp, javaType=java.lang.Long, jdbcType=BIGINT},
 		COMPANY_ADDRESS = #{companyAddress},
 		COMPANY_MGR_NAME = #{companyMgrName},
 		COMPANY_MGR_PHONE = #{companyMgrPhone},

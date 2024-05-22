@@ -19,11 +19,10 @@ public class ReplyDto {
 	private String replyName;
 	private String replyContent;
 	private String createdDate;
-	private Long likeCount;
 
 	public static ReplyDto createReplyDto(Reply reply) {
 		LocalDateTime createdDate = TimeAgo.stringToLocalDateTime(reply.getCreatedDate());
 		return new ReplyDto(reply.getReplyIdx(), reply.getCommunity().getCommunityIdx(), reply.getUser().getUserIdx(),
-				reply.getReplyName(), reply.getReplyContent(), TimeAgo.calculateTimeAgo(createdDate), reply.getLikeCount());
+				reply.getReplyName(), reply.getReplyContent(), TimeAgo.calculateTimeAgo(createdDate));
 	}
 }

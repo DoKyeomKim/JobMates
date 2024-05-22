@@ -85,8 +85,8 @@
 
 <section>
     <article>
-    
-    <h3 class="mb-3 mt-3" style="text-align:center;"> 내 이력서 관리 </h3>
+    <input type="hidden" id="personSkillCheck" value="${personSkill}">
+        <h3 class="mb-3 mt-3" style="text-align:center;"> 내 이력서 관리 </h3>
 	<hr>
 
         <div class="mt-5">
@@ -109,7 +109,7 @@
 		  </div>
             <br>
             <div class="resume-write-container mt-4">
-                <a href="/resumeWriteForm" class="btn btn-outline-primary resume-write" >이력서 작성</a>
+                <a href="/resumeWriteForm" id="resumeWriteBtn" class="btn btn-outline-primary resume-write" >이력서 작성</a>
             </div>
         </div>
 
@@ -136,32 +136,35 @@
 <%@include file="/WEB-INF/layouts/footer.jsp"%>
 <script src="/js/bootstrap.bundle.min.js"></script>
 
-<!-- div 클릭시 이동  -->
-<!-- <script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
-    var resumesContainer = document.getElementById('resumes-container');
-
-    resumesContainer.addEventListener('click', function(event) {
-        var target = event.target;
-
-        // 버튼이나 링크 클릭 시 이동하지 않음
-        if (target.tagName.toLowerCase() === 'button' || target.tagName.toLowerCase() === 'a') {
-            return;
-        }
-
-        // 클릭된 요소부터 상위 요소로 거슬러 올라가며 resume-box 클래스를 가진 div 탐색
-        while (target != null && !target.classList.contains('resume-box')) {
-            target = target.parentElement;
-        }
+    // "이력서 작성" 버튼에 대한 클릭 이벤트 리스너를 추가합니다.
+    document.getElementById('resumeWriteBtn').addEventListener('click', function(event) {
+        // 기본 이벤트 동작(링크 이동)을 방지합니다.
+        event.preventDefault();
         
-        // resume-box를 찾았다면 페이지 이동
-        if (target != null) {
-            const resumeIdx = target.getAttribute('data-resume-idx');
-            window.location.href = '/resumeView?resumeIdx='+resumeIdx;
+        // personSkillCheck의 값을 받아옵니다.
+        // JSON.parse를 사용하여 문자열을 배열로 변환합니다.
+        var personSkill = JSON.parse(document.getElementById('personSkillCheck').value);
+
+        // personSkill이 배열이고, 그 배열이 비어 있는 경우 경고창을 띄웁니다.
+        if (Array.isArray(personSkill) && personSkill.length === 0) {
+            var userChoice = confirm('기술스택이 없습니다. 기술스택을 추가하시겠습니까?');
+
+            if (userChoice) {
+                // 사용자가 '예'를 선택한 경우, /mypageUpdateForm 페이지로 이동합니다.
+                window.location.href = '/mypageUpdateForm';
+            } else {
+                // 사용자가 '아니오'를 선택한 경우, /resumeWriteForm 페이지로 이동합니다.
+                window.location.href = '/resumeWriteForm';
+            }
+        } else {
+            // personSkill이 있는 경우, 기본적으로 설정된 링크(/resumeWriteForm)로 이동합니다.
+            window.location.href = '/resumeWriteForm';
         }
     });
 });
-</script> -->
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -274,5 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+
 </body>
 </html>

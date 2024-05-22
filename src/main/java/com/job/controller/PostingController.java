@@ -67,9 +67,12 @@ public class PostingController {
 			// 로그인 페이지로 리다이렉트하거나 에러 메시지 처리
 			return new ModelAndView("redirect:/login");
 		}
-
+		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
+		
+		
 		List<PostingDto> posting = postingMapper.getPostListByUserIdx(userIdx);
 		Long userType = user.getUserType();
+		mv.addObject("company", company);
 		mv.addObject("userType", userType);
 		mv.addObject("posting", posting);
 		mv.setViewName("posting/postings");
@@ -94,6 +97,7 @@ public class PostingController {
 			return mv;
 		}
 
+
 		// posting_tb 갖고오기
 		PostingDto posting = postingMapper.getPostingByPostingIdx(postingIdx);
 		if (posting == null) {
@@ -101,8 +105,9 @@ public class PostingController {
 			return mv;
 		}
 		Long userType = user.getUserType();
-		mv.addObject("userType", userType);
+		
 		mv.addObject("company", company);
+		mv.addObject("userType", userType);
 		mv.addObject("posting", posting);
 		mv.addObject("skill", skill);
 		mv.setViewName("posting/postingView");
@@ -123,6 +128,7 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
+		
 
 		// 스킬 들고 오기
 		List<SkillDto> skill = postingMapper.getAllSkill();
@@ -250,12 +256,17 @@ public class PostingController {
 			// 로그인 페이지로 리다이렉트하거나 에러 메시지 처리
 			return new ModelAndView("redirect:/login");
 		}
-
+		Long personIdx = postingMapper.getPersonIdxByUserIdx(userIdx);
+		List<Long> personSkill = postingMapper.getPersonSkillByPersonIdx(personIdx);
+		
+		
 		// userIdx를 사용해서 해당 사용자의 이력서 리스트를 조회
 		List<ResumeDto> resumeList = postingMapper.getResumeListByUserIdx(userIdx);
 
 		ModelAndView mv = new ModelAndView();
 		Long userType = user.getUserType();
+		
+		mv.addObject("personSkill", personSkill);
 		mv.addObject("userType", userType);
 		mv.addObject("resumes", resumeList);
 		mv.setViewName("posting/resumes");
@@ -543,7 +554,7 @@ public class PostingController {
 			// 새 파일이 업로드되지 않았을 경우 예전 파일 정보 유지
 		}
 
-		mv.setViewName("redirect:/resumeView?resumeIdx=" + resumeIdx);
+		mv.setViewName("redirect:/resumes");
 
 		return mv;
 	}

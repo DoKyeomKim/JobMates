@@ -33,7 +33,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
       
       if(  obj == null && obj2 == null ) {
          // 로그인되어 있지 않다면 /login 으로 이동하시오
-         response.sendRedirect("personlogin");
+         response.sendRedirect("/personlogin");
          return false;      
       }
       
