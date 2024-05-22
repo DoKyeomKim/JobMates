@@ -219,17 +219,17 @@ width : 150px;}
 
   const  btnIdCheckEl = document.querySelector('#btnIdCheck');
   btnIdCheckEl.onclick = function(e) {     
-     // alert('중복확인체크');
-      const  outputEl = document.querySelector('#output');
-               
+  	// alert('중복확인체크');
+  	 const  outputEl = document.querySelector('#output');
+  	 	  	 
       let    intext    = document.querySelector('[name=userId]');
       // 서버 Controller에 있는 /IdDupCheck 주소를 실행 
       fetch('/IdDupCheck?userId=' + intext.value)
         .then(response => response.text())  // 서버 data 가 html
         .then((data) => {   // data <- response.text()
-            console.log(data);
-          outputEl.innerHTML = data;        
-        });
+       	  console.log(data);
+  		  outputEl.innerHTML = data;    	 
+        });        	 
   }
 
 </script>

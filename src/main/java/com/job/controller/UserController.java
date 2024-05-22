@@ -143,7 +143,7 @@ public class UserController {
 			}
 			return "<h4 style='color:red'>사용할 수 없는 아이디입니다</h4>";}
 
-		// 개인 로그아웃을 한다
+		//  로그아웃을 한다
 		@RequestMapping("/logout")
 		public   String   logout(  HttpSession  session    ) {
 			session.invalidate();
@@ -219,6 +219,8 @@ public class UserController {
 				    System.out.println(bookmarks);
 				    log.info("personIdx = {}", personIdx);
 				    log.info("bookmarks = {}", bookmarks);
+				    
+				    mv.addObject("personIdx", personIdx);
 				    mv.addObject("bookmarks", bookmarks);
 				    mv.addObject("userType", userType);
 				    mv.setViewName("member/postingScrap");
