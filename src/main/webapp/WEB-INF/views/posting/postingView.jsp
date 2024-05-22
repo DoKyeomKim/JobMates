@@ -64,21 +64,21 @@
         <div style="margin-top:15px;">
             <h4>기업소개</h4>
             <textarea name="resumeComment" class="w-100" rows="15" style="resize:none;" readonly>
-기업 이름     :		${company.companyName}
+기업 이름		:	${company.companyName}
 
-기업 대표     :		${company.companyRepName}
+기업 대표		:	${company.companyRepName}
 
-기업 직종     :		${company.companySector}
+기업 직종		:	${company.companySector}
 
-기업 주소     :		${company.companyAddress}
+기업 주소		:	${company.companyAddress}
 
-기업 규모     :		${company.companySize}
+기업 규모		:	${company.companySize}
 
-직원 수       :		${company.companyEmp}
+직원 수		:	${company.companyEmp}
 
-설립 연도     :		${company.companyYear}
+설립 연도		:	${company.companyYear}
 
-기업 전화번호 :		${company.companyPhone}</textarea>
+기업 전화번호	:	${company.companyPhone}</textarea>
         </div>
 
         <div style="margin-top:15px;">

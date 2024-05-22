@@ -68,7 +68,6 @@ public class PostingController {
 			return new ModelAndView("redirect:/login");
 		}
 		CompanyDto company = postingMapper.getCompanyByUserIdx(userIdx);
-		System.out.println("==============================="+company);
 		
 		
 		List<PostingDto> posting = postingMapper.getPostListByUserIdx(userIdx);
@@ -97,7 +96,7 @@ public class PostingController {
 			mv.setViewName("redirect:/");
 			return mv;
 		}
-		
+
 
 		// posting_tb 갖고오기
 		PostingDto posting = postingMapper.getPostingByPostingIdx(postingIdx);

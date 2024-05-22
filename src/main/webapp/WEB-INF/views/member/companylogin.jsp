@@ -157,7 +157,7 @@
 <script>
   const  goListEl  = document.getElementById('goList');
 	goListEl.addEventListener('click', function(e) {
-		location.href = '/companyjoin';
+		location.href = '/join';
 	})
   </script>
 
