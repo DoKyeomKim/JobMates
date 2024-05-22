@@ -50,7 +50,21 @@
 
 
 
-
+    <select id="getUserBookmarks" resultType="com.job.dto.CScrapListDto">
+ SELECT 
+            COMPANY_TB.COMPANY_NAME, 
+            POSTING_TB.POSTING_TITLE, 
+            POSTING_TB.JOB_TYPE, 
+            POSTING_TB.POSTING_DEADLINE 
+        FROM 
+            POSTING_TB
+        JOIN 
+            COMPANY_TB ON POSTING_TB.USER_IDX = COMPANY_TB.USER_IDX
+        JOIN 
+            POSTING_SCRAP_TB ON POSTING_TB.POSTING_IDX = POSTING_SCRAP_TB.POSTING_IDX
+        WHERE 
+            POSTING_SCRAP_TB.PERSON_IDX = #{personIdx}
+    </select>
 
  
 

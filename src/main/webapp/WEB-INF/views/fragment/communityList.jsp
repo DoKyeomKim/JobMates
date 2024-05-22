@@ -8,7 +8,6 @@
 		<input type="text" class="form-control search-input" placeholder="검색">
 		<img alt="검색 아이콘" src="/images/search.svg" class="search-icon">
 		<img alt="삭제 아이콘" src="/images/x-circle.svg" class="clear-icon">
->>>>>>> branch 'develop' of https://github.com/DoKyeomKim/JobMates.git
 	</div>
 
 </div>

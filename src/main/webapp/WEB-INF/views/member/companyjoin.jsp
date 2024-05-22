@@ -214,24 +214,7 @@ width : 150px;}
             }
         }
     </script>
-    <script>
-       document.getElementById("checkDuplicateBtn").addEventListener("click", function() {
-                var userId = document.getElementById("comid").value;
-                var userIdMessage = document.getElementById("comIdMessage");
 
-                // 여기에 중복 확인하는 AJAX 요청 코드를 추가합니다.
-                // 이 코드는 실제로 서버에 요청을 보내 아이디 중복 여부를 확인하는 기능을 수행해야 합니다.
-
-                // 임시로 아이디가 중복되었다고 가정합니다.
-                var isDuplicate = true;
-
-                if (isDuplicate) {
-                    userIdMessage.innerHTML = "이미 사용 중인 아이디입니다.";
-                } else {
-                    userIdMessage.innerHTML = "사용 가능한 아이디입니다.";
-                }
-            });
-  </script>
   <script>
   	const  goListEl  = document.getElementById('goList');
   	goListEl.addEventListener('click', function(e) {
@@ -243,20 +226,20 @@ width : 150px;}
   </script>
   <script>
 
-const  btnIdCheckEl = document.querySelector('#btnIdCheck');
-btnIdCheckEl.onclick = function(e) {     
-	// alert('중복확인체크');
-	 const  outputEl = document.querySelector('#output');
-	 	  	 
-    let    intext    = document.querySelector('[name=com_id]');
-    // 서버 Controller에 있는 /IdDupCheck 주소를 실행 
-    fetch('/IdDupCheck1?com_id=' + intext.value)
-      .then(response => response.text())  // 서버 data 가 html
-      .then((data) => {   // data <- response.text()
-     	  console.log(data);
-		  outputEl.innerHTML = data;    	 
-      });        	 
-}
+  const  btnIdCheckEl = document.querySelector('#btnIdCheck');
+  btnIdCheckEl.onclick = function(e) {     
+  	// alert('중복확인체크');
+  	 const  outputEl = document.querySelector('#output');
+  	 	  	 
+      let    intext    = document.querySelector('[name=userId]');
+      // 서버 Controller에 있는 /IdDupCheck 주소를 실행 
+      fetch('/IdDupCheck?userId=' + intext.value)
+        .then(response => response.text())  // 서버 data 가 html
+        .then((data) => {   // data <- response.text()
+       	  console.log(data);
+  		  outputEl.innerHTML = data;    	 
+        });        	 
+  }
 
 </script>
 </body>

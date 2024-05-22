@@ -79,7 +79,7 @@
 		<hr class="container">
 	</div>
 
-	<div class="fs-6 text-truncate-2 container" id="communityContent">${community.communityContent}</div>
+	<div class="fs-6 container" id="communityContent">${community.communityContent}</div>
 	<div class="container mt-3">
 		<span>${community.communityName}</span>
 	</div>
