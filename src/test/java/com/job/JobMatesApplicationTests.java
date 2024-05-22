@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -40,7 +41,7 @@ class JobMatesApplicationTests {
 	@InjectMocks
     private MainController mainController;
 
-    @Mock
+    @Autowired
     private MainService mainService;
 
     @Mock
@@ -174,20 +175,38 @@ class JobMatesApplicationTests {
 
     @Test
     public void testFindAllSkills() {
-        List<Skill> skillList = new ArrayList<>();
-        Skill skill = new Skill();
-        skillList.add(skill);
-        when(skillRepository.findAll()).thenReturn(skillList);
+        // Mock 스킬 목록 생성
+        List<Skill> mockSkillList = new ArrayList<>();
+        mockSkillList.add(Skill.builder().skillIdx(1L).skillName("Digital Marketing").build());
+        mockSkillList.add(Skill.builder().skillIdx(2L).skillName("Java").build());
+        mockSkillList.add(Skill.builder().skillIdx(3L).skillName("JavaScript").build());
+        mockSkillList.add(Skill.builder().skillIdx(4L).skillName("Python").build());
+        mockSkillList.add(Skill.builder().skillIdx(5L).skillName("React").build());
+        mockSkillList.add(Skill.builder().skillIdx(6L).skillName("SQL").build());
 
+        // skillRepository.findAll()이 호출될 때 Mock 스킬 목록을 반환하도록 설정
+        when(skillRepository.findAll()).thenReturn(mockSkillList);
+
+        // 메인 서비스의 findAllSkills() 메서드 호출
         List<SkillDto> results = mainService.findAllSkills();
-
+        
+        System.out.println("results = "+results);
+  
+        // 결과가 null이 아닌지 확인
         assertNotNull(results);
-        assertEquals(1, results.size()); // 추가 검증: 결과 리스트의 크기 확인
-        // 추가 검증: 결과의 필드 값 확인
-        SkillDto skillDto = results.get(0);
-        assertEquals(skill.getSkillIdx(), skillDto.getSkillIdx());
-        // 다른 필드들에 대한 검증 추가...
+
+        // 결과 리스트의 크기가 6인지 확인
+        assertEquals(6, results.size());
+
+        // 결과의 필드 값이 올바른지 확인
+        for (int i = 0; i < 6; i++) {
+            SkillDto skillDto = results.get(i);
+            assertEquals((long) (i + 1), skillDto.getSkillIdx());
+            assertEquals(mockSkillList.get(i).getSkillName(), skillDto.getSkillName());
+        }
     }
+
+
 
 
     @Test
@@ -205,7 +224,6 @@ class JobMatesApplicationTests {
         List<Object[]> mockResults = new ArrayList<>();
         mockResults.add(new Object[]{mockPosting, mockCompanyFile, mockCompany});
         when(entityManager.createQuery(criteriaQuery).getResultList()).thenReturn(mockResults);
-        System.out.println("결과 값 = "+mockPosting);
         List<PostingWithFileDto> results = mainService.findPostingBySearchResult(region, experience, selectedSkills, selectedJobs);
         assertNotNull(results);
         assertEquals(1, results.size()); 

@@ -130,6 +130,7 @@ public class MainService {
 
 	public List<SkillDto> findAllSkills() {
 		List<Skill> skillList = skillRepository.findAll();
+		System.out.println("스킬 = "+skillList);
 		return skillList.stream().map(skill -> SkillDto.createSkillDto(skill)).collect(Collectors.toList());
 	}
 
