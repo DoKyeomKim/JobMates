@@ -1,16 +1,13 @@
 package com.job.mapper;
 
 import java.util.HashMap;
-
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.job.dto.CScrapListDto;
-import com.job.dto.PostingScrapDto;
 import com.job.dto.UserDto;
-
 @Mapper
 public interface UserMapper {
 

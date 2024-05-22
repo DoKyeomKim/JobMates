@@ -40,10 +40,6 @@ header {
 	line-height: 1.5; /* Adjust this value based on your line height */
 }
 
-.text-truncate-2::after {
-	content: '...'; /* 말 줄임표 추가 */
-}
-
 .search-box {
 	position: relative;
 	display: flex;

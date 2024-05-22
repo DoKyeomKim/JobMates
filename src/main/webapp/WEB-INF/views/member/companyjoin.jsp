@@ -84,15 +84,15 @@ width : 150px;}
 
     
     /* 중복아이디 존재하지 않는경우 */
-	.id_input_re_1{
-		color : green;
-		display : none;
-	}
-	/* 중복아이디 존재하는 경우 */
-	.id_input_re_2{
-		color : red;
-		display : none;
-	}
+   .id_input_re_1{
+      color : green;
+      display : none;
+   }
+   /* 중복아이디 존재하는 경우 */
+   .id_input_re_2{
+      color : red;
+      display : none;
+   }
 </style>
 <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <script>
@@ -142,6 +142,8 @@ width : 150px;}
   <main>
     <h2>기업회원가입</h2>
     <form id="companyjoin" action="/companyjoin" method="POST" onsubmit="return validateForm()">
+            <input type="hidden" name="userType" value="2" disabled>
+            <input type="hidden" name="userType" value="1" checked>
         <table>
             <tr>    
     <td>
@@ -157,7 +159,7 @@ width : 150px;}
             </tr>
             <tr>
                 <td><input type="password" name="passwd" id=pw2 placeholder="비밀번호를 다시 입력하세요" oninput="pwCheck()"/></td>
-            	</tr> <td><span id="pwConfirm">  </span></td>
+               </tr> <td><span id="pwConfirm"></span></td>
          
             <tr>
                 <td><input type="text" name="companyName"  placeholder="기업이름을 입력하세요" /></td>
@@ -171,24 +173,13 @@ width : 150px;}
             <tr>
                 <td><input type="text" name="userEmail" placeholder="이메일을 입력하세요" maxlength="20" /></td>
             </tr>
-             <tr>
-    <tr>
-    <td>
-        <div style="display: flex;">
-            <input type="checkbox" name="userType" value="2" style="margin-right: 5px; width: 20px; height: 20px;" disabled><label style="margin-right: 10px;">개인</label>
-            <input type="checkbox" name="userType" value="1" style="margin-left: 20px; margin-right: 5px; width: 20px; height: 20px;" checked><label style="margin-right: 10px;">기업</label>
 
 
-
-           
-        </div>
-    </td>
-</tr>
             <tr>
                 <td>
                     
                     <input type="button"  onclick="daumPost()" value="우편번호 찾기" />
-                    <br><input type="text" name="companyAddress" placeholder="상세주소"></br>
+                    <input type="text" name="companyAddress" placeholder="상세주소">
                 </td>
             </tr>
        
@@ -216,11 +207,11 @@ width : 150px;}
     </script>
 
   <script>
-  	const  goListEl  = document.getElementById('goList');
-  	goListEl.addEventListener('click', function(e) {
-  		location.href = '/';
-  	});
-  	
+     const  goListEl  = document.getElementById('goList');
+     goListEl.addEventListener('click', function(e) {
+        location.href = '/';
+     });
+     
 
    
   </script>
@@ -244,8 +235,3 @@ width : 150px;}
 </script>
 </body>
 </html>
-
-
-	
-
-
