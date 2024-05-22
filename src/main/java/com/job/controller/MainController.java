@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,6 +32,7 @@ import com.job.dto.CommunityDto;
 import com.job.dto.CommunityLikesDto;
 import com.job.dto.CommunityViewDto;
 import com.job.dto.CompanyDto;
+import com.job.dto.FaqDto;
 import com.job.dto.PersonDto;
 import com.job.dto.PostingDto;
 import com.job.dto.PostingScrapDto;
@@ -40,6 +42,7 @@ import com.job.dto.ResumeDto;
 import com.job.dto.ResumeFileDto;
 import com.job.dto.SkillDto;
 import com.job.dto.UserDto;
+import com.job.mapper.MainMapper;
 import com.job.service.MainService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,6 +55,9 @@ public class MainController {
 
 	@Autowired
 	private MainService mainService;
+	
+	@Autowired
+	private MainMapper mainMapper;
 
 	@GetMapping("/")
 	public ModelAndView main(HttpSession session) {
@@ -750,4 +756,15 @@ public class MainController {
         mv.addObject("size", size);
         return mv;
     }
+    
+	@RequestMapping("/faq")
+	public ModelAndView faq(FaqDto faqDto) {
+		List<FaqDto> faqlist = mainMapper.getFaqlist();
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("faqlist", faqlist); 
+		mv.setViewName("section/faq");
+		return mv;
+	
+}
+    
 }
