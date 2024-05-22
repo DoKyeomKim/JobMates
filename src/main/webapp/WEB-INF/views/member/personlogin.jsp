@@ -21,7 +21,6 @@ body {
 	padding-bottom:0.7em;
 }
 
-
 input[type="button"] {
 	font-size: 0.75rem;
 	padding: 5px 10px;
@@ -93,6 +92,5 @@ input[type="button"] {
   		location.href = '/join';
  	})
 </script>
-
 </body>
 </html>

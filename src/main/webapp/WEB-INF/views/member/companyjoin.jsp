@@ -229,7 +229,7 @@ width : 150px;}
         .then((data) => {   // data <- response.text()
             console.log(data);
           outputEl.innerHTML = data;        
-        });            
+        });
   }
 
 </script>

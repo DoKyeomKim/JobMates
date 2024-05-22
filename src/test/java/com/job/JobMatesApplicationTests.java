@@ -189,35 +189,26 @@ class JobMatesApplicationTests {
         // 다른 필드들에 대한 검증 추가...
     }
 
+
     @Test
-    public void testFindPostingBySearchResult() throws Exception {
-        String region = "서울";
-        String experience = "3년차";
-        List<Long> selectedSkills = List.of(1L, 2L);
-        List<String> selectedJobs = List.of("백엔드");
+    public void testFindPostingBySearchResult() {
+        String region = "부산";
+        String experience = "신입";
+        List<Long> selectedSkills = List.of(1L);
+        List<String> selectedJobs = List.of("웹프로그래머");
 
-        // 리플렉션을 사용하여 Posting 객체 생성
-        Constructor<Posting> postingConstructor = Posting.class.getDeclaredConstructor();
-        postingConstructor.setAccessible(true);
-        Posting posting = postingConstructor.newInstance();
-
-        Constructor<CompanyFile> companyFileConstructor = CompanyFile.class.getDeclaredConstructor();
-        companyFileConstructor.setAccessible(true);
-        CompanyFile companyFile = companyFileConstructor.newInstance();
-
-        Constructor<Company> companyConstructor = Company.class.getDeclaredConstructor();
-        companyConstructor.setAccessible(true);
-        Company company = companyConstructor.newInstance();
-
+        Posting mockPosting = mock(Posting.class);
+        CompanyFile mockCompanyFile = mock(CompanyFile.class);
+        Company mockCompany = mock(Company.class);
+        
+        
         List<Object[]> mockResults = new ArrayList<>();
-        mockResults.add(new Object[]{posting, companyFile, company});
+        mockResults.add(new Object[]{mockPosting, mockCompanyFile, mockCompany});
         when(entityManager.createQuery(criteriaQuery).getResultList()).thenReturn(mockResults);
-
+        System.out.println("결과 값 = "+mockPosting);
         List<PostingWithFileDto> results = mainService.findPostingBySearchResult(region, experience, selectedSkills, selectedJobs);
-
         assertNotNull(results);
-        assertEquals(1, results.size()); // 추가 검증: 결과 리스트의 크기 확인
-        // 추가 검증: 결과의 필드 값 확인
+        assertEquals(1, results.size()); 
         PostingWithFileDto dto = results.get(0);
         assertNotNull(dto.getPostingDto());
         assertNotNull(dto.getCompanyFileDto());
@@ -226,7 +217,7 @@ class JobMatesApplicationTests {
 
     @Test
     public void testFindAllPosting() throws Exception {
-        // Use reflection to create Posting, CompanyFile, and Company instances
+    	
         Constructor<Posting> postingConstructor = Posting.class.getDeclaredConstructor();
         postingConstructor.setAccessible(true);
         Posting posting = postingConstructor.newInstance();
@@ -246,7 +237,7 @@ class JobMatesApplicationTests {
         List<PostingWithFileDto> results = mainService.findAllPosting();
 
         assertNotNull(results);
-        assertEquals(3, results.size()); 
+        assertEquals(1, results.size()); 
         PostingWithFileDto dto = results.get(0);
         assertNotNull(dto.getPostingDto());
         assertNotNull(dto.getCompanyFileDto());

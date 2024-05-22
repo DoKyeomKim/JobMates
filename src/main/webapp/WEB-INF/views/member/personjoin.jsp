@@ -186,7 +186,7 @@ width : 150px;}
 <script>
     const btnIdCheckEl = document.querySelector('#btnIdCheck');
     btnIdCheckEl.onclick = function(e) {     
-        const outputEl = document.querySelector('#output');    
+        const outputEl = document.querySelector('#output'); 
         let intext = document.querySelector('[name=userId]');
         fetch('/IdDupCheck?userId=' + intext.value)
             .then(response => response.text())

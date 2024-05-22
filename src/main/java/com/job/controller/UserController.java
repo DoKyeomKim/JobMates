@@ -3,10 +3,10 @@ package com.job.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.job.dto.CScrapListDto;
 import com.job.dto.CompanyDto;
 import com.job.dto.CompanyFileDto;
 import com.job.dto.PersonDto;
-
 import com.job.dto.UserDto;
 import com.job.mapper.CompanyMapper;
 import com.job.mapper.PersonMapper;
+import com.job.mapper.PostingMapper;
 import com.job.mapper.UserMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +42,9 @@ public class UserController {
 	
 	@Autowired
 	private CompanyMapper companyMapper;
+	
+	@Autowired
+	private PostingMapper postingMapper;
 	
 	// 로그인 페이지
 	@GetMapping("/personlogin")
@@ -66,12 +70,12 @@ public class UserController {
 	public  String  companyjoin() {
 		return "member/companyjoin"; 
 	}
-	// 관심기업 페이지
+/*	// 관심기업 페이지
 	@GetMapping("/postingScrap")
 	public  String  postingScrap() {
 		return "member/postingScrap"; 
 	}
-	
+	*/
 	// 개인 회원가입을 한다
 	
 	@PostMapping("/personjoin")
@@ -120,6 +124,7 @@ public class UserController {
 		return mv;
 	}
 	
+
 		@GetMapping("/IdDupCheck")
 		@ResponseBody
 		public String IdDupCheck(UserDto userDto) {
@@ -190,7 +195,38 @@ public class UserController {
 					mv.setViewName("redirect:/");
 					return mv;
 				}
+				
+				@GetMapping("/postingScrap")
+				public ModelAndView view(HttpServletRequest request) {
+				    ModelAndView mv = new ModelAndView();
+				    HttpSession session = request.getSession();
+				    UserDto user = (UserDto) session.getAttribute("login");
+				    PersonDto person = postingMapper.getPersonByUserIdx(user.getUserIdx());
+				    Long userType = user.getUserType();
+				    System.out.println(person);
+				    System.out.println(person);
+				    System.out.println(person);
+				    
+				    // userId 대신 personIdx를 사용
+				    Long personIdx = person.getPersonIdx();
+				    System.out.println("----------"+personIdx);
+				    System.out.println(personIdx);
+				    System.out.println(personIdx);
+				    
+				    List<CScrapListDto> bookmarks = userMapper.getUserBookmarks(personIdx);
+				    System.out.println("2222222"+bookmarks);
+				    System.out.println(bookmarks);
+				    System.out.println(bookmarks);
+				    log.info("personIdx = {}", personIdx);
+				    log.info("bookmarks = {}", bookmarks);
+				    mv.addObject("bookmarks", bookmarks);
+				    mv.addObject("userType", userType);
+				    mv.setViewName("member/postingScrap");
 
+				    return mv;
+				}
+
+			
 				
 }
 

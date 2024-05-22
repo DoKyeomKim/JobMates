@@ -121,6 +121,7 @@ public class MainController {
 			@RequestParam("experience") String experience, @RequestParam("selectedSkills") List<Long> selectedSkills,
 			@RequestParam("selectedJobs") List<String> selectedJobs) {
 		ModelAndView mv = new ModelAndView("fragment/postResult");
+		log.info("selectedSkills = {}", selectedSkills);
 		List<PostingWithFileDto> lists = mainService.findPostingBySearchResult(region, experience, selectedSkills,
 				selectedJobs);
 		mv.addObject("posts", lists);

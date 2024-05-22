@@ -105,7 +105,6 @@ public class PostingController {
 			return mv;
 		}
 		Long userType = user.getUserType();
-		
 		mv.addObject("company", company);
 		mv.addObject("userType", userType);
 		mv.addObject("posting", posting);
