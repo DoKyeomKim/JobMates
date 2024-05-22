@@ -124,7 +124,8 @@ public class UserController {
 		return mv;
 	}
 	
-		@RequestMapping("/IdDupCheck")
+
+		@GetMapping("/IdDupCheck")
 		@ResponseBody
 		public String IdDupCheck(UserDto userDto) {
 			
@@ -133,14 +134,14 @@ public class UserController {
 			// db id 중복체크 결과(서버data) 를 html 에 돌려준다
 			
 			if ( map == null  ) {
-				return "<h2 style='color:green'>사용가능한 아이디입니다</h2>";
+				return "<h4 style='color:green'>사용가능한 아이디입니다</h4>";
 			} else {
 				if( userDto.getUserId().equals(map.get("userId"))) {
-					return "<h2 style='color:red'>사용할 수 없는 아이디입니다</h2>";			
+					return "<h4 style='color:red'>사용할 수 없는 아이디입니다</h4>";			
 				} 
 			
 			}
-			return "<h2 style='color:red'>사용할 수 없는 아이디입니다</h2>";}
+			return "<h4 style='color:red'>사용할 수 없는 아이디입니다</h4>";}
 
 		// 개인 로그아웃을 한다
 		@RequestMapping("/logout")
