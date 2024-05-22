@@ -138,7 +138,8 @@
 	 <tr>
 	   <td>비밀번호</td>
 	   <td><input type="password" name="userPw" id="userPw" /></td>
-	 </tr>	
+	 </tr>
+
 	
        <tr class="buttons">
     <td colspan="2">
