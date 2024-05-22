@@ -60,7 +60,7 @@ header {
 <%@include file="/WEB-INF/layouts/header.jsp"%>
 <input type="hidden" value="${personIdx}" id="personIdx">
   <h3 style="text-align:center;">관심기업</h3>
-<div class="tab-panel" id="book-id">
+<div class="container" id="book-id">
   <table id="scrap">
     <thead>
       <tr>
