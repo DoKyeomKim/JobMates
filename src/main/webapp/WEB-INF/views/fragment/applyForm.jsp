@@ -54,7 +54,7 @@
 			if (e.target.classList.contains('resumeSelect')) {
 				const button = e.target;
 				const resumeIdx = button.getAttribute('data-resume-idx');
-				const url = `/ResumeSelect?resumeIdx=` + resumeIdx;
+				const url = `/resumeSelect?resumeIdx=` + resumeIdx;
 				console.log(resumeIdx);
 				fetch(url, {
 					method: 'GET',
@@ -78,7 +78,7 @@
 		    const personIdx = document.querySelector('#personIdx').value;
 		    const companyIdx = document.querySelector('#companyIdx').value;
 		    const formData = new FormData(); // 필요한 데이터 추가
-		    fetch('/ApplyPosting', { 
+		    fetch('/applyPosting', { 
 		        method: 'POST',
 		        headers: {
 		            'Content-Type': 'application/json'
@@ -94,7 +94,7 @@
 		    .then(response => {
 		        alert('지원이 완료되었습니다!'); // 성공 메시지 출력
 		        window.close(); // 현재 팝업 창 닫기
-		       window.opener.location.href = '/ApplyPage'; // 부모 창을 '/ApplyPerson' 페이지로 이동
+		       window.opener.location.href = '/applyPage'; // 부모 창을 '/ApplyPerson' 페이지로 이동
 		    })
 		    .catch(error => {
 		        console.error('There has been a problem with your fetch operation:', error);

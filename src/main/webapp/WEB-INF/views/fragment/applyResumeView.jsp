@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const applyStatus = button.getAttribute('data-apply-status');
         const applyIdx = button.getAttribute('data-apply-idx');
 
-        fetch('/ApplyProcess/' + applyIdx + '/' + applyStatus, {
+        fetch('/applyProcess/' + applyIdx + '/' + applyStatus, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 부모 창이 접근 가능한지 확인
             if (window.opener && !window.opener.closed) {
                 // 업데이트된 ApplyPage 콘텐츠를 가져옴
-                fetch('/CompanyApply', {
+                fetch('/companyApply', {
                     method: 'GET',
                 })
                 .then(response => response.text())

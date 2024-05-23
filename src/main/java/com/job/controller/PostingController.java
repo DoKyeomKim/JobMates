@@ -687,14 +687,14 @@ public class PostingController {
 		// ================ 이력서 스크랩 =====================
 		
 		// 스크랩 상태 확인
-		@GetMapping("/CheckResumeScrap")
+		@GetMapping("/checkResumeScrap")
 		public ResponseEntity<Boolean> checkScrap(@RequestParam("resumeIdx") Long resumeIdx, @RequestParam("companyIdx") Long companyIdx) {
 		    boolean isScraped = postingService.checkResumeScrap(resumeIdx, companyIdx);
 		    return ResponseEntity.ok(isScraped);
 		}
 		
 	    // 스크랩 추가
-	    @PostMapping("/ResumeScrapAdd")
+	    @PostMapping("/resumeScrapAdd")
 	    @ResponseBody
 	    public Map<String, Object> addScrap(@RequestBody ResumeScrapDto resumeScrapDto) {
 	        Map<String, Object> response = new HashMap<>();
@@ -709,7 +709,7 @@ public class PostingController {
 	    }
 
 	    // 스크랩 삭제
-	    @DeleteMapping("/ResumeScrapDelete")
+	    @DeleteMapping("/resumeScrapDelete")
 	    @ResponseBody
 	    public Map<String, Object> deleteScrap(@RequestBody ResumeScrapDto resumeScrapDto) {
 	        Map<String, Object> response = new HashMap<>();

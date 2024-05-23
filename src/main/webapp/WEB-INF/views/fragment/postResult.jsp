@@ -37,7 +37,6 @@
 				</div>
 			</c:forEach>
 		</div>
-		<script src="/js/postingScrap.js"></script>
 	</c:if>
 	<c:if test="${empty posts}">
 		<p>검색 결과가 없습니다.</p>

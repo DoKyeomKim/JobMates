@@ -4,14 +4,13 @@ document.addEventListener("DOMContentLoaded", function() {
 	var searchInputs = document.querySelectorAll(".search-input"); // 수정된 부분
 	var timer; // 타이머 전역 변수 선언
 	const personIdx = document.getElementById('personIdx').value; // 현재 사용자 ID
-
-	function updateScrapButtons() {
-		const scrapButtons = document.querySelectorAll('.scrapBtn');
-		scrapButtons.forEach(function(button) {
+	function updatescrapSvgs() {
+		const scrapSvgs = document.querySelectorAll('.scrapSvg');
+		scrapSvgs.forEach(function(button) {
 			const postingIdx = button.getAttribute('data-posting-idx');
 
 			// 스크랩 상태 확인 요청
-			fetch(`/CheckScrap?postingIdx=` + postingIdx + `&personIdx=` + personIdx, {
+			fetch(`/checkScrap?postingIdx=` + postingIdx + `&personIdx=` + personIdx, {
 				method: 'GET',
 			})
 				.then(response => response.json())
@@ -28,6 +27,63 @@ document.addEventListener("DOMContentLoaded", function() {
 				});
 		});
 	}
+
+	updatescrapSvgs(); // 페이지 로드 시 스크랩 버튼 상태 갱신
+
+	document.addEventListener('click', async function(e) {
+		const button = e.target.closest('.scrapBtn'); // 상위 요소인 버튼을 찾기
+		if (button) {
+			e.preventDefault(); // 기본 동작 방지
+			e.stopPropagation(); // 이벤트 전파 방지
+			const scrapSvg = button.querySelector('.scrapSvg');
+			const postingIdx = scrapSvg.getAttribute('data-posting-idx');
+			const personIdx = document.getElementById('personIdx').value;
+			const isScraped = scrapSvg.getAttribute('data-scraped') === 'true';
+
+			try {
+				let response;
+				if (isScraped) {
+					// 스크랩 삭제 요청
+					response = await fetch(`/scrapDelete`, {
+						method: 'DELETE',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({ postingIdx, personIdx }),
+					});
+				} else {
+					// 스크랩 추가 요청
+					response = await fetch('/scrapAdd', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({ postingIdx, personIdx }),
+					});
+				}
+
+				if (response.ok) {
+					const message = isScraped ? '스크랩이 해제되었습니다.' : '스크랩되었습니다.';
+					alert(message);
+					updatescrapSvgs(); // 모든 스크랩 버튼 상태 갱신
+				} else {
+					throw new Error('네크워크 에러');
+				}
+			} catch (error) {
+				console.error('Error:', error);
+				alert('오류가 발생했습니다. 다시 시도해주세요.');
+			}
+			return; // 여기서 함수 실행 종료
+		}
+		// detail-div 클릭 시 페이지 이동 로직을 scrapSvg 로직과 별도로 처리
+		if (e.target && e.target.closest('.detail-div')) {
+			const detailDiv = e.target.closest('.detail-div');
+			const postingIdx = detailDiv.getAttribute('data-posting-idx');
+			window.location.href = '/mainPosting/' + postingIdx;
+
+		}
+	});
+
 
 
 	document.getElementById('btn-region').textContent = '지역 전국';
@@ -93,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		// URLSearchParams를 사용하여 자동으로 쿼리 스트링 생성
 		const queryString = new URLSearchParams(params).toString();
-		const url = `/SearchResult?` + queryString;
+		const url = `/searchResult?` + queryString;
 
 		fetch(url, {
 			method: 'GET',
@@ -101,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			.then(response => response.text())
 			.then(response => {
 				document.querySelector("#result").innerHTML = response;
-				updateScrapButtons();
+				updatescrapSvgs();
 			})
 			.catch(error => {
 				console.error("Error: " + error);
@@ -161,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 
 			timer = setTimeout(function() {
-				fetch("/SearchJobType?keyword=" + encodeURIComponent(keyword))
+				fetch("/searchJobType?keyword=" + encodeURIComponent(keyword))
 					.then(response => response.text())
 					.then(response => {
 						document.querySelector("#SearchJobType").innerHTML = response;

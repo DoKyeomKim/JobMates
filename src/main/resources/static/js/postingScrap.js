@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			const postingIdx = button.getAttribute('data-posting-idx');
 
 			// 스크랩 상태 확인 요청
-			fetch(`/CheckScrap?postingIdx=` + postingIdx + `&personIdx=` + personIdx, {
+			fetch(`/checkScrap?postingIdx=` + postingIdx + `&personIdx=` + personIdx, {
 				method: 'GET',
 			})
 				.then(response => response.json())
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				let response;
 				if (isScraped) {
 					// 스크랩 삭제 요청
-					response = await fetch(`/ScrapDelete`, {
+					response = await fetch(`/scrapDelete`, {
 						method: 'DELETE',
 						headers: {
 							'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					});
 				} else {
 					// 스크랩 추가 요청
-					response = await fetch('/ScrapAdd', {
+					response = await fetch('/scrapAdd', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (e.target && e.target.closest('.detail-div')) {
 			const detailDiv = e.target.closest('.detail-div');
 			const postingIdx = detailDiv.getAttribute('data-posting-idx');
-			window.location.href = '/MainPosting/' + postingIdx;
+			window.location.href = '/mainPosting/' + postingIdx;
 		
 		}
 	});

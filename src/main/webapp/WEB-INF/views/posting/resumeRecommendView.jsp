@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const resumeIdx = button.getAttribute('data-resume-idx');
 
             // 스크랩 상태 확인 요청
-            fetch(`/CheckResumeScrap?resumeIdx=` + resumeIdx + `&companyIdx=` + companyIdx, {
+            fetch(`/checkResumeScrap?resumeIdx=` + resumeIdx + `&companyIdx=` + companyIdx, {
                 method: 'GET',
             })
             .then(response => response.json())
@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 let response;
                 if (isScraped) {
                     // 스크랩 삭제 요청
-                    response = await fetch(`/ResumeScrapDelete`, {
+                    response = await fetch(`/resumeScrapDelete`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 } else {
                     // 스크랩 추가 요청
-                    response = await fetch('/ResumeScrapAdd', {
+                    response = await fetch('/resumeScrapAdd', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

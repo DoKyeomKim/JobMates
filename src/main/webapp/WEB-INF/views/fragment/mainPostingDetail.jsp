@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 async function checkApplyStatus(personIdx, postingIdx) {
-    const response = await fetch(`/ApplyCheck/` + personIdx + `/` + postingIdx, {
+    const response = await fetch(`/applyCheck/` + personIdx + `/` + postingIdx, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

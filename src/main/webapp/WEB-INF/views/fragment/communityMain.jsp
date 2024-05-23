@@ -126,7 +126,7 @@ header {
     }
 
     function loadReply(communityIdx) {
-        fetch(`/LoadReply/` + communityIdx)
+        fetch(`/loadReply/` + communityIdx)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('댓글을 불러오는 데 실패했습니다.');
@@ -155,7 +155,7 @@ header {
 
     async function loadContent(sort, page = 0) {
         try {
-            const url = `/CommunitySort?sort=` + sort + `&page=` + page + `&size=5`;
+            const url = `/communitySort?sort=` + sort + `&page=` + page + `&size=5`;
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -178,7 +178,7 @@ header {
 
     async function loadDetail(communityIdx, isPopState = false) {
         try {
-            const response = await fetch(`/CommunityDetail/` + communityIdx, {
+            const response = await fetch(`/communityDetail/` + communityIdx, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -209,7 +209,7 @@ header {
 
     async function loadWrite(userIdx) {
         try {
-            const response = await fetch(`/CommunityWrite`, {
+            const response = await fetch(`/communityWrite`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'text/html'
@@ -234,7 +234,7 @@ header {
             const svg = button.querySelector('svg');
 
             try {
-                const response = await fetch('/CheckLike/' + communityIdx + '/' + userIdx);
+                const response = await fetch('/checkLike/' + communityIdx + '/' + userIdx);
                 const isLiked = await response.json();
                 button.setAttribute('data-liked', isLiked);
                 svg.setAttribute('fill', isLiked ? 'blue' : 'currentColor');
@@ -248,7 +248,7 @@ header {
         try {
             const userIdx = document.getElementById('userIdx').value;
             const view = { userIdx: userIdx, communityIdx: communityIdx };
-            const response = await fetch('/ViewAdd', {
+            const response = await fetch('/viewAdd', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -268,7 +268,7 @@ header {
 
     async function LoadView(communityIdx) {
         try {
-            const loadViewResponse = await fetch('/LoadView', {
+            const loadViewResponse = await fetch('/loadView', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -290,7 +290,7 @@ header {
 
     async function UpdateReply(communityIdx) {
         try {
-            const UpdateReplyResponse = await fetch('/UpdateReply', {
+            const UpdateReplyResponse = await fetch('/updateReply', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -367,7 +367,7 @@ header {
                 
                 if (confirmation) {
                     try {
-                        const response = await fetch('/DeleteReply', {
+                        const response = await fetch('/deleteReply', {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -404,7 +404,7 @@ header {
                 
                 // 여기서 댓글 업데이트 요청을 서버로 보냅니다
                 try {
-                    const response = await fetch('/UpdateReply', {
+                    const response = await fetch('/updateReply', {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
@@ -458,7 +458,7 @@ header {
                 const communityIdx = likeButton.getAttribute('data-community-idx');
                 const userIdx = document.getElementById('userIdx').value;
                 const isLiked = likeButton.getAttribute('data-liked') === 'true';
-                const url = isLiked ? '/LikeDelete' : '/LikeAdd';
+                const url = isLiked ? '/likeDelete' : '/likeAdd';
                 const method = isLiked ? 'DELETE' : 'POST';
 
                 try {
@@ -475,7 +475,7 @@ header {
 
                     if (response.ok) {
                         updateLikeButtons();
-                        const loadLikesResponse = await fetch('/LoadLikes', {
+                        const loadLikesResponse = await fetch('/loadLikes', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -541,7 +541,7 @@ header {
                     var keyword = searchInput.value.trim(); // 입력된 검색어를 가져옵니다.
                     if (keyword !== '') {
                         // 검색어가 비어있지 않다면 검색 요청을 보냅니다.
-                        fetch("/SearchCommunity?keyword=" + keyword, {
+                        fetch("/searchCommunity?keyword=" + keyword, {
                             method: 'GET',
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -574,7 +574,7 @@ header {
                             replyContent: replyContent,
                             communityIdx: communityIdx
                         }
-                        fetch('/ReplyInsert', {
+                        fetch('/replyInsert', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -649,7 +649,7 @@ header {
             const sort = urlParams.get('sort');
             if (confirmation) {
                 try {
-                    fetch('/DeleteCommunity', {
+                    fetch('/deleteCommunity', {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -714,7 +714,7 @@ header {
             const form = document.getElementById('postWrite');
             const formData = new FormData(form);
 
-            fetch('/CommunityWrite', {
+            fetch('/communityWrite', {
                 method: 'POST',
                 body: formData
             })
