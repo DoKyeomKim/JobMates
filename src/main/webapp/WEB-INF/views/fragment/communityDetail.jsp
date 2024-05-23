@@ -166,7 +166,10 @@
 		<p class="container">댓글</p>
 		<div class="mt-3 reply-container">
 			<c:forEach items="${reply}" var="reply">
-				<div class="px-3 py-4" id="replyCurrentForm${reply.replyIdx}" data-reply-idx="${reply.replyIdx}">
+				<!-- Current reply form -->
+				<div class="px-3 py-4 reply-form"
+					id="replyCurrentForm${reply.replyIdx}"
+					data-reply-idx="${reply.replyIdx}">
 					<div class="d-flex justify-content-between me-2">
 						<p>${reply.replyName}</p>
 						<p>${reply.createdDate}</p>
@@ -182,9 +185,10 @@
 						</c:if>
 					</div>
 				</div>
-			</c:forEach>
-			<c:forEach items="${reply}" var="reply">
-				<div class="px-3 py-4" id="replyEditForm${reply.replyIdx}" style="display: none" data-reply-idx="${reply.replyIdx}">
+				<!-- Edit reply form -->
+				<div class="px-3 py-4 reply-form hidden"
+					id="replyEditForm${reply.replyIdx}"
+					data-reply-idx="${reply.replyIdx}">
 					<div class="d-flex justify-content-between me-2">
 						<p>${reply.replyName}</p>
 						<p>${reply.createdDate}</p>
@@ -203,6 +207,7 @@
 				</div>
 			</c:forEach>
 		</div>
+
 	</div>
 	<div class="mt-3 row">
 		<textarea class="form-control replyBox col" placeholder="댓글 달기..."

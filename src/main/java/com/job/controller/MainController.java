@@ -124,7 +124,7 @@ public class MainController {
 
 	@GetMapping("/searchResult")
 	public ModelAndView searchResult(@RequestParam("region") String region,
-			@RequestParam("experience") String experience, @RequestParam("selectedSkills") List<Long> selectedSkills, 
+			@RequestParam("experience") String experience, @RequestParam("selectedSkills") List<Long> selectedSkills,
 			@RequestParam("selectedJobs") List<String> selectedJobs, HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/postResult");
 		log.info("selectedSkills = {}", selectedSkills);
@@ -533,13 +533,13 @@ public class MainController {
 	@GetMapping("/communityDetail/{communityIdx}")
 	public ModelAndView getCommunityData(@PathVariable("communityIdx") Long communityIdx, HttpSession session,
 			HttpServletRequest request) {
-		ModelAndView mv;
+		ModelAndView mv = new ModelAndView();
 		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
 		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
 		UserDto user = (UserDto) session.getAttribute("login");
 
 		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-			mv = new ModelAndView("fragment/communityDetail");
+			mv.setViewName("fragment/communityDetail");
 			if (isLoggedIn) {
 				if (user != null) {
 					Long userType = user.getUserType();
@@ -592,15 +592,6 @@ public class MainController {
 			log.error("댓글 추가에 실패했습니다.", e);
 			return ResponseEntity.badRequest().body("댓글 추가에 실패했습니다.");
 		}
-	}
-
-	@GetMapping("/loadReply/{communityIdx}")
-	@ResponseBody
-	public List<ReplyDto> loadReply(@PathVariable("communityIdx") Long communityIdx) {
-		// 특정 게시물에 대한 댓글 조회
-		List<ReplyDto> replys = mainService.findReplysByCommunityIdx(communityIdx);
-
-		return replys;
 	}
 
 	@PostMapping("/viewAdd")
