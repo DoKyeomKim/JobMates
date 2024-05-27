@@ -1,15 +1,18 @@
 package com.job.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class UserDto {   
 	private Long userIdx;
 	private String userId;
 	private String userPw;
 	private Long userType;
-	private String userEmail;
 	private String createdDate;
+	private String userEmail;
 }

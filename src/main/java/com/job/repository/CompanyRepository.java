@@ -9,6 +9,8 @@ import com.job.entity.Company;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 	
-    Optional<Company> findByCompanyIdx(Long company_idx); 
+    Optional<Company> findByCompanyIdx(Long company_idx);
+
+	Optional<Company> findCompanyByUserUserIdx(Long userIdx); 
     
 }

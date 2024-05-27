@@ -1,5 +1,5 @@
-package com.job.repository;
 
+package com.job.repository;
 
 import java.util.Optional;
 
@@ -9,6 +9,8 @@ import com.job.entity.Person;
 
 public interface PersonRepository extends JpaRepository<Person, Long> {
 	
-    Optional<Person> findByPersonIdx(Long person_idx); 
-    
+	Optional<Person> findByUserUserIdx(Long userIdx);
+	
+	Optional<Person> findByPersonIdx(Long personIdx);
+
 }

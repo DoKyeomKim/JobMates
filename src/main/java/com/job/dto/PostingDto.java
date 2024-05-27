@@ -1,11 +1,16 @@
 package com.job.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.job.entity.Posting;
 
-@Setter
-@Getter
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PostingDto {   
 	private Long postingIdx;
 	private Long userIdx;
@@ -20,4 +25,24 @@ public class PostingDto {
 	private String jobType;
 	private String createdDate;
 	private String postingAddress;
+	
+	
+	public static PostingDto createPostingDto(Posting posting) {
+	    return new PostingDto(
+	        posting.getPostingIdx(),
+	        posting.getUser().getUserIdx(), // userIdx를 올바른 위치로 이동
+	        posting.getPostingTitle(),
+	        posting.getPostingComment(),
+	        posting.getExperience(),
+	        posting.getEmpType(),
+	        posting.getSalary(),
+	        posting.getStartTime(),
+	        posting.getEndTime(),
+	        posting.getPostingDeadline(),
+	        posting.getJobType(),
+	        posting.getCreatedDate(),
+	        posting.getPostingAddress()
+	    );
+	}
+
 }
