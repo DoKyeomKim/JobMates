@@ -12,6 +12,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 	
 	List<Reply> findReplysByCommunityCommunityIdx(Long communityIdx);
 
-	Long countByCommunityCommunityIdx(Long communityIdx); 
+	Long countByCommunityCommunityIdx(Long communityIdx);
+
+	List<Reply> findReplysByCommunityCommunityIdxOrderByCreatedDateDesc(Long communityIdx); 
     
 }

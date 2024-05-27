@@ -633,7 +633,7 @@ public class MainService {
 	}
 
 	public List<ReplyDto> findReplysByCommunityIdx(Long communityIdx) {
-		List<Reply> replyList = replyRepository.findReplysByCommunityCommunityIdx(communityIdx);
+		List<Reply> replyList = replyRepository.findReplysByCommunityCommunityIdxOrderByCreatedDateDesc(communityIdx);
 
 		return replyList.stream().map(reply -> ReplyDto.createReplyDto(reply)) // Posting 엔티티를 PostingDto로 변환
 				.collect(Collectors.toList());
@@ -653,13 +653,14 @@ public class MainService {
 				.replyContent(reply.getReplyContent()).createdDate(reply.getCreatedDate()).build();
 		log.info("replyEntity = {}", replyEntity);
 		replyRepository.save(replyEntity);
+		Long likeCount = communityLikesRepository.countByCommunityCommunityIdx(reply.getCommunityIdx());
 		Long replyCount = replyRepository.countByCommunityCommunityIdx(reply.getCommunityIdx());
 		// Community 엔티티의 좋아요 수 업데이트를 위해 Builder 사용
 		Community updatedCommunity = Community.builder().communityIdx(community.getCommunityIdx()) // 기존 Community ID
 				.communityTitle(community.getCommunityTitle()).user(community.getUser())
 				.communityName(community.getCommunityName()).communityContent(community.getCommunityContent())
 				.createdDate(community.getCreatedDate()).viewCount(community.getViewCount())
-				.likeCount(community.getLikeCount()).replyCount(replyCount).build();
+				.likeCount(likeCount).replyCount(replyCount).build();
 		communityRepository.save(updatedCommunity);
 	}
 

@@ -55,7 +55,7 @@ public class MainController {
 
 	@Autowired
 	private MainService mainService;
-	
+
 	@Autowired
 	private MainMapper mainMapper;
 
@@ -105,8 +105,8 @@ public class MainController {
 		return mv;
 	}
 
-	@GetMapping("/SearchJobType")
-	public ModelAndView SearchJobType(@RequestParam("keyword") String keyword) {
+	@GetMapping("/searchJobType")
+	public ModelAndView searchJobType(@RequestParam("keyword") String keyword) {
 		ModelAndView mv = new ModelAndView("fragment/searchBox");
 		List<PostingDto> lists = mainService.findByKeyword(keyword);
 
@@ -122,10 +122,10 @@ public class MainController {
 		return mv;
 	}
 
-	@GetMapping("/SearchResult")
+	@GetMapping("/searchResult")
 	public ModelAndView searchResult(@RequestParam("region") String region,
 			@RequestParam("experience") String experience, @RequestParam("selectedSkills") List<Long> selectedSkills,
-			@RequestParam("selectedJobs") List<String> selectedJobs) {
+			@RequestParam("selectedJobs") List<String> selectedJobs, HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/postResult");
 		log.info("selectedSkills = {}", selectedSkills);
 		List<PostingWithFileDto> lists = mainService.findPostingBySearchResult(region, experience, selectedSkills,
@@ -137,10 +137,24 @@ public class MainController {
 		log.info("skills = {}", skillList);
 		mv.addObject("skills", skillList);
 
+		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
+		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
+		UserDto user = (UserDto) session.getAttribute("login");
+		if (isLoggedIn) {
+			if (user != null) {
+				Long userType = user.getUserType();
+				log.info("user = {}", user);
+				if (userType == 2) {
+					Long userIdx = user.getUserIdx();
+					PersonDto person = mainService.findPersonByUserIdx(userIdx);
+					mv.addObject("person", person);
+				}
+			}
+		}
 		return mv;
 	}
 
-	@PostMapping("/ScrapAdd")
+	@PostMapping("/scrapAdd")
 	public ResponseEntity<?> addScrap(@RequestBody PostingScrapDto postingScrapDto) {
 		try {
 			mainService.insertPostingScrap(postingScrapDto);
@@ -150,7 +164,7 @@ public class MainController {
 		}
 	}
 
-	@DeleteMapping("/ScrapDelete")
+	@DeleteMapping("/scrapDelete")
 	public ResponseEntity<?> deleteScrap(@RequestBody PostingScrapDto postingScrapDto) {
 		try {
 			mainService.deleteScrap(postingScrapDto);
@@ -163,7 +177,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping("/CheckScrap")
+	@GetMapping("/checkScrap")
 	public ResponseEntity<?> checkScrap(@RequestParam("postingIdx") Long postingIdx,
 			@RequestParam("personIdx") Long personIdx) {
 		Long scarapCount = mainService.countPostingScrap(personIdx, postingIdx);
@@ -182,7 +196,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping("/MainPosting/{postingIdx}")
+	@GetMapping("/mainPosting/{postingIdx}")
 	public ModelAndView mainPosting(@PathVariable("postingIdx") Long postingIdx, HttpSession session) {
 		ModelAndView mv = new ModelAndView("section/mainPosting");
 		UserDto user = (UserDto) session.getAttribute("login");
@@ -242,7 +256,7 @@ public class MainController {
 		return mv;
 	}
 
-	@GetMapping("/ResumeSelect")
+	@GetMapping("/resumeSelect")
 	public ModelAndView selectResume(@RequestParam("resumeIdx") Long resumeIdx) {
 		ModelAndView mv = new ModelAndView("fragment/selectedResume");
 		ResumeDto resume = mainService.findResumeByResumeIdx(resumeIdx);
@@ -250,7 +264,7 @@ public class MainController {
 		return mv;
 	}
 
-	@PostMapping("/ApplyPosting")
+	@PostMapping("/applyPosting")
 	public ResponseEntity<?> postApply(@RequestBody ApplyDto applyDto) {
 		try {
 			mainService.insertApply(applyDto);
@@ -260,7 +274,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping("/ApplyPage")
+	@GetMapping("/applyPage")
 	public ModelAndView applyPage(HttpSession session) {
 		ModelAndView mv = new ModelAndView("section/apply");
 		UserDto user = (UserDto) session.getAttribute("login");
@@ -285,7 +299,7 @@ public class MainController {
 		return mv;
 	}
 
-	@GetMapping("/CompanyApply")
+	@GetMapping("/companyApply")
 	public ModelAndView companyApply(HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/companyApply");
 		UserDto user = (UserDto) session.getAttribute("login");
@@ -299,7 +313,7 @@ public class MainController {
 		return mv;
 	}
 
-	@GetMapping("/PersonApply")
+	@GetMapping("/personApply")
 	public ModelAndView personApply(HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/personApply");
 		UserDto user = (UserDto) session.getAttribute("login");
@@ -313,7 +327,7 @@ public class MainController {
 		return mv;
 	}
 
-	@DeleteMapping("/Applycancel/{applyIdx}")
+	@DeleteMapping("/applycancel/{applyIdx}")
 	public ResponseEntity<?> cancelApply(@PathVariable("applyIdx") Long applyIdx) {
 		try {
 			log.info("applyIdxs = {}", applyIdx);
@@ -324,7 +338,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping("/ApplyCheck/{personIdx}/{postingIdx}")
+	@GetMapping("/applyCheck/{personIdx}/{postingIdx}")
 	public ResponseEntity<Map<String, String>> checkApply(@PathVariable("personIdx") Long personIdx,
 			@PathVariable("postingIdx") Long postingIdx) {
 		try {
@@ -348,8 +362,8 @@ public class MainController {
 		}
 	}
 
-	@PatchMapping("/ApplyProcess/{applyIdx}/{applyStatus}")
-	public ResponseEntity<?> ProcessApply(@PathVariable("applyIdx") Long applyIdx,
+	@PatchMapping("/applyProcess/{applyIdx}/{applyStatus}")
+	public ResponseEntity<?> processApply(@PathVariable("applyIdx") Long applyIdx,
 			@PathVariable("applyStatus") Long applyStatus) {
 		try {
 			log.info("applyIdxs = {}", applyIdx);
@@ -360,7 +374,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping("/ApplyResumeView/{resumeIdx}/{personIdx}/{postingIdx}")
+	@GetMapping("/applyResumeView/{resumeIdx}/{personIdx}/{postingIdx}")
 	public ModelAndView resumeView(HttpSession session, @PathVariable("resumeIdx") Long resumeIdx,
 			@PathVariable("personIdx") Long personIdx, @PathVariable("postingIdx") Long postingIdx) {
 
@@ -388,7 +402,7 @@ public class MainController {
 		return mv;
 	}
 
-	@GetMapping("/Community")
+	@GetMapping("/community")
 	public ModelAndView community(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "size", defaultValue = "5") int size, HttpSession session) {
 		ModelAndView mv = new ModelAndView("section/community");
@@ -414,10 +428,11 @@ public class MainController {
 		return mv;
 	}
 
-	@GetMapping("/CommunitySort")
+	@GetMapping("/communitySort")
 	public ModelAndView getCommunityData(@RequestParam(value = "sort", defaultValue = "recent") String sort,
 			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size, HttpServletRequest request, HttpSession session) {
+			@RequestParam(value = "size", defaultValue = "5") int size, HttpServletRequest request,
+			HttpSession session) {
 		ModelAndView mv;
 		UserDto user = (UserDto) session.getAttribute("login");
 		Sort sortOrder;
@@ -463,7 +478,7 @@ public class MainController {
 		return mv;
 	}
 
-	@PostMapping("/LikeAdd")
+	@PostMapping("/likeAdd")
 	public ResponseEntity<?> addLike(@RequestBody CommunityLikesDto like) {
 		try {
 			mainService.insertLike(like);
@@ -474,7 +489,7 @@ public class MainController {
 		}
 	}
 
-	@DeleteMapping("/LikeDelete")
+	@DeleteMapping("/likeDelete")
 	public ResponseEntity<?> deleteLike(@RequestBody CommunityLikesDto like) {
 		try {
 			mainService.deleteLike(like);
@@ -486,7 +501,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping("/CheckLike/{communityIdx}/{userIdx}")
+	@GetMapping("/checkLike/{communityIdx}/{userIdx}")
 	public ResponseEntity<?> checkLike(@PathVariable("communityIdx") Long communityIdx,
 			@PathVariable("userIdx") Long userIdx) {
 		int checkLike = mainService.checkLike(communityIdx, userIdx);
@@ -504,7 +519,7 @@ public class MainController {
 		}
 	}
 
-	@PostMapping("/LoadLikes")
+	@PostMapping("/loadLikes")
 	@ResponseBody
 	public Long loadLikes(@RequestParam("communityIdx") Long communityIdx) {
 
@@ -515,16 +530,16 @@ public class MainController {
 		return loadlikes;
 	}
 
-	@GetMapping("/CommunityDetail/{communityIdx}")
+	@GetMapping("/communityDetail/{communityIdx}")
 	public ModelAndView getCommunityData(@PathVariable("communityIdx") Long communityIdx, HttpSession session,
 			HttpServletRequest request) {
-		ModelAndView mv;
+		ModelAndView mv = new ModelAndView();
 		Boolean isLoggedInObj = (Boolean) session.getAttribute("isLoggedIn");
 		boolean isLoggedIn = isLoggedInObj != null && isLoggedInObj.booleanValue();
 		UserDto user = (UserDto) session.getAttribute("login");
 
 		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-			mv = new ModelAndView("fragment/communityDetail");
+			mv.setViewName("fragment/communityDetail");
 			if (isLoggedIn) {
 				if (user != null) {
 					Long userType = user.getUserType();
@@ -544,7 +559,7 @@ public class MainController {
 		return mv;
 	}
 
-	@PostMapping("/ReplyInsert")
+	@PostMapping("/replyInsert")
 	public ResponseEntity<?> insertComment(@RequestBody ReplyDto reply, HttpSession session) {
 		try {
 			UserDto user = (UserDto) session.getAttribute("login");
@@ -579,16 +594,7 @@ public class MainController {
 		}
 	}
 
-	@GetMapping("/LoadReply/{communityIdx}")
-	@ResponseBody
-	public List<ReplyDto> loadReply(@PathVariable("communityIdx") Long communityIdx) {
-		// 특정 게시물에 대한 댓글 조회
-		List<ReplyDto> replys = mainService.findReplysByCommunityIdx(communityIdx);
-
-		return replys;
-	}
-
-	@PostMapping("/ViewAdd")
+	@PostMapping("/viewAdd")
 	public ResponseEntity<?> addView(@RequestBody CommunityViewDto view) {
 		try {
 			mainService.insertView(view);
@@ -599,7 +605,7 @@ public class MainController {
 		}
 	}
 
-	@PostMapping("/LoadView")
+	@PostMapping("/loadView")
 	@ResponseBody
 	public Long loadView(@RequestParam("communityIdx") Long communityIdx) {
 
@@ -608,7 +614,7 @@ public class MainController {
 		return loadView;
 	}
 
-	@PostMapping("/UpdateReply")
+	@PostMapping("/updateReply")
 	@ResponseBody
 	public Long updateReply(@RequestParam("communityIdx") Long communityIdx) {
 
@@ -617,7 +623,7 @@ public class MainController {
 		return updateReply;
 	}
 
-	@GetMapping("/CommunityWrite")
+	@GetMapping("/communityWrite")
 	public ModelAndView communityWriteForm(HttpSession session) {
 		ModelAndView mv = new ModelAndView("fragment/communityWrite");
 		UserDto user = (UserDto) session.getAttribute("login");
@@ -650,121 +656,125 @@ public class MainController {
 		return mv;
 	}
 
-	@PostMapping("/CommunityWrite")
+	@PostMapping("/communityWrite")
 	public ResponseEntity<?> communityWriteForm(HttpSession session, CommunityDto community) {
-	    try {
-	        UserDto user = (UserDto) session.getAttribute("login");
-	        if (user != null) {
-	            Long userType = user.getUserType();
-	            if (userType == 1) {
-	                Long userIdx = user.getUserIdx();
-	                CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
-	                community.setUserIdx(userIdx);
-	                community.setCommunityName(company.getCompanyName());
-	                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	                String currentDate = formatter.format(new Date());
-	                community.setCreatedDate(currentDate);
-	                community.setViewCount((long) 0);
-	                community.setLikeCount((long) 0);
-	                community.setReplyCount((long) 0);
-	                log.info("community = {}", community);
-	                mainService.insertCommunity(community, userIdx);
-	            } else {
-	                Long userIdx = user.getUserIdx();
-	                PersonDto person = mainService.findPersonByUserIdx(userIdx);
-	                community.setUserIdx(userIdx);
-	                community.setCommunityName(person.getPersonName());
-	                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	                String currentDate = formatter.format(new Date());
-	                community.setCreatedDate(currentDate);
-	                community.setViewCount((long) 0);
-	                community.setLikeCount((long) 0);
-	                community.setReplyCount((long) 0);
-	                log.info("community = {}", community);
-	                mainService.insertCommunity(community, userIdx);
-	            }
-	        }
-	        return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 추가되었습니다.\"}");
-	    } catch (Exception e) {
-	        log.error("게시글 추가에 실패했습니다.", e);
-	        return ResponseEntity.badRequest().body("{\"message\": \"게시글 추가에 실패했습니다.\"}");
-	    }
+		try {
+			UserDto user = (UserDto) session.getAttribute("login");
+			if (user != null) {
+				Long userType = user.getUserType();
+				if (userType == 1) {
+					Long userIdx = user.getUserIdx();
+					CompanyDto company = mainService.findCompanyByUserIdx(userIdx);
+					community.setUserIdx(userIdx);
+					community.setCommunityName(company.getCompanyName());
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+					String currentDate = formatter.format(new Date());
+					community.setCreatedDate(currentDate);
+					community.setViewCount((long) 0);
+					community.setLikeCount((long) 0);
+					community.setReplyCount((long) 0);
+					log.info("community = {}", community);
+					mainService.insertCommunity(community, userIdx);
+				} else {
+					Long userIdx = user.getUserIdx();
+					PersonDto person = mainService.findPersonByUserIdx(userIdx);
+					community.setUserIdx(userIdx);
+					community.setCommunityName(person.getPersonName());
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+					String currentDate = formatter.format(new Date());
+					community.setCreatedDate(currentDate);
+					community.setViewCount((long) 0);
+					community.setLikeCount((long) 0);
+					community.setReplyCount((long) 0);
+					log.info("community = {}", community);
+					mainService.insertCommunity(community, userIdx);
+				}
+			}
+			return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 추가되었습니다.\"}");
+		} catch (Exception e) {
+			log.error("게시글 추가에 실패했습니다.", e);
+			return ResponseEntity.badRequest().body("{\"message\": \"게시글 추가에 실패했습니다.\"}");
+		}
 	}
 
 	@PatchMapping("/updateCommunity")
 	public ResponseEntity<?> communityUpdate(HttpSession session, @RequestBody CommunityDto community) {
-	    try {
-	        	mainService.updateCommunity(community);
-	        
-	        return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 수정되었습니다.\"}");
-	    } catch (Exception e) {
-	        log.error("게시글 추가에 실패했습니다.", e);
-	        return ResponseEntity.badRequest().body("{\"message\": \"게시글 수정에 실패했습니다.\"}");
-	    }
+		try {
+			mainService.updateCommunity(community);
+
+			return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 수정되었습니다.\"}");
+		} catch (Exception e) {
+			log.error("게시글 추가에 실패했습니다.", e);
+			return ResponseEntity.badRequest().body("{\"message\": \"게시글 수정에 실패했습니다.\"}");
+		}
 	}
-	@DeleteMapping("/DeleteCommunity")
+
+	@DeleteMapping("/deleteCommunity")
 	public ResponseEntity<?> communityDelete(HttpSession session, @RequestBody CommunityDto communityDto) {
 		try {
 			mainService.deleteCommunity(communityDto);
-			
+
 			return ResponseEntity.ok().body("{\"message\": \"게시글이 성공적으로 삭제되었습니다.\"}");
 		} catch (Exception e) {
 			log.error("댓글 삭제에 실패했습니다.", e);
 			return ResponseEntity.badRequest().body("{\"message\": \"게시글 삭제에 실패했습니다.\"}");
 		}
 	}
-	@PatchMapping("/UpdateReply")
+
+	@PatchMapping("/updateReply")
 	public ResponseEntity<?> replyUpdate(HttpSession session, @RequestBody ReplyDto replyDto) {
 		try {
 			mainService.updateReply(replyDto);
-			
+
 			return ResponseEntity.ok().body("{\"message\": \"댓글이 성공적으로 수정되었습니다.\"}");
 		} catch (Exception e) {
 			log.error("댓글 수정에 실패했습니다.", e);
 			return ResponseEntity.badRequest().body("{\"message\": \"댓글 수정에 실패했습니다.\"}");
 		}
 	}
-	@DeleteMapping("/DeleteReply")
+
+	@DeleteMapping("/deleteReply")
 	public ResponseEntity<?> replyDelete(HttpSession session, @RequestBody ReplyDto replyDto) {
 		try {
 			mainService.deleteReply(replyDto);
-			
+
 			return ResponseEntity.ok().body("{\"message\": \"댓글이 성공적으로 삭제되었습니다.\"}");
 		} catch (Exception e) {
 			log.error("댓글 삭제에 실패했습니다.", e);
 			return ResponseEntity.badRequest().body("{\"message\": \"댓글 삭제에 실패했습니다.\"}");
 		}
 	}
-    @GetMapping("/SearchCommunity")
-    public ModelAndView searchCommunity(@RequestParam("keyword") String keyword, HttpServletRequest request,
-                                        @RequestParam(value = "page", defaultValue = "0") int page,
-                                        @RequestParam(value = "size", defaultValue = "5") int size) {
-        ModelAndView mv;
-        Pageable pageable = PageRequest.of(page, size);
-        Page<CommunityDto> communityPage = mainService.findCommunityByKeywordAndPage(keyword, pageable);
 
-        // AJAX 요청인지 확인
-        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-            mv = new ModelAndView("fragment/communityMain");
-        } else {
-            mv = new ModelAndView("section/community"); // 전체 페이지를 로드
-        }
+	@GetMapping("/searchCommunity")
+	public ModelAndView searchCommunity(@RequestParam("keyword") String keyword, HttpServletRequest request,
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size) {
+		ModelAndView mv;
+		Pageable pageable = PageRequest.of(page, size);
+		Page<CommunityDto> communityPage = mainService.findCommunityByKeywordAndPage(keyword, pageable);
 
-        mv.addObject("community", communityPage);
-        mv.addObject("currentPage", communityPage.getNumber());
-        mv.addObject("pageCount", communityPage.getTotalPages());
-        mv.addObject("size", size);
-        return mv;
-    }
-    
+		// AJAX 요청인지 확인
+		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+			mv = new ModelAndView("fragment/communityMain");
+		} else {
+			mv = new ModelAndView("section/community"); // 전체 페이지를 로드
+		}
+
+		mv.addObject("community", communityPage);
+		mv.addObject("currentPage", communityPage.getNumber());
+		mv.addObject("pageCount", communityPage.getTotalPages());
+		mv.addObject("size", size);
+		return mv;
+	}
+
 	@RequestMapping("/faq")
 	public ModelAndView faq(FaqDto faqDto) {
 		List<FaqDto> faqlist = mainMapper.getFaqlist();
 		ModelAndView mv = new ModelAndView();
-		mv.addObject("faqlist", faqlist); 
+		mv.addObject("faqlist", faqlist);
 		mv.setViewName("section/faq");
 		return mv;
-	
-}
-    
+
+	}
+
 }

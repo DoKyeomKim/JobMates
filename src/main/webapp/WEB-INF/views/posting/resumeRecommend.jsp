@@ -206,7 +206,7 @@
             const scrapSvgs = document.querySelectorAll('.scrapSvg');
             scrapSvgs.forEach(function (button) {
                 const resumeIdx = button.getAttribute('data-resume-idx');
-                fetch(`/CheckResumeScrap?resumeIdx=` + resumeIdx + `&companyIdx=` + companyIdx, {
+                fetch(`/checkResumeScrap?resumeIdx=` + resumeIdx + `&companyIdx=` + companyIdx, {
                     method: 'GET',
                 })
                     .then(response => response.json())
@@ -238,7 +238,7 @@
                 try {
                     let response;
                     if (isScraped) {
-                        response = await fetch(`/ResumeScrapDelete`, {
+                        response = await fetch(`/resumeScrapDelete`, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -246,7 +246,7 @@
                             body: JSON.stringify({ resumeIdx, companyIdx }),
                         });
                     } else {
-                        response = await fetch('/ResumeScrapAdd', {
+                        response = await fetch('/resumeScrapAdd', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

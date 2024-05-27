@@ -24,10 +24,10 @@
 						<td><input type="checkbox" class="processCheckbox" /></td>
 						<td>${ apply.personDto.personName }</td>
 						<td><a
-							href="/ApplyResumeView/${ apply.resumeDto.resumeIdx }/${ apply.personDto.personIdx }/${apply.postingDto.postingIdx}"
+							href="/applyResumeView/${ apply.resumeDto.resumeIdx }/${ apply.personDto.personIdx }/${apply.postingDto.postingIdx}"
 							class="text-dark text-decoration-none">${ apply.resumeDto.resumeTitle }</a></td>
 						<td>${ apply.applyDto.createdDate }</td>
-						<td><a href="/MainPosting/${ apply.postingDto.postingIdx }"
+						<td><a href="/mainPosting/${ apply.postingDto.postingIdx }"
 							class="text-dark text-decoration-none">${ apply.postingDto.postingTitle }</a></td>
 						<td class="processTd"
 							data-resume-idx="${ apply.resumeDto.resumeIdx }"
@@ -84,7 +84,7 @@
 	            var tr = checkbox.closest('tr');
 	            var applyIdx = tr.getAttribute('data-apply-idx');
 
-	            fetch('/ApplyProcess/' + applyIdx + '/' + applyStatus, {
+	            fetch('/applyProcess/' + applyIdx + '/' + applyStatus, {
 	                method: 'PATCH',
 	                headers: {
 	                    'Content-Type': 'application/json'
@@ -101,7 +101,7 @@
 	                return response.text();
 	            })
 	            .then(data => {
-	                fetch('/CompanyApply', { method: 'GET' })
+	                fetch('/companyApply', { method: 'GET' })
 	                .then(response => response.text())
 	                .then(responseText => {
 	                    document.querySelector("#section").innerHTML = responseText;
@@ -134,7 +134,7 @@
                 var resumeIdx = event.target.getAttribute('data-resume-idx');
                 var personIdx = event.target.getAttribute('data-person-idx');
                 var postingIdx = event.target.getAttribute('data-posting-idx');
-                openPopup('/ApplyResumeView/' + resumeIdx + '/' + personIdx + '/' + postingIdx);
+                openPopup('/applyResumeView/' + resumeIdx + '/' + personIdx + '/' + postingIdx);
             }
         });
         
@@ -147,7 +147,7 @@
 	        var left = (screenWidth - windowWidth) / 2;
 	        var top = (screenHeight - windowHeight) / 2;
 	        var options = 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top;
-	        window.open(url, 'ResumeView', options);
+	        window.open(url, 'resumeView', options);
 	    }
         
 	});

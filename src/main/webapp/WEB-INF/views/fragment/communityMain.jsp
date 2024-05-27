@@ -57,7 +57,13 @@ header {
 	height: 20px;
 	z-index: 10;
 }
-
+.reply-form {
+    position: relative;
+}
+.reply-form.hidden {
+    visibility: hidden;
+    position: absolute;
+}
 .search-icon {
 	left: 10px;
 	top: 50%;
@@ -114,48 +120,20 @@ header {
 </head>
 <body>
 	<input type="hidden" id="userIdx" value="${user.userIdx}">
-	
+
 	<div class="container mt-4" id="communityMain">
 		<%@ include file="/WEB-INF/views/fragment/communityList.jsp"%>
 	</div>
-<script>
+	<script>
     function loadPage(event, page) {
         event.preventDefault(); // 기본 동작(링크 이동) 방지
         const sort = event.target.getAttribute('data-sort'); // 클릭된 링크의 sort 값 가져오기
         loadContent(sort, page); // loadContent 함수 호출
     }
 
-    function loadReply(communityIdx) {
-        fetch(`/LoadReply/` + communityIdx)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('댓글을 불러오는 데 실패했습니다.');
-                }
-                return response.json();
-            })
-            .then(comments => {
-                let commentsHtml = '';
-                comments.forEach(comment => {
-                    commentsHtml += `
-                        <div class="px-3 py-4">
-                            <div class="d-flex justify-content-between">
-                                <p>` + comment.replyName + `</p> 
-                                <p>` + comment.createdDate + `</p> 
-                            </div>
-                            <p>` + comment.replyContent + `</p> 
-                        </div>`;
-                });
-                // 특정 게시물의 댓글 섹션에 댓글 목록을 업데이트합니다.
-                document.querySelector('.reply-container').innerHTML = commentsHtml;
-            })
-            .catch(error => {
-                alert(error.message);
-            });
-    }
-
     async function loadContent(sort, page = 0) {
         try {
-            const url = `/CommunitySort?sort=` + sort + `&page=` + page + `&size=5`;
+            const url = `/communitySort?sort=` + sort + `&page=` + page + `&size=5`;
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -178,7 +156,7 @@ header {
 
     async function loadDetail(communityIdx, isPopState = false) {
         try {
-            const response = await fetch(`/CommunityDetail/` + communityIdx, {
+            const response = await fetch(`/communityDetail/` + communityIdx, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -209,7 +187,7 @@ header {
 
     async function loadWrite(userIdx) {
         try {
-            const response = await fetch(`/CommunityWrite`, {
+            const response = await fetch(`/communityWrite`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'text/html'
@@ -234,7 +212,7 @@ header {
             const svg = button.querySelector('svg');
 
             try {
-                const response = await fetch('/CheckLike/' + communityIdx + '/' + userIdx);
+                const response = await fetch('/checkLike/' + communityIdx + '/' + userIdx);
                 const isLiked = await response.json();
                 button.setAttribute('data-liked', isLiked);
                 svg.setAttribute('fill', isLiked ? 'blue' : 'currentColor');
@@ -248,7 +226,7 @@ header {
         try {
             const userIdx = document.getElementById('userIdx').value;
             const view = { userIdx: userIdx, communityIdx: communityIdx };
-            const response = await fetch('/ViewAdd', {
+            const response = await fetch('/viewAdd', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -268,7 +246,7 @@ header {
 
     async function LoadView(communityIdx) {
         try {
-            const loadViewResponse = await fetch('/LoadView', {
+            const loadViewResponse = await fetch('/loadView', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -290,7 +268,7 @@ header {
 
     async function UpdateReply(communityIdx) {
         try {
-            const UpdateReplyResponse = await fetch('/UpdateReply', {
+            const UpdateReplyResponse = await fetch('/updateReply', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -367,7 +345,7 @@ header {
                 
                 if (confirmation) {
                     try {
-                        const response = await fetch('/DeleteReply', {
+                        const response = await fetch('/deleteReply', {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -395,16 +373,18 @@ header {
             if (replyEditBtn) {
                 // 댓글 수정 버튼 클릭 시
                 const replyIdx = replyEditBtn.closest('.px-3').getAttribute('data-reply-idx');
-                document.getElementById('replyCurrentForm' + replyIdx).style.display = 'none';
-                document.getElementById('replyEditForm' + replyIdx).style.display = 'block';
+                document.getElementById('replyCurrentForm' + replyIdx).style.visibility = 'hidden';
+                document.getElementById('replyCurrentForm' + replyIdx).style.position = 'absolute';
+                document.getElementById('replyEditForm' + replyIdx).style.visibility = 'visible';
+                document.getElementById('replyEditForm' + replyIdx).style.position = 'relative';
             } else if (replyEditSave) {
                 // 댓글 저장 버튼 클릭 시
                 const replyIdx = replyEditSave.closest('.px-3').getAttribute('data-reply-idx');
                 const newContent = document.getElementById('replyEditForm' + replyIdx).querySelector('.replyeditContent').value;
-                
+                const communityIdx = document.getElementById('communityIdx').value;
                 // 여기서 댓글 업데이트 요청을 서버로 보냅니다
                 try {
-                    const response = await fetch('/UpdateReply', {
+                    const response = await fetch('/updateReply', {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
@@ -417,9 +397,7 @@ header {
 
                     if (response.ok) {
                         // 성공적으로 업데이트되면 UI를 업데이트합니다
-                        document.getElementById('replyCurrentForm' + replyIdx).querySelector('.replyContent').textContent = newContent;
-                        document.getElementById('replyCurrentForm' + replyIdx).style.display = 'block';
-                        document.getElementById('replyEditForm' + replyIdx).style.display = 'none';
+                    	loadDetail(communityIdx);
                     } else {
                         alert('댓글 업데이트에 실패했습니다.');
                     }
@@ -430,8 +408,10 @@ header {
             } else if (replyDeleteCancel) {
                 // 댓글 수정 취소 버튼 클릭 시
                 const replyIdx = replyDeleteCancel.closest('.px-3').getAttribute('data-reply-idx');
-                document.getElementById('replyCurrentForm' + replyIdx).style.display = 'block';
-                document.getElementById('replyEditForm' + replyIdx).style.display = 'none';
+                document.getElementById('replyEditForm' + replyIdx).style.visibility = 'hidden';
+                document.getElementById('replyEditForm' + replyIdx).style.position = 'absolute';
+                document.getElementById('replyCurrentForm' + replyIdx).style.visibility = 'visible';
+                document.getElementById('replyCurrentForm' + replyIdx).style.position = 'relative';
             }
             
             
@@ -458,7 +438,7 @@ header {
                 const communityIdx = likeButton.getAttribute('data-community-idx');
                 const userIdx = document.getElementById('userIdx').value;
                 const isLiked = likeButton.getAttribute('data-liked') === 'true';
-                const url = isLiked ? '/LikeDelete' : '/LikeAdd';
+                const url = isLiked ? '/likeDelete' : '/likeAdd';
                 const method = isLiked ? 'DELETE' : 'POST';
 
                 try {
@@ -475,7 +455,7 @@ header {
 
                     if (response.ok) {
                         updateLikeButtons();
-                        const loadLikesResponse = await fetch('/LoadLikes', {
+                        const loadLikesResponse = await fetch('/loadLikes', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -541,7 +521,7 @@ header {
                     var keyword = searchInput.value.trim(); // 입력된 검색어를 가져옵니다.
                     if (keyword !== '') {
                         // 검색어가 비어있지 않다면 검색 요청을 보냅니다.
-                        fetch("/SearchCommunity?keyword=" + keyword, {
+                        fetch("/searchCommunity?keyword=" + keyword, {
                             method: 'GET',
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -574,7 +554,7 @@ header {
                             replyContent: replyContent,
                             communityIdx: communityIdx
                         }
-                        fetch('/ReplyInsert', {
+                        fetch('/replyInsert', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -587,7 +567,7 @@ header {
                                 }
                             })
                             .then(data => {
-                                loadReply(communityIdx);
+                            	 loadDetail(communityIdx);
                                 UpdateReply(communityIdx);
                             })
                             .catch(error => {
@@ -649,7 +629,7 @@ header {
             const sort = urlParams.get('sort');
             if (confirmation) {
                 try {
-                    fetch('/DeleteCommunity', {
+                    fetch('/deleteCommunity', {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
@@ -714,7 +694,7 @@ header {
             const form = document.getElementById('postWrite');
             const formData = new FormData(form);
 
-            fetch('/CommunityWrite', {
+            fetch('/communityWrite', {
                 method: 'POST',
                 body: formData
             })
@@ -739,7 +719,7 @@ header {
     }
     window.onload = removeQueryParamsFromUrl;
 </script>
-	
+
 
 	<script src="/js/bootstrap.bundle.min.js"></script>
 </body>
