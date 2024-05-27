@@ -20,7 +20,7 @@ footer {
 
 header {
 	background-color: #e0f7fa;
-}
+} 
 </style>
 
 </head>
