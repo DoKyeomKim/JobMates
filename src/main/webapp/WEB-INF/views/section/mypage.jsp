@@ -17,17 +17,31 @@ footer {
     width: 100%;
     padding: 20px 0;
     text-align: center;
+	z-index: 1000;
 }
 
 header {
-    background-color: #e0f7fa;
+	background-color: #e0f7fa;
+	position: fixed;
+	top: 0;
+	height:100px;
+	width: 100%;
+	z-index: 1000;
 }
+
+
+section {
+    position: relative;
+    top: 100px;
+    margin-top: 0;
+    margin-left: 220px; /* 사이드바(nav)의 너비에 따라 조정 */
+    width: calc(100% - 220px); /* 사이드바(nav)의 너비에 따라 조정 */
+}
+
 
 .card-body {
     width: 60%;
     margin: 0 auto;
-    margin-top: 60px; 
-    margin-left:450px;
     border: 0.5px solid #ccc;
     padding: 0;
     box-sizing: border-box;
@@ -39,10 +53,7 @@ label {
     height: 60px;
     display: flex;
     align-items: center; /* 상하 가운데 정렬 */
-    padding-left: 10px;
-    padding-right: 10px;
     box-sizing: border-box;
-    margin: 0;
     width: 100%;
 }
 
@@ -60,13 +71,16 @@ label {
     border-bottom: 1px solid #ccc;
 }
 
+
 /* 사이드바 스타일링 */
 .sidenav {
     background-color: #f1f1f1;
-    position: fixed;
+    position: absolute; /* 변경된 부분 */
+    top: 100px; /* 헤더(header)의 높이에 따라 조정 */
     width: 200px;
-    height: 100%;
-    padding-top: 20px; /* padding 추가 */
+    z-index: 100;
+    min-height: 100%;
+    padding-top: 20px;
 }
 
 .sidenav ul {
@@ -103,7 +117,6 @@ padding-left : 30px;
     <%@include file="/WEB-INF/layouts/header.jsp"%>
 
     <!-- 사이드바 -->
-    <aside>
         <nav class="col-sm-3 sidenav">
             <h4 class="mb-4 mt-4" style="text-align:center;">마이페이지</h4>
             <ul class="nav flex-column">
@@ -112,68 +125,66 @@ padding-left : 30px;
                 <li class="nav-item"><a class="nav-link" href="/accountDeleteForm">회원 탈퇴</a></li>
             </ul>
         </nav>
-    </aside>
     <!-- 사이드바 끝 -->
-
     <section>
         <div class="info">
             <div class="card-header">
-                <h3 class="card-title mt-5" style="text-align:center;">회원정보 보기</h3>
+                <h3 class="card-title mt-5 mb-5" style="text-align:center;">회원정보 보기</h3>
             </div>            
             
             <form class="form-horizontal" action="/mypageUpdateForm">
-                <div class="card-body">
+                <div class="card-body mt-5">
                     <div class="form-group row">
-                        <label for="inputEmail3" class="col-sm-1 col-form-label">아이디</label>
+                        <label for="inputEmail3" class="col-sm-1 col-form-label" style="width:10%;">아이디</label>
                         <div class="col-sm-7">
                             <span>${userId}</span>
                         </div>
                     </div>
                                         
                     <div class="form-group row">
-                        <label for="inputPassword3" class="col-sm-1 col-form-label">주소</label>
+                        <label for="inputPassword3" class="col-sm-1 col-form-label" style="width:10%;">주소</label>
                         <div class="col-sm-7" style="width:50%;">
                             <span>${person.personAddress}</span>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="inputPassword3" class="col-sm-1 col-form-label">생년월일</label>
+                        <label for="inputPassword3" class="col-sm-1 col-form-label" style="width:10%;">생년월일</label>
                         <div class="col-sm-7" style="width:50%;">
                             <span>${person.personBirth}</span>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="inputPassword3" class="col-sm-1 col-form-label">학력</label>
+                        <label for="inputPassword3" class="col-sm-1 col-form-label"  style="width:10%;">학력</label>
                         <div class="col-sm-7" style="width:50%;">
                             <span>${person.personEducation}</span>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="inputPassword3" class="col-sm-1 col-form-label">이름</label>
+                        <label for="inputPassword3" class="col-sm-1 col-form-label"  style="width:10%;">이름</label>
                         <div class="col-sm-7" style="width:50%;">
                             <span>${person.personName}</span>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="inputPassword3" class="col-sm-1 col-form-label">전화번호</label>
+                        <label for="inputPassword3" class="col-sm-1 col-form-label"  style="width:10%;">전화번호</label>
                         <div class="col-sm-7" style="width:50%;">
                             <span>${person.personPhone}</span>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="inputPassword3" class="col-sm-1 col-form-label">이메일</label>
+                        <label for="inputPassword3" class="col-sm-1 col-form-label"  style="width:10%;">이메일</label>
                         <div class="col-sm-7" style="width:50%;">
                             <span>${userEmail}</span>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="inputPassword3" class="col-sm-1 col-form-label">기술 스택</label>
+                        <label for="inputPassword3" class="col-sm-1 col-form-label"  style="width:10%;">기술 스택</label>
                         <div class="col-auto" style="padding-left:25px;" >
                         <c:forEach var="skill" items="${skill}">
                                <div style="margin-left:15px;"class="btn btn-outline-primary">${skill.skillName}</div>
