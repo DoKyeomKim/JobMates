@@ -35,7 +35,7 @@ public class MypageController {
 	@Autowired
 	private PostingMapper postingMapper;
 	
-	// 개인 마이페이지
+	// 마이페이지
 	@RequestMapping("/mypage")
 	public ModelAndView mypage(HttpSession session) {
 		UserDto user = (UserDto) session.getAttribute("login");
